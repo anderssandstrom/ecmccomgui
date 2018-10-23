@@ -1,10 +1,50 @@
+import sys
+import epics
 import numpy as np
+from PyQt5 import QtCore,QtWidgets, QtGui
+import random
 
 PARSE_ERROR_ELEMENT_COUNT_OUT_OF_RANGE = 1000
 ELEMENT_COUNT = 30
 
-class ecmcArrayStat:
-  def __init__(self):
+list1 = ['', 'chemistry', 1997, 2000]
+
+description = [
+    'axId',
+    'posSet',
+    'posAct',
+    'posErr',
+    'posTarg',
+    'posErrTarg',
+    'posRaw',
+    'cntrlOut',
+    'velSet',
+    'velAct',
+    'velFFraw',
+    'velRaw',
+    'cycleCounter',
+    'error',
+    'command',
+    'cmdData',
+    'seqState',
+    'ilock',
+    'ilockLastActive',
+    'trajSource',
+    'encSource',
+    'enable',
+    'enabled',
+    'execute',
+    'busy',
+    'atTarget',
+    'homed',
+    'lowLim',
+    'highLim',
+    'homeSensor',
+]
+
+class ecmcArrayStat(QtWidgets.QFrame):
+  def __init__(self,parent=None):
+    super(ecmcArrayStat, self).__init__(parent)
     self.axId=0
     self.posSet=0
     self.posAct=0
@@ -35,12 +75,43 @@ class ecmcArrayStat:
     self.lowLim=0
     self.highLim=0
     self.homeSensor=0
+    
+    self.axisDiagPvName=""
+
+    self.stdItemArrayName=[]
+    self.stdItemArrayData=[]
+    
+    self.create_GUI()
     return
 
+  def create_GUI(self):
+    self.table = QtWidgets.QTableView(self)  # SELECTING THE VIEW
+    self.table.setGeometry(0, 0, 575, 575)
+    self.model = QtGui.QStandardItemModel(self)  # SELECTING THE MODEL - FRAMEWORK THAT HANDLES QUERIES AND EDITS
+    self.table.setModel(self.model)  # SETTING THE MODEL
+    self.populate()
+    self.show()
+
+  def populate(self):
+    for i in range(0,ELEMENT_COUNT-1):
+      row= []
+      cell=QtGui.QStandardItem(description[i])
+      self.stdItemArrayName.append(cell)
+      row.append(cell)
+      cell=QtGui.QStandardItem('value'+str(i))
+      self.stdItemArrayData.append(cell)
+      row.append(cell)      
+      self.model.appendRow(row)
+      
   def parseAxisStatArray(self,charData):
     dataList=charData.split(',')
     if len(dataList)!=ELEMENT_COUNT:
       return PARSE_ERROR_ELEMENT_COUNT_OUT_OF_RANGE
+
+    #Update table view  
+    for i in range(0,ELEMENT_COUNT-1):
+      self.stdItemArrayData[i].setData(dataList[i],role=QtCore.Qt.DisplayRole)
+    
 
     self.axId=int(dataList[0])
     self.posSet=float(dataList[1])
@@ -72,7 +143,28 @@ class ecmcArrayStat:
     self.lowLim=int(dataList[27])
     self.highLim=int(dataList[28])
     self.homeSensor=int(dataList[29])
-    return
+
+  def onChangeAxisDiagPv(self,pvname=None, value=None, char_value=None, **kw):
+    errorCode=self.parseAxisStatArray(char_value)
+    if errorCode:
+      print("Parse failed with error code: " + str(errorCode))
+    self.printInfo()
+
+  def connect(self, pvname):
+    if pvname is None:            
+      raise RuntimeError("pvname must not be 'None'")
+
+    if len(pvname)==0:
+      raise RuntimeError("pvname must not be ''")
+    
+    self.axisDiagPvName = pvname
+    self.axisDiagPv = epics.PV(self.axisDiagPvName)
+    self.axisDiagPv.add_callback(self.onChangeAxisDiagPv)
+    
+
+  def disconnect(self):
+    if self.axisDiagPv is not None:
+      self.axisDiagPv.clear_callbacks()
 
   def printInfo(self):
     print("axId             :  " + str(self.axId))

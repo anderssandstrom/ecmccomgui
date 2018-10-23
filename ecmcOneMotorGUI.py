@@ -1,7 +1,17 @@
 import epics
 import sys
 from PyQt5 import QtWidgets, QtGui
+from ecmcArrayStat import *
 
+#Define pvs
+# Axis
+ECMC_PV_AXIS_DIAG_ARRAY_SUFFIX =       '-Array-Stat'
+ECMC_PV_AXIS_ERROR_RESET_SUFFIX =      '-ErrRst'
+# Controller
+ECMC_PV_CNTROLLER_ERROR_ID_SUFFIX =    'MCU-ErrId'
+ECMC_PV_CNTROLLER_ERROR_MSG_SUFFIX =   'MCU-ErrMsg'
+ECMC_PV_CNTROLLER_ERROR_RESET_SUFFIX = 'MCU-ErrRst'
+ECMC_PV_CNTROLLER_ERROR_CND_SUFFIX =   'MCU-Cmd'
 
 BLANK = ' '*4
 BACKGROUND_DEFAULT = '#efefef'
@@ -22,6 +32,7 @@ TOOLTIPS = {
         'TWR':  'TWR: decrement motor by tweak value',
         '*10':  'multiply tweak value by 10',
         '/10':  'divide tweak value by 10',
+        'CNEN': 'enable/disable drive'
 }
 STYLES = {      ### http://doc.qt.digia.com/qt/stylesheet-reference.html
     'self': '''
@@ -76,6 +87,19 @@ STYLES = {      ### http://doc.qt.digia.com/qt/stylesheet-reference.html
                    text-align: center;
                    }
             ''',
+    'CNEN': '''
+            QPushButton { 
+                   background-color: red;
+                   color: black;
+                   text-align: center;
+                   }
+            QPushButton:hover { 
+                   background-color: red;
+                   color: yellow;
+                   font: bold;
+                   text-align: center;
+                   }
+            ''',
     'TWV': '''
             QLineEdit { 
                    background-color: lightgray;
@@ -113,30 +137,30 @@ STYLES = {      ### http://doc.qt.digia.com/qt/stylesheet-reference.html
 }
 
 class MotorPanel(QtWidgets.QDialog):
-    '''
-    Basic GUI for one EPICS motor pv
     
-    USAGE::
-
-        panel = MotorPanel()
-        panel.connect('como:m1')
-        ...
-        panel.connect('como:m2')    # changes the panel to a different PV
-        ...
-        panel.disconnect()
-
-    '''
-    
-    def __init__(self, parent=None, pvname=None):
+    def __init__(self, parent=None,iocPrefix=None,axisName=None):
         super(MotorPanel, self).__init__(parent)
         QtWidgets.QToolTip.setFont(QtGui.QFont('SansSerif', 10))
-        
+        self.motorPv = None
+        self.motorPvName = ""
+        self.axisDiagPvName=""
+        self.axisErrorResetPv = None
+        self.axisErrorResetPvName = ""
+        self.cntrlErrorIdPv = None
+        self.cntrlErrorIdPvName = ""
+        self.cntrlErrorResetPv = None
+        self.cntrlErrorResetPvName = ""
+        self.cntrlErrorMsgPv = None
+        self.cntrlErrorMsgPvName = ""
+        self.cntrlErrorMsg=""
+        self.cntrlCmdPv = None
+        self.cntrlCmdPvName = ""
         self.create_GUI()
         self.apply_styles()
         self.create_actions()
-        
-        if isinstance(pvname, str):
-            self.connect(pvname)
+
+        if isinstance(axisName, str) and  isinstance(iocPrefix, str):
+            self.connect(iocPrefix,axisName)
 
     def create_GUI(self):
         '''define controls AND set the layout'''    
@@ -150,30 +174,50 @@ class MotorPanel(QtWidgets.QDialog):
         self.controls['TWR'] = QtWidgets.QPushButton('&lt;',default=False, autoDefault=False)
         self.controls['*10'] = QtWidgets.QPushButton('*',default=False, autoDefault=False)
         self.controls['/10'] = QtWidgets.QPushButton('/',default=False, autoDefault=False)
-        self.pv = None
+        self.controls['CNEN'] = QtWidgets.QPushButton('CNEN',default=False, autoDefault=False)
+        
         self.controls['RBV'].setAutoFillBackground(True)
         self.setLabelBackground(self.controls['RBV'], BACKGROUND_DONE_MOVING)
         
-        layout = QtWidgets.QVBoxLayout()
+        main_frame= QtWidgets.QFrame(self)
+        main_layout = QtWidgets.QHBoxLayout()
+   
+        sub_frame = QtWidgets.QFrame(self)
+        sub_layout = QtWidgets.QVBoxLayout()
         for field in ['DESC', 'NAME', 'EGU', 'RBV', 'VAL']:
-            layout.addWidget(self.controls[field])
+            sub_layout.addWidget(self.controls[field])
         
         tweak_frame = QtWidgets.QFrame(self)
         tweak_layout = QtWidgets.QHBoxLayout()
         for field in ['TWR', '/10', 'TWV', '*10', 'TWF']:
             tweak_layout.addWidget(self.controls[field])
         tweak_frame.setLayout(tweak_layout)
-        layout.addWidget(tweak_frame)
+        sub_layout.addWidget(tweak_frame)
         
-        layout.addWidget(self.controls['STOP'])
+        sub_layout.addWidget(self.controls['STOP'])
+        sub_layout.addWidget(self.controls['CNEN'])
 
-        self.setLayout(layout)
-        self.setWindowTitle("Motor panel")
+        sub_frame.setLayout(sub_layout)
+
+        main_layout.addWidget(sub_frame)
+
+        self.arrayStat=ecmcArrayStat(self)        
+        self.arrayStat.setMinimumSize(200,200)
+        main_layout.addWidget(self.arrayStat)
+        
+        main_frame.setLayout(main_layout)
+
+
+        
+
+        self.setLayout(main_layout)
+        self.setWindowTitle("ECMC Motor panel")
+        
 
     def apply_styles(self):
         '''apply styles and tips'''     
         for field in ['DESC', 'NAME', 'EGU', 'RBV', 'VAL', 
-                      'STOP', 'TWV', 'TWF', 'TWR', '*10', '/10']:
+                      'STOP','CNEN','TWV', 'TWF', 'TWR', '*10', '/10']:
             if field in STYLES:
                 self.controls[field].setStyleSheet(STYLES[field])
             if field in TOOLTIPS:
@@ -190,21 +234,34 @@ class MotorPanel(QtWidgets.QDialog):
         self.controls['*10'].clicked.connect(self.onPush10x)
         self.controls['/10'].clicked.connect(self.onPush_1x)
         self.controls['STOP'].clicked.connect(self.onPushSTOP)
+        self.controls['CNEN'].clicked.connect(self.onPushCNEN)
 
-    def connect(self, pvname=None):
+    def setPvNames(self,iocPrefix=None,axisName=None):
+        self.motorPvName = (iocPrefix + axisName).split('.')[0]  # keep everything to left of first dot
+        self.axisDiagPvName = self.motorPvName + ECMC_PV_AXIS_DIAG_ARRAY_SUFFIX
+        self.axisErrorResetPvName = self.motorPvName + ECMC_PV_AXIS_ERROR_RESET_SUFFIX
+        self.cntrlErrorIdPvName = iocPrefix + ECMC_PV_CNTROLLER_ERROR_ID_SUFFIX
+        self.cntrlErrorResetPvName = iocPrefix + ECMC_PV_CNTROLLER_ERROR_RESET_SUFFIX
+        self.cntrlErrorMsgPvName = iocPrefix + ECMC_PV_CNTROLLER_ERROR_MSG_SUFFIX
+        self.cntrlCmdPvName = iocPrefix + ECMC_PV_CNTROLLER_ERROR_CND_SUFFIX
+
+    def connect(self, iocPrefix=None,axisName=None):
         '''connect this panel with an EPICS motor PV'''
-        if pvname is None:            
-            raise RuntimeError("lbl_name must not be 'None'")
-        if len(pvname) == 0:
-            raise RuntimeError("lbl_name must not be ''")
+        if iocPrefix is None:            
+            raise RuntimeError("iocPrefix must not be 'None'")
+        if axisName is None:            
+            raise RuntimeError("axisName must not be 'None'")
         
-        if self.pv is not None:
+        self.setPvNames(iocPrefix,axisName)
+
+        if len(iocPrefix) == 0 or len(axisName) == 0:
+            raise RuntimeError("iocPrefix or axisName must not be ''")
+        
+        if self.motorPv is not None:
             self.disconnect()
         
-        self.motor_pv = pvname.split('.')[0]   # keep everything to left of first dot
-        
-        self.controls['NAME'].setText(self.motor_pv)
-        self.pv = epics.Motor(str(self.motor_pv))   # verifies that self.motor_pv has RTYP='motor'
+        self.controls['NAME'].setText(self.motorPvName)
+        self.motorPv = epics.Motor(str(self.motorPvName))   # verifies that self.motor_pv has RTYP='motor'
 
         callback_dict = {
             #field:  callback function
@@ -216,28 +273,51 @@ class MotorPanel(QtWidgets.QDialog):
             'DMOV': self.onChangeDMOV,
             'HLS':  self.onChangeHLS,
             'LLS':  self.onChangeLLS,
+            'CNEN': self.onChangeCNEN,
         }
         for field, func in callback_dict.items():
-            self.pv.set_callback(attr=field, callback=func)
+            self.motorPv.set_callback(attr=field, callback=func)
 
-        self.controls['DESC'].setText(self.pv.description)
-        self.controls['EGU'].setText(self.pv.units)
+        self.controls['DESC'].setText(self.motorPv.description)
+        self.controls['EGU'].setText(self.motorPv.units)
         
         # display initial values
-        self.onChangeRBV(value=self.pv.get('RBV'))
-        self.onChangeVAL(value=self.pv.get('VAL'))
-        self.onChangeTWV(value=self.pv.get('TWV'))
-        self.onChangeDMOV(value=self.pv.get('DMOV'))
+        self.onChangeRBV(value=self.motorPv.get('RBV'))
+        self.onChangeVAL(value=self.motorPv.get('VAL'))
+        self.onChangeTWV(value=self.motorPv.get('TWV'))
+        self.onChangeDMOV(value=self.motorPv.get('DMOV'))
+        self.onChangeCNEN(value=self.motorPv.get('CNEN'))
+        
+        # additional records
+        self.axisErrorResetPv = epics.PV(self.axisErrorResetPvName)
+        self.cntrlErrorIdPv = epics.PV(self.cntrlErrorIdPvName)
+        self.cntrlErrorIdPv.add_callback(self.onChangeCntrlErrorIdPv)
+        self.cntrlErrorResetPv = epics.PV(self.cntrlErrorResetPvName)
+        self.cntrlErrorMsgPv = epics.PV(self.cntrlErrorMsgPvName)
+        self.cntrlCmdPv = epics.PV(self.cntrlCmdPvName)
+        self.cntrlCmdPv.add_callback(self.onChangeCntrlCmdPv)
+        if self.arrayStat is not None:
+          self.arrayStat.connect(self.axisDiagPvName)
 
     def disconnect(self):
         '''disconnect this panel from EPICS'''
-        if self.pv is not None:
+        if self.motorPv is not None:
             for field in ['VAL', 'RBV', 'DESC', 'EGU', 'TWV', 'DMOV', 'HLS', 'LLS']:
-                self.pv.clear_callback(attr=field)
-            #self.pv.disconnect()   # There is no disconnect() method!
-            self.pv = None
+                self.motorPv.clear_callback(attr=field)
+            #self.motorPv.disconnect()   # There is no disconnect() method!
+            self.motorPv = None
             for field in ['DESC', 'NAME', 'EGU', 'RBV', 'VAL', 'TWV']:
                 self.controls[field].setText(BLANK)
+
+        if self.cntrlErrorIdPv is not None:
+            self.cntrlErrorIdPv.clear_callbacks()
+        if self.cntrlCmdPv is not None:
+            self.cntrlCmdPv.clear_callbacks()
+
+        if self.arrayStat is not None:
+          self.arrayStat.disconnect()
+
+
 
     def closeEvent(self, event):
         '''be sure to disconnect from EPICS when closing'''
@@ -245,40 +325,52 @@ class MotorPanel(QtWidgets.QDialog):
 
     def onPushSTOP(self):
         '''stop button was pressed'''
-        if self.pv is not None:
-            self.pv.stop()
+        if self.motorPv is not None:
+            self.motorPv.stop()
+
+    def onPushCNEN(self):
+        '''cnen button was pressed'''
+        if self.motorPv is not None:
+            self.motorPv.put('CNEN',not self.motorPv.get('CNEN'))
 
     def onPushTWF(self):
         '''tweak forward button was pressed'''
-        if self.pv is not None:
-            self.pv.put('TWF', 1)
+        if self.motorPv is not None:
+            self.motorPv.put('TWF', 1)
 
     def onPushTWR(self):
         '''tweak reverse button was pressed'''
-        if self.pv is not None:
-            self.pv.put('TWR', 1)
+        if self.motorPv is not None:
+            self.motorPv.put('TWR', 1)
 
     def onPush10x(self):
         '''multiply TWV*10 button was pressed'''
-        if self.pv is not None:
-            self.pv.put('TWV', 10*self.pv.get('TWV'))
+        if self.motorPv is not None:
+            self.motorPv.put('TWV', 10*self.motorPv.get('TWV'))
 
     def onPush_1x(self):
         '''multiply TWV*0.1 button was pressed'''
-        if self.pv is not None:
-            self.pv.put('TWV', 0.1*self.pv.get('TWV'))
+        if self.motorPv is not None:
+            self.motorPv.put('TWV', 0.1*self.motorPv.get('TWV'))
 
     def onReturnTWV(self):
         '''new target value was entered in this panel'''
-        if self.pv is not None:
+        if self.motorPv is not None:
             number = float(self.controls['TWV'].text())
-            self.pv.put('TWV', number)
+            self.motorPv.put('TWV', number)
 
     def onReturnVAL(self):
         '''new target value was entered in this panel'''
-        if self.pv is not None:
+        if self.motorPv is not None:
             number = float(self.controls['VAL'].text())
-            self.pv.move(number)
+            self.motorPv.move(number)
+
+    def onChangeCNEN(self, value = None, **kws):
+        '''EPICS monitor on DESC called this'''
+        if value:
+            self.controls['CNEN'].setStyleSheet("background-color: green")
+        else:
+            self.controls['CNEN'].setStyleSheet("background-color: red")
 
     def onChangeDESC(self, char_value=None, **kws):
         '''EPICS monitor on DESC called this'''
@@ -309,20 +401,31 @@ class MotorPanel(QtWidgets.QDialog):
     def onChangeRBV(self, value=None, **kws):
         '''EPICS monitor on RBV called this'''
         if value is not None:
-            fmt = "%%.%df" % self.pv.get('PREC')
+            fmt = "%%.%df" % self.motorPv.get('PREC')
             self.controls['RBV'].setText(fmt % value)
 
     def onChangeTWV(self, value=None, **kws):
         '''EPICS monitor on TWV called this'''
         if value is not None:
-            fmt = "%%.%df" % self.pv.get('PREC')
+            fmt = "%%.%df" % self.motorPv.get('PREC')
             self.controls['TWV'].setText(fmt % value)
 
     def onChangeVAL(self, value=None, **kws):
         '''EPICS monitor on VAL called this'''
         if value is not None:
-            fmt = "%%.%df" % self.pv.get('PREC')
+            fmt = "%%.%df" % self.motorPv.get('PREC')
             self.controls['VAL'].setText(fmt % value)
+
+    def onChangeCntrlErrorIdPv(self,pvname=None, value=None, char_value=None, **kw):
+        print("onChangeCntrlErrorIdPv"+ char_value )
+        self.cntrlErrorMsg=self.cntrlErrorMsgPv.get(as_string=True)
+        print("new Error message: " +str(self.cntrlErrorMsg))
+
+    def onChangeCntrlErrorMsgPv(self,pvname=None, value=None, char_value=None, **kw):
+        print("onChangeCntrlErrorMsgPv:" + char_value)
+
+    def onChangeCntrlCmdPv(self,pvname=None, value=None, char_value=None, **kw):
+        print("onChangeCntrlCmdPv")
 
     def setLabelBackground(self, widget = None, color = BACKGROUND_DEFAULT):
         '''change the background color of a Qt widget'''
