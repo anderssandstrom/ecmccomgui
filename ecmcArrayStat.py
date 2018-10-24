@@ -89,6 +89,7 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.model = QtGui.QStandardItemModel(self)  # SELECTING THE MODEL - FRAMEWORK THAT HANDLES QUERIES AND EDITS
     self.table.setModel(self.model)  # SETTING THE MODEL
     self.populate()
+    self.model.setHorizontalHeaderLabels(['Parameter', 'Value', 'Select'])
     self.show()
 
   def populate(self):
@@ -96,10 +97,14 @@ class ecmcArrayStat(QtWidgets.QTableView):
       row= []
       cell=QtGui.QStandardItem(DESCRIPTION[i])
       cell.setFlags(QtCore.Qt.ItemIsEditable)
+      cell.setBackground(QtGui.QBrush(QtCore.Qt.white))
+      cell.setForeground(QtGui.QBrush(QtCore.Qt.black))
       self.stdItemArrayName.append(cell)
       row.append(cell)
       cell=QtGui.QStandardItem('value'+str(i))
       cell.setFlags(QtCore.Qt.ItemIsEditable)
+      cell.setBackground(QtGui.QBrush(QtCore.Qt.white))
+      cell.setForeground(QtGui.QBrush(QtCore.Qt.black))      
       self.stdItemArrayData.append(cell)
       row.append(cell)            
       cell=QtGui.QStandardItem('')
@@ -122,7 +127,9 @@ class ecmcArrayStat(QtWidgets.QTableView):
 
     #Update table view  
     for i in range(0,ELEMENT_COUNT):
-      self.stdItemArrayData[i].setData(dataList[i],role=QtCore.Qt.DisplayRole)
+      if dataList[i] is not None:
+        if len(dataList[i])>0:
+          self.stdItemArrayData[i].setData(dataList[i],role=QtCore.Qt.DisplayRole)
 
     self.axId=int(dataList[0])
     self.posSet=float(dataList[1])
@@ -137,7 +144,7 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.velFFraw=float(dataList[10])
     self.velRaw=float(dataList[11])
     self.cycleCounter=int(dataList[12])
-    self.error=int(dataList[13])
+    self.error=int(dataList[13],16)
     self.command=int(dataList[14])
     self.cmdData=int(dataList[15])
     self.seqState=int(dataList[16])

@@ -1,6 +1,6 @@
 import epics
 import sys
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtWidgets, QtGui, QtCore
 from ecmcArrayStat import *
 
 #Define pvs
@@ -35,8 +35,11 @@ TOOLTIPS = {
         'CNEN': 'enable/disable drive',
         'ArrayStat': 'axis Status',
         'ErrRst': 'reset axis error',
-        'JOGF': 'JOGF: jog forward',
         'JOGR': 'JOGR: jog backward',
+        'JOGF': 'JOGF: jog forward',
+        'HOMR': 'HOMR: Home reverse',
+        'HOMF': 'HOMF: Home forward',     
+        'MSTA': 'MSTA: Status'   
 }
 STYLES = {      ### http://doc.qt.digia.com/qt/stylesheet-reference.html
     'self': '''
@@ -48,34 +51,30 @@ STYLES = {      ### http://doc.qt.digia.com/qt/stylesheet-reference.html
             ''',
     'DESC': '''
              QLabel { 
-                qproperty-alignment: AlignCenter;
-                color: white; 
-                background-color: blue;
+                qproperty-alignment: AlignRight;
                 font: bold;
              }
             ''',
     'NAME': '''
              QLabel { 
-                qproperty-alignment: AlignCenter;
-                color: darkblue; 
-                background-color: lightgray;
+                qproperty-alignment: AlignRight;
                 font: bold;
              }
             ''',
     'RBV': '''
              QLabel { 
-                qproperty-alignment: AlignCenter;
+                qproperty-alignment: AlignRight;
              }
             ''',
     'EGU': '''
              QLabel { 
-                qproperty-alignment: AlignCenter;
+                qproperty-alignment: AlignRight;
              }
             ''',
     'VAL': '''
             QLineEdit { 
-                   background-color: beige;
-                   text-align: left;
+                   background-color: white;
+                   text-align: right;
                    }
            ''',
     'STOP': '''
@@ -99,6 +98,9 @@ STYLES = {      ### http://doc.qt.digia.com/qt/stylesheet-reference.html
                    background-color: red;
                    color: black;
                    text-align: center;
+                   height: 40px;
+                   min-height: 40px;
+                   max-height: 40px;
                    }
             QPushButton:hover { 
                    background-color: red;
@@ -107,10 +109,27 @@ STYLES = {      ### http://doc.qt.digia.com/qt/stylesheet-reference.html
                    text-align: center;
                    }
             ''',
+    'BUTTON_ON': '''
+            QPushButton { 
+                   background-color: green;
+                   color: black;
+                   text-align: center;
+                   height: 40px;
+                   min-height: 40px;
+                   max-height: 40px;
+                   }
+            QPushButton:hover { 
+                   background-color: green;
+                   color: yellow;
+                   font: bold;
+                   text-align: center;
+                   }
+            ''',
+
     'TWV': '''
             QLineEdit { 
-                   background-color: lightgray;
-                   text-align: left;
+                   background-color: white;
+                   text-align: right;
                    width: 80px;
                    min-width: 80px;
                    max-width: 80px;
@@ -162,22 +181,46 @@ STYLES = {      ### http://doc.qt.digia.com/qt/stylesheet-reference.html
            ''',
     'ArrayStat': '''
             QTableView { 
-                   width: 250px;
-                   min-width: 250px;
-                   max-width: 250px;
-                   font-size:8pt;
+                   background-color: white;
+                   forground-color: black;
+                   font: bold;
+                   width: 330px;
+                   min-width: 330px;
+                   font-size:10pt;
                    height:800px;
                    min-height:800px;
                    }
            ''',
     'ErrRst': '''
             QPushButton { 
-    
+                   background-color: red;
+                   color: black;
+                   text-align: center;
+                   height: 40px;
+                   min-height: 40px;
+                   max-height: 40px;
+                   }
+            QPushButton:hover { 
+                   background-color: red;
+                   color: yellow;
+                   font: bold;
+                   text-align: center;
+                   }
+
+           ''',
+    'JOGR': '''
+            QPushButton { 
+                   background-color: grey;
+                   color: black;
+                   text-align: center;
+                   height: 40px;
+                   min-height: 40px;
+                   max-height: 40px;
                    }
            ''',
     'JOGF': '''
             QPushButton { 
-                   background-color: red;
+                   background-color: grey;
                    color: black;
                    text-align: center;
                    height: 40px;
@@ -185,9 +228,9 @@ STYLES = {      ### http://doc.qt.digia.com/qt/stylesheet-reference.html
                    max-height: 40px;
                    }
            ''',
-    'JOGR': '''
+    'HOMR': '''
             QPushButton { 
-                   background-color: red;
+                   background-color: grey;
                    color: black;
                    text-align: center;
                    height: 40px;
@@ -195,7 +238,21 @@ STYLES = {      ### http://doc.qt.digia.com/qt/stylesheet-reference.html
                    max-height: 40px;
                    }
            ''',
-
+    'HOMF': '''
+            QPushButton { 
+                   background-color: grey;
+                   color: black;
+                   text-align: center;
+                   height: 40px;
+                   min-height: 40px;
+                   max-height: 40px;
+                   }
+           ''',
+    'MSTA': '''
+            QLabel { 
+                   text-align: right;
+                   }
+           ''',
 }
 
 class MotorPanel(QtWidgets.QDialog):
@@ -239,42 +296,76 @@ class MotorPanel(QtWidgets.QDialog):
         self.controls['CNEN'] = QtWidgets.QPushButton('CNEN',default=False, autoDefault=False)
         self.controls['ArrayStat']=ecmcArrayStat(self)        
         self.controls['ErrRst'] = QtWidgets.QPushButton('Reset Error',default=False, autoDefault=False)
-        self.controls['JOGF'] = QtWidgets.QPushButton('JOGF',default=False, autoDefault=False)
         self.controls['JOGR'] = QtWidgets.QPushButton('JOGR',default=False, autoDefault=False)
+        self.controls['JOGF'] = QtWidgets.QPushButton('JOGF',default=False, autoDefault=False)
+        self.controls['HOMR'] = QtWidgets.QPushButton('HOMR',default=False, autoDefault=False)
+        self.controls['HOMF'] = QtWidgets.QPushButton('HOMF',default=False, autoDefault=False)
+        self.controls['MSTA'] = QtWidgets.QLabel()
         self.controls['RBV'].setAutoFillBackground(True)
         self.setLabelBackground(self.controls['RBV'], BACKGROUND_DONE_MOVING)
         
         main_frame= QtWidgets.QFrame(self)
         main_layout = QtWidgets.QHBoxLayout()
    
-        sub_frame = QtWidgets.QFrame(self)
-        sub_layout = QtWidgets.QVBoxLayout()
-        for field in ['DESC', 'NAME', 'EGU', 'RBV', 'VAL']:
-            sub_layout.addWidget(self.controls[field])
-        
+        left_frame = QtWidgets.QFrame(self)
+        left_layout = QtWidgets.QVBoxLayout()
+        for field in ['NAME','DESC', 'EGU', 'RBV', 'VAL','MSTA']:
+            tmp_frame = QtWidgets.QFrame(self)
+            tmp_layout = QtWidgets.QHBoxLayout()
+            tmp_label=QtWidgets.QLabel()
+            tmp_label.setText(field+ ':')
+            tmp_layout.addWidget(tmp_label)
+            tmp_layout.addWidget(self.controls[field])
+            tmp_frame.setLayout(tmp_layout)
+            left_layout.addWidget(tmp_frame)   
+
         #Tweak
+        tweak_label= QtWidgets.QLabel()
+        tweak_label.setText('TWEAK:')
+        left_layout.addWidget(tweak_label)        
+
         tweak_frame = QtWidgets.QFrame(self)
+        #tweak_frame.setStyleSheet("margin:5px; border:1px solid rgb(255, 255, 255);")
         tweak_layout = QtWidgets.QHBoxLayout()
         for field in ['TWR', '/10', 'TWV', '*10', 'TWF']:
             tweak_layout.addWidget(self.controls[field])
         tweak_frame.setLayout(tweak_layout)
-        sub_layout.addWidget(tweak_frame)
         
+        left_layout.addWidget(tweak_frame)
+
         #Jog
+        jog_label= QtWidgets.QLabel()
+        jog_label.setText('JOG:')
+        left_layout.addWidget(jog_label)        
+
         jog_frame = QtWidgets.QFrame(self)
         jog_layout = QtWidgets.QHBoxLayout()
         jog_layout.addWidget(self.controls['JOGR'])
         jog_layout.addWidget(self.controls['JOGF'])
         jog_frame.setLayout(jog_layout)
-        sub_layout.addWidget(jog_frame)
-        
+        left_layout.addWidget(jog_frame)
 
-        sub_layout.addWidget(self.controls['STOP'])
-        sub_layout.addWidget(self.controls['CNEN'])
-        sub_layout.addWidget(self.controls['ErrRst'])
+        #Home
+        home_label= QtWidgets.QLabel()
+        home_label.setText('HOME:')
+        left_layout.addWidget(home_label)        
+        home_frame = QtWidgets.QFrame(self)
+        home_layout = QtWidgets.QHBoxLayout()
+        home_layout.addWidget(self.controls['HOMR'])
+        home_layout.addWidget(self.controls['HOMF'])
+        home_frame.setLayout(home_layout)
+        left_layout.addWidget(home_frame)
 
-        sub_frame.setLayout(sub_layout)
-        main_layout.addWidget(sub_frame)
+        control_label= QtWidgets.QLabel()
+        control_label.setText('CONTROL:')
+        left_layout.addWidget(control_label)        
+
+        left_layout.addWidget(self.controls['STOP'])
+        left_layout.addWidget(self.controls['CNEN'])
+        left_layout.addWidget(self.controls['ErrRst'])
+
+        left_frame.setLayout(left_layout)
+        main_layout.addWidget(left_frame)
 
         self.controls['ArrayStat'].setMinimumSize(200,500)
         main_layout.addWidget(self.controls['ArrayStat'])
@@ -282,13 +373,15 @@ class MotorPanel(QtWidgets.QDialog):
         main_frame.setLayout(main_layout)
 
         self.setLayout(main_layout)
-        self.setWindowTitle("ECMC Motor panel")
+        self.setWindowTitle("ECMC: Axis Control")
         
 
     def apply_styles(self):
         '''apply styles and tips'''     
         for field in ['DESC', 'NAME', 'EGU', 'RBV', 'VAL', 
-                      'STOP','CNEN','TWV', 'TWF', 'TWR', '*10', '/10','ArrayStat','ErrRst']:
+                      'STOP','CNEN','TWV', 'TWF', 'TWR', '*10', 
+                      '/10','ArrayStat','ErrRst','JOGR','JOGF',
+                      'HOMR','HOMF','MSTA']:
             if field in STYLES:
                 self.controls[field].setStyleSheet(STYLES[field])
             if field in TOOLTIPS:
@@ -307,8 +400,11 @@ class MotorPanel(QtWidgets.QDialog):
         self.controls['STOP'].clicked.connect(self.onPushSTOP)
         self.controls['CNEN'].clicked.connect(self.onPushCNEN)
         self.controls['ErrRst'].clicked.connect(self.onPushErrRst)
-        self.controls['JOGF'].clicked.connect(self.onPushJOGF)
         self.controls['JOGR'].clicked.connect(self.onPushJOGR)
+        self.controls['JOGF'].clicked.connect(self.onPushJOGF)
+        self.controls['HOMR'].clicked.connect(self.onPushHOMR)
+        self.controls['HOMF'].clicked.connect(self.onPushHOMF)
+        
 
     def setPvNames(self,iocPrefix=None,axisName=None):
         self.motorPvName = (iocPrefix + axisName).split('.')[0]  # keep everything to left of first dot
@@ -347,9 +443,12 @@ class MotorPanel(QtWidgets.QDialog):
             'DMOV': self.onChangeDMOV,
             'HLS':  self.onChangeHLS,
             'LLS':  self.onChangeLLS,
-            'CNEN': self.onChangeCNEN,
-            'JOGF': self.onChangeJOGF,
+            'CNEN': self.onChangeCNEN,            
             'JOGR': self.onChangeJOGR,
+            'JOGF': self.onChangeJOGF,
+            'HOMR': self.onChangeHOMR,
+            'HOMF': self.onChangeHOMF,
+            'MSTA': self.onChangeMSTA,
         }
         for field, func in callback_dict.items():
             self.motorPv.set_callback(attr=field, callback=func)
@@ -362,9 +461,12 @@ class MotorPanel(QtWidgets.QDialog):
         self.onChangeVAL(value=self.motorPv.get('VAL'))
         self.onChangeTWV(value=self.motorPv.get('TWV'))
         self.onChangeDMOV(value=self.motorPv.get('DMOV'))
-        self.onChangeCNEN(value=self.motorPv.get('CNEN'))
-        self.onChangeJOGF(value=self.motorPv.get('JOGF'))
+        self.onChangeCNEN(value=self.motorPv.get('CNEN'))        
         self.onChangeJOGR(value=self.motorPv.get('JOGR'))
+        self.onChangeJOGF(value=self.motorPv.get('JOGF'))
+        self.onChangeHOMR(value=self.motorPv.get('HOMR'))
+        self.onChangeHOMF(value=self.motorPv.get('HOMF'))
+        self.onChangeMSTA(value=self.motorPv.get('MSTA'))
         
         # additional records
         self.axisErrorResetPv = epics.PV(self.axisErrorResetPvName)
@@ -414,15 +516,25 @@ class MotorPanel(QtWidgets.QDialog):
         if self.axisErrorResetPv is not None:
             self.axisErrorResetPv.put(1)
 
+    def onPushJOGR(self):
+        '''jogr button was pressed'''
+        if self.motorPv is not None:
+            self.motorPv.put('JOGR',not self.motorPv.get('JOGR'))
+
     def onPushJOGF(self):
         '''jogf button was pressed'''
         if self.motorPv is not None:
             self.motorPv.put('JOGF',not self.motorPv.get('JOGF'))
 
-    def onPushJOGR(self):
-        '''jogf button was pressed'''
+    def onPushHOMR(self):
+        '''homr button was pressed'''
         if self.motorPv is not None:
-            self.motorPv.put('JOGR',not self.motorPv.get('JOGR'))
+            self.motorPv.put('HOMR',1)
+
+    def onPushHOMF(self):
+        '''homf button was pressed'''
+        if self.motorPv is not None:
+            self.motorPv.put('HOMF',1)
 
     def onPushTWF(self):
         '''tweak forward button was pressed'''
@@ -442,7 +554,7 @@ class MotorPanel(QtWidgets.QDialog):
     def onPush_1x(self):
         '''multiply TWV*0.1 button was pressed'''
         if self.motorPv is not None:
-            self.motorPv.put('TWV', 0.1*self.motorPv.get('TWV'))
+            self.motorPv.put('TWV', 0.1*self.motorPv.get('TWV'))            
 
     def onReturnTWV(self):
         '''new target value was entered in this panel'''
@@ -458,25 +570,48 @@ class MotorPanel(QtWidgets.QDialog):
 
     def onChangeCNEN(self, value = None, **kws):
         '''EPICS monitor on CNEN called this'''
-        if value:
-            self.controls['CNEN'].setStyleSheet("background-color: green")
+        field='CNEN'
+        if value:            
+            self.controls[field].setStyleSheet(STYLES['BUTTON_ON'])
         else:
-            self.controls['CNEN'].setStyleSheet("background-color: red")
-
-    def onChangeJOGF(self, value = None, **kws):
-        '''EPICS monitor on JOGF called this'''
-        if value:
-            self.controls['JOGF'].setStyleSheet("background-color: green")
-        else:
-            self.controls['JOGF'].setStyleSheet("background-color: grey")
+            self.controls[field].setStyleSheet(STYLES[field])
 
     def onChangeJOGR(self, value = None, **kws):
         '''EPICS monitor on JOGR called this'''
+        field='JOGR'
         if value:
-            self.controls['JOGR'].setStyleSheet("background-color: green")
+            self.controls[field].setStyleSheet(STYLES['BUTTON_ON'])
         else:
-            self.controls['JOGR'].setStyleSheet("background-color: grey")
+            self.controls[field].setStyleSheet(STYLES[field])
 
+    def onChangeJOGF(self, value = None, **kws):
+        '''EPICS monitor on JOGF called this'''
+        field='JOGF'
+        if value:
+            self.controls[field].setStyleSheet(STYLES['BUTTON_ON'])
+        else:
+            self.controls[field].setStyleSheet(STYLES[field])
+
+    def onChangeHOMR(self, value = None, **kws):
+        '''EPICS monitor on HOMR called this'''
+        field='HOMR'
+        if value:
+            self.controls[field].setStyleSheet(STYLES['BUTTON_ON'])
+        else:
+            self.controls[field].setStyleSheet(STYLES[field])
+
+    def onChangeHOMF(self, value = None, **kws):
+        '''EPICS monitor on HOMF called this'''
+        field='HOMF'
+        if value:
+            self.controls[field].setStyleSheet(STYLES['BUTTON_ON'])
+        else:
+            self.controls[field].setStyleSheet(STYLES[field])
+
+    def onChangeMSTA(self, value = None, **kws):
+        '''EPICS monitor on MSTA called this'''
+        field='MSTA'                
+        self.controls[field].setText(bin(int(value))[2:])
 
     def onChangeDESC(self, char_value=None, **kws):
         '''EPICS monitor on DESC called this'''
@@ -495,7 +630,7 @@ class MotorPanel(QtWidgets.QDialog):
             self.setLabelBackground(self.controls['TWF'], color)
 
     def onChangeLLS(self, value=None, **kws):
-        '''EPICS monitor on LLS called this, change the color of the TWR button'''
+        '''EPICS monitor on LLS called this, change the color of the TWR button'''        
         if value is not None:
             color = {0: BACKGROUND_DEFAULT, 1: BACKGROUND_LIMIT_ON}[value]
             self.setLabelBackground(self.controls['TWR'], color)
@@ -506,21 +641,23 @@ class MotorPanel(QtWidgets.QDialog):
 
     def onChangeRBV(self, value=None, **kws):
         '''EPICS monitor on RBV called this'''
+        field='RBV'
         if value is not None:
-            fmt = "%%.%df" % self.motorPv.get('PREC')
-            self.controls['RBV'].setText(fmt % value)
+            self.controls[field].setText(str(value))
 
     def onChangeTWV(self, value=None, **kws):
         '''EPICS monitor on TWV called this'''
-        if value is not None:
-            fmt = "%%.%df" % self.motorPv.get('PREC')
-            self.controls['TWV'].setText(fmt % value)
+        field='TWV'
+        if value is not None:            
+            self.controls[field].setText(str(value))
+            self.controls[field].setAlignment(QtCore.Qt.AlignRight)
 
     def onChangeVAL(self, value=None, **kws):
         '''EPICS monitor on VAL called this'''
+        field='VAL'
         if value is not None:
-            fmt = "%%.%df" % self.motorPv.get('PREC')
-            self.controls['VAL'].setText(fmt % value)
+            self.controls[field].setText(str(value))
+            self.controls[field].setAlignment(QtCore.Qt.AlignRight)
 
     def onChangeCntrlErrorIdPv(self,pvname=None, value=None, char_value=None, **kw):
         print("onChangeCntrlErrorIdPv"+ char_value )
