@@ -7,9 +7,7 @@ import random
 PARSE_ERROR_ELEMENT_COUNT_OUT_OF_RANGE = 1000
 ELEMENT_COUNT = 30
 
-list1 = ['', 'chemistry', 1997, 2000]
-
-description = [
+DESCRIPTION = [
     'axId',
     'posSet',
     'posAct',
@@ -42,7 +40,7 @@ description = [
     'homeSensor',
 ]
 
-class ecmcArrayStat(QtWidgets.QFrame):
+class ecmcArrayStat(QtWidgets.QTableView):
   def __init__(self,parent=None):
     super(ecmcArrayStat, self).__init__(parent)
     self.axId=0
@@ -80,6 +78,7 @@ class ecmcArrayStat(QtWidgets.QFrame):
 
     self.stdItemArrayName=[]
     self.stdItemArrayData=[]
+    self.stdItemArraySelect=[]
     
     self.create_GUI()
     return
@@ -93,25 +92,37 @@ class ecmcArrayStat(QtWidgets.QFrame):
     self.show()
 
   def populate(self):
-    for i in range(0,ELEMENT_COUNT-1):
+    for i in range(0,ELEMENT_COUNT):
       row= []
-      cell=QtGui.QStandardItem(description[i])
+      cell=QtGui.QStandardItem(DESCRIPTION[i])
+      cell.setFlags(QtCore.Qt.ItemIsEditable)
       self.stdItemArrayName.append(cell)
       row.append(cell)
       cell=QtGui.QStandardItem('value'+str(i))
+      cell.setFlags(QtCore.Qt.ItemIsEditable)
       self.stdItemArrayData.append(cell)
-      row.append(cell)      
-      self.model.appendRow(row)
-      
+      row.append(cell)            
+      cell=QtGui.QStandardItem('')
+      self.stdItemArraySelect.append(cell)
+      self.model.appendRow(row)         
+    
+    self.formatTableView()
+
+  def formatTableView(self):
+    self.table.resizeRowsToContents()
+    #self.table.resizeColumnToContents(0)
+    self.table.setColumnWidth(0,100)
+    self.table.setColumnWidth(1,100)
+    #self.table.setHorizontalHeaderLabels(['Parameter', 'Value','Select'])
+
   def parseAxisStatArray(self,charData):
     dataList=charData.split(',')
     if len(dataList)!=ELEMENT_COUNT:
       return PARSE_ERROR_ELEMENT_COUNT_OUT_OF_RANGE
 
     #Update table view  
-    for i in range(0,ELEMENT_COUNT-1):
+    for i in range(0,ELEMENT_COUNT):
       self.stdItemArrayData[i].setData(dataList[i],role=QtCore.Qt.DisplayRole)
-    
 
     self.axId=int(dataList[0])
     self.posSet=float(dataList[1])
@@ -147,8 +158,7 @@ class ecmcArrayStat(QtWidgets.QFrame):
   def onChangeAxisDiagPv(self,pvname=None, value=None, char_value=None, **kw):
     errorCode=self.parseAxisStatArray(char_value)
     if errorCode:
-      print("Parse failed with error code: " + str(errorCode))
-    self.printInfo()
+      print("Parse failed with error code: " + str(errorCode))    
 
   def connect(self, pvname):
     if pvname is None:            
