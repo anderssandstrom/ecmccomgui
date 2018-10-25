@@ -1,10 +1,18 @@
+#!/usr/bin/python3.6
 import sys
 import epics
 import numpy as np
 from PyQt5 import QtCore,QtWidgets, QtGui
 import random
+import matplotlib
+matplotlib.use('Qt5Agg')
+import matplotlib.pyplot as plt
+from datetime import datetime
+import matplotlib.lines
+
 PARSE_ERROR_ELEMENT_COUNT_OUT_OF_RANGE = 1000
 ELEMENT_COUNT = 30
+TIMESTAMP_INDEX = 30
 
 ECMC_COMMAND = {
     'MOVE_VEL': 1,
@@ -98,6 +106,9 @@ STYLES={
 class ecmcArrayStat(QtWidgets.QTableView):
   def __init__(self,parent=None):
     super(ecmcArrayStat, self).__init__(parent)
+    self.background=None
+    self.plotBuffer=[]    
+    self.startToPlot=False; 
     self.axId=0
     self.posSet=0
     self.posAct=0
@@ -142,7 +153,7 @@ class ecmcArrayStat(QtWidgets.QTableView):
       10 :self.defaultStrFunc,
       11 :self.defaultStrFunc,
       12 :self.defaultStrFunc,
-      13 :self.lowOKHighNotOKShowValFunc,
+      13 :self.errorFunc,
       14 :self.commandStrFunc,
       15 :self.cmdDataStrFunc,
       16 :self.defaultStrFunc,
@@ -176,7 +187,7 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.model = QtGui.QStandardItemModel(self)  # SELECTING THE MODEL - FRAMEWORK THAT HANDLES QUERIES AND EDITS
     self.table.setModel(self.model)  # SETTING THE MODEL    
     self.populate()    
-    self.model.setHorizontalHeaderLabels(['Parameter', 'Value', 'Select'])
+    self.model.setHorizontalHeaderLabels(['Parameter', 'Value', ''])
     self.btnPlot=QtWidgets.QPushButton('Plot',default=False, autoDefault=False)    
     self.show()
 
@@ -200,15 +211,36 @@ class ecmcArrayStat(QtWidgets.QTableView):
       cell.setCheckState(QtCore.Qt.Unchecked)
       row.append(cell)            
       self.stdItemArraySelect.append(cell)
-      self.model.appendRow(row)         
-    
+      self.model.appendRow(row)   
+
+    #Timestamp
+    row= []    
+    cell=QtGui.QStandardItem("Timestamp")
+    cell.setFlags(QtCore.Qt.ItemIsEditable)
+    cell.setBackground(QtGui.QBrush(QtCore.Qt.white))
+    cell.setForeground(QtGui.QBrush(QtCore.Qt.black))
+    self.stdItemArrayName.append(cell)
+    row.append(cell)
+    cell=QtGui.QStandardItem('empty')
+    cell.setFlags(QtCore.Qt.ItemIsEditable)
+    cell.setBackground(QtGui.QBrush(QtCore.Qt.white))
+    cell.setForeground(QtGui.QBrush(QtCore.Qt.black))      
+    self.stdItemArrayData.append(cell)
+    row.append(cell)            
+    cell=QtGui.QStandardItem(True)
+    cell.setCheckable(True)
+    cell.setCheckState(QtCore.Qt.Unchecked)
+    row.append(cell)            
+    self.stdItemArraySelect.append(cell)
+    self.model.appendRow(row)       
     self.formatTableView()
 
   def formatTableView(self):
     self.table.resizeRowsToContents()
     #self.table.resizeColumnToContents(0)
     self.table.setColumnWidth(0,100)
-    self.table.setColumnWidth(1,100)
+    self.table.setColumnWidth(1,200)
+    self.table.setColumnWidth(2,20)
     #self.table.setHorizontalHeaderLabels(['Parameter', 'Value','Select'])
 
   def parseAxisStatArray(self,charData):
@@ -222,8 +254,10 @@ class ecmcArrayStat(QtWidgets.QTableView):
         if len(dataList[i])>0:                    
           func=self.dataSourceConvFuncPoint[i]
           func(dataList[i],self.stdItemArrayData[i])
-
+    
     self.covertStringToData(dataList)
+    if self.startToPlot:
+      self.updateDataPlot()
 
   def defaultStrFunc(self,strValue,cell):
     cell.setData(strValue,role=QtCore.Qt.DisplayRole)
@@ -267,6 +301,13 @@ class ecmcArrayStat(QtWidgets.QTableView):
       strToSet="Busy"
       cell.setBackground(QtGui.QBrush(QtCore.Qt.red))      
     cell.setData(strToSet,role=QtCore.Qt.DisplayRole)
+
+  def errorFunc(self,strValue,cell):
+    if int(strValue,16)==0:
+      cell.setBackground(QtGui.QBrush(QtCore.Qt.green))      
+    else:      
+      cell.setBackground(QtGui.QBrush(QtCore.Qt.red))      
+    cell.setData(strValue,role=QtCore.Qt.DisplayRole)
 
   def lowOKHighNotOKShowValFunc(self,strValue,cell):
     if int(strValue)==0:
@@ -362,10 +403,16 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.highLim=int(dataList[28])
     self.homeSensor=int(dataList[29])
 
-  def onChangeAxisDiagPv(self,pvname=None, value=None, char_value=None, **kw):
+    self.plotBuffer.append(self.posAct)
+
+  def onChangeAxisDiagPv(self,pvname=None, value=None, char_value=None,timestamp=None, **kw):
     errorCode=self.parseAxisStatArray(char_value)
     if errorCode:
       print("Parse failed with error code: " + str(errorCode))    
+    
+    strTime=datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S%f')
+    self.stdItemArrayData[TIMESTAMP_INDEX].setData(strTime,role=QtCore.Qt.DisplayRole)          
+
 
   def connect(self, pvname):
     if pvname is None:            
@@ -415,3 +462,50 @@ class ecmcArrayStat(QtWidgets.QTableView):
     print("highLim          :  " + str(self.highLim))
     print("homeSensor       :  " + str(self.homeSensor))
     return
+
+  def startPlot(self):    
+    #self.fig, self.ax = plt.subplots(1, 1)
+    #self.ax.hold=1
+    #plt.ion() 
+    #plt.axis([-50,50,0,10])        
+    #plt.draw()
+    #self.background = self.fig.canvas.copy_from_bbox(self.ax.bbox)
+    #plt.pause(0.1)
+    #plt.plot_date(self.plotBuffer)    
+    #plt.plot(self.plotBuffer)
+    #plt.xlabel('time')
+    #plt.grid()
+    
+    #plt.show()
+    #plt.draw()
+    #plt.pause(0.01)
+    #self.fig=plt.figure() 
+    #self.ln, = plt.plot([])
+    #plt.ion()
+    #plt.show()   
+    #x = np.linspace(0,50., num=100)
+    #X,Y = np.meshgrid(x,x)
+    self.fig = plt.figure()    
+    self.ax = self.fig.add_subplot(111)    
+    self.fig.canvas.draw()   # note that the first draw comes before setting data 
+    self.points = self.ax.plot(self.posAct, self.cycleCounter, 'o')[0]       
+    # cache the background
+    self.axbackground = self.fig.canvas.copy_from_bbox(self.ax.bbox)        
+    plt.ion()
+    plt.show()
+    self.startToPlot=True;  
+
+  def updateDataPlot(self):  
+    #self.points.set_data(self.posAct, self.cycleCounter)
+    #self.fig.canvas.restore_region(self.background) 
+    #self.ax.draw_artist(self.points)
+    #self.fig.canvas.blit(self.ax.bbox)            
+    #self.ln.set_xdata(self.cycleCounter)
+    #self.ln.set_ydata(self.posAct)
+    #plt.draw()
+    #plt.pause(0.001)
+    self.points.set_data(self.cycleCounter,self.posAct)
+    self.fig.canvas.restore_region(self.axbackground)
+    self.ax.draw_artist(self.points)
+    #self.fig.canvas.blit(self.ax.bbox)
+    plt.pause(0.001) 

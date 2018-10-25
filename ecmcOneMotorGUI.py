@@ -184,13 +184,13 @@ STYLES = {      ### http://doc.qt.digia.com/qt/stylesheet-reference.html
                    background-color: white;
                    foreground-color: black;
                    font: bold;
-                   width: 324px;
-                   min-width: 324px;
-                   max-width: 324px;
+                   width: 350px;
+                   min-width: 350px;
+                   max-width: 350px;
                    font-size:10pt;
-                   height:745px;
-                   min-height:745px;
-                   max-height:745px;
+                   height:770px;
+                   min-height:770px;
+                   max-height:770px;
                    }
            ''',
     'ErrRst': '''
@@ -423,6 +423,7 @@ class MotorPanel(QtWidgets.QDialog):
         self.controls['JOGF'].clicked.connect(self.onPushJOGF)
         self.controls['HOMR'].clicked.connect(self.onPushHOMR)
         self.controls['HOMF'].clicked.connect(self.onPushHOMF)
+        self.controls['PLOT'].clicked.connect(self.onPushPLOT)
         
 
     def setPvNames(self,iocPrefix=None,axisName=None):
@@ -554,6 +555,10 @@ class MotorPanel(QtWidgets.QDialog):
         '''homf button was pressed'''
         if self.motorPv is not None:
             self.motorPv.put('HOMF',1)
+
+    def onPushPLOT(self):
+        '''plot button was pressed'''
+        self.controls['ArrayStat'].startPlot()
 
     def onPushTWF(self):
         '''tweak forward button was pressed'''

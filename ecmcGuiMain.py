@@ -14,6 +14,8 @@ from ecmcMainWndDesigner import Ui_MainWindow
 # 3. sudo yum install qt5-qtbase-devel
 # 4. sudo python3.6 -m pip install numpy scipy matplotlib
 # 5. sudo pip3 install pyepics
+# 6. sudo yum install python3-matplotlib
+
 
 # Regenerate py from ui file:
 # pyuic5 ecmcMainWndDesigner.ui -o ecmcMainWndDesigner.py
