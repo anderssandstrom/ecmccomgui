@@ -182,13 +182,15 @@ STYLES = {      ### http://doc.qt.digia.com/qt/stylesheet-reference.html
     'ArrayStat': '''
             QTableView { 
                    background-color: white;
-                   forground-color: black;
+                   foreground-color: black;
                    font: bold;
-                   width: 330px;
-                   min-width: 330px;
+                   width: 324px;
+                   min-width: 324px;
+                   max-width: 324px;
                    font-size:10pt;
-                   height:800px;
-                   min-height:800px;
+                   height:745px;
+                   min-height:745px;
+                   max-height:745px;
                    }
            ''',
     'ErrRst': '''
@@ -253,6 +255,17 @@ STYLES = {      ### http://doc.qt.digia.com/qt/stylesheet-reference.html
                    text-align: right;
                    }
            ''',
+    'PLOT': '''
+            QPushButton { 
+                   background-color: grey;
+                   color: black;
+                   text-align: center;
+                   height: 40px;
+                   min-height: 40px;
+                   max-height: 40px;
+                   }
+           ''',
+
 }
 
 class MotorPanel(QtWidgets.QDialog):
@@ -300,6 +313,7 @@ class MotorPanel(QtWidgets.QDialog):
         self.controls['JOGF'] = QtWidgets.QPushButton('JOGF',default=False, autoDefault=False)
         self.controls['HOMR'] = QtWidgets.QPushButton('HOMR',default=False, autoDefault=False)
         self.controls['HOMF'] = QtWidgets.QPushButton('HOMF',default=False, autoDefault=False)
+        self.controls['PLOT'] = QtWidgets.QPushButton('Plot',default=False, autoDefault=False)
         self.controls['MSTA'] = QtWidgets.QLabel()
         self.controls['RBV'].setAutoFillBackground(True)
         self.setLabelBackground(self.controls['RBV'], BACKGROUND_DONE_MOVING)
@@ -367,9 +381,14 @@ class MotorPanel(QtWidgets.QDialog):
         left_frame.setLayout(left_layout)
         main_layout.addWidget(left_frame)
 
-        self.controls['ArrayStat'].setMinimumSize(200,500)
-        main_layout.addWidget(self.controls['ArrayStat'])
-        
+        right_frame = QtWidgets.QFrame(self)
+        right_layout = QtWidgets.QVBoxLayout()
+        #self.controls['ArrayStat'].setMinimumSize(200,500)
+        right_layout.addWidget(self.controls['ArrayStat'])
+        right_layout.addWidget(self.controls['PLOT'])
+        right_frame.setLayout(right_layout);
+
+        main_layout.addWidget(right_frame)
         main_frame.setLayout(main_layout)
 
         self.setLayout(main_layout)

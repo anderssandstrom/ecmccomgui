@@ -40,7 +40,7 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
 
   def showMotorGUI(self):
     self.dialog = MotorPanel(self,self.prefix,self.axisName)
-    self.dialog.resize(400, 800)
+    self.dialog.resize(500, 900)
     self.dialog.show()
     
   def newIOCPrefix(self,iocPrefix):

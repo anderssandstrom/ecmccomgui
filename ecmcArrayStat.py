@@ -3,9 +3,48 @@ import epics
 import numpy as np
 from PyQt5 import QtCore,QtWidgets, QtGui
 import random
-
 PARSE_ERROR_ELEMENT_COUNT_OUT_OF_RANGE = 1000
 ELEMENT_COUNT = 30
+
+ECMC_COMMAND = {
+    'MOVE_VEL': 1,
+    'MOVE_REL' :2,
+    'MOVE_ABS' :3,
+    'MOVE_HOME' :10,
+}
+
+DATASOURCE = {
+    'AX_ID': 0,
+    'POS_SET' :1,
+    'POS_ACT' :2,
+    'POS_ERR' :3,
+    'POS_TARG' :4,
+    'POS_ERR_TARG' :5,
+    'POS_RAW' :6,
+    'CNTRL_OUT' :7,
+    'VEL_SET' :8,
+    'VEL_ACT' :9,
+    'VEL_FF_RAW' :10,
+    'VEL_RAW' :11,
+    'CYCLE_COUNTER' :12,
+    'ERROR' :13,
+    'COMMAND' :14,
+    'CMD_DATA' :15,
+    'SEQ_STATE' :16,
+    'ILOCK' :17,
+    'ILOCK_LAST_ACTIVE' :18,
+    'TRAJ_SOURCE' :19,
+    'ENC_SOURCE' :20,
+    'ENABLE' :21,
+    'ENABLED' :22,
+    'EXECUTE' :23,
+    'BUSY' :24,
+    'AT_TAGEY' :25,
+    'HOMED' :26,
+    'LOW_LIM' :27,
+    'HIGH_LIM' :28,
+    'HOME_SENSOR' :29
+    }
 
 DESCRIPTION = [
     'axId',
@@ -39,6 +78,22 @@ DESCRIPTION = [
     'highLim',
     'homeSensor',
 ]
+STYLES={
+ 'ArrayStat': '''
+            QTableView{ 
+                   background-color: white;
+                   foreground-color: black;
+                   font: bold;
+                   width: 430px;
+                   min-width: 430px;
+                   max-width: 430px;
+                   font-size:10pt;
+                   height:750px;
+                   min-height:750px;
+                   max-height:750px;
+                   }
+                   '''
+}
 
 class ecmcArrayStat(QtWidgets.QTableView):
   def __init__(self,parent=None):
@@ -62,7 +117,7 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.seqState=0
     self.ilock=0
     self.ilockLastActive=0
-    self.trajSource=0
+    self.trajSourc=0
     self.encSource=0
     self.enable=0
     self.enabled=0
@@ -73,7 +128,39 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.lowLim=0
     self.highLim=0
     self.homeSensor=0
-    
+    self.dataSourceConvFuncPoint = {
+      0 :self.defaultStrFunc,
+      1 :self.defaultStrFunc,
+      2 :self.defaultStrFunc,
+      3 :self.defaultStrFunc,
+      4 :self.defaultStrFunc,
+      5 :self.defaultStrFunc,
+      6 :self.defaultStrFunc,
+      7 :self.defaultStrFunc,
+      8 :self.defaultStrFunc,
+      9 :self.defaultStrFunc,
+      10 :self.defaultStrFunc,
+      11 :self.defaultStrFunc,
+      12 :self.defaultStrFunc,
+      13 :self.lowOKHighNotOKShowValFunc,
+      14 :self.commandStrFunc,
+      15 :self.cmdDataStrFunc,
+      16 :self.defaultStrFunc,
+      17 :self.iLockFunc,
+      18 :self.iLockFunc,
+      19 :self.sourceFunc,
+      20 :self.sourceFunc,
+      21 :self.defaultStrFunc,
+      22 :self.defaultStrFunc,
+      23 :self.defaultStrFunc,
+      24 :self.busyFunc,
+      25 :self.highOKLowNotOKFunc,
+      26 :self.highOKLowNotOKFunc,
+      27 :self.highOKLowNotOKFunc,
+      28 :self.highOKLowNotOKFunc,
+      29 :self.defaultStrFunc,
+    }
+
     self.axisDiagPvName=""
 
     self.stdItemArrayName=[]
@@ -85,11 +172,12 @@ class ecmcArrayStat(QtWidgets.QTableView):
 
   def create_GUI(self):
     self.table = QtWidgets.QTableView(self)  # SELECTING THE VIEW
-    self.table.setGeometry(0, 0, 575, 575)
+    #self.table.setGeometry(0, 0, 575, 575)
     self.model = QtGui.QStandardItemModel(self)  # SELECTING THE MODEL - FRAMEWORK THAT HANDLES QUERIES AND EDITS
-    self.table.setModel(self.model)  # SETTING THE MODEL
-    self.populate()
+    self.table.setModel(self.model)  # SETTING THE MODEL    
+    self.populate()    
     self.model.setHorizontalHeaderLabels(['Parameter', 'Value', 'Select'])
+    self.btnPlot=QtWidgets.QPushButton('Plot',default=False, autoDefault=False)    
     self.show()
 
   def populate(self):
@@ -107,7 +195,10 @@ class ecmcArrayStat(QtWidgets.QTableView):
       cell.setForeground(QtGui.QBrush(QtCore.Qt.black))      
       self.stdItemArrayData.append(cell)
       row.append(cell)            
-      cell=QtGui.QStandardItem('')
+      cell=QtGui.QStandardItem(True)
+      cell.setCheckable(True)
+      cell.setCheckState(QtCore.Qt.Unchecked)
+      row.append(cell)            
       self.stdItemArraySelect.append(cell)
       self.model.appendRow(row)         
     
@@ -128,9 +219,118 @@ class ecmcArrayStat(QtWidgets.QTableView):
     #Update table view  
     for i in range(0,ELEMENT_COUNT):
       if dataList[i] is not None:
-        if len(dataList[i])>0:
-          self.stdItemArrayData[i].setData(dataList[i],role=QtCore.Qt.DisplayRole)
+        if len(dataList[i])>0:                    
+          func=self.dataSourceConvFuncPoint[i]
+          func(dataList[i],self.stdItemArrayData[i])
 
+    self.covertStringToData(dataList)
+
+  def defaultStrFunc(self,strValue,cell):
+    cell.setData(strValue,role=QtCore.Qt.DisplayRole)
+
+  def sourceFunc(self,strValue,cell):
+    if int(strValue)==0:
+      strToSet="Internal"
+    else:
+      strToSet="Expression"
+
+    cell.setData(strToSet,role=QtCore.Qt.DisplayRole)
+
+  def commandStrFunc(self,strValue,cell):
+    switcher = {
+        1:  "Move Vel",
+        2:  "Move Rel",
+        3:  "Move Abs",
+        10: "Move Home",
+    }
+    strToSet=switcher.get(int(strValue),strValue)
+    if strToSet==strValue:
+      cell.setBackground(QtGui.QBrush(QtCore.Qt.red))      
+    else:
+      cell.setBackground(QtGui.QBrush(QtCore.Qt.white))      
+    cell.setData(strToSet,role=QtCore.Qt.DisplayRole)
+
+  def highOKLowNotOKFunc(self,strValue,cell):
+    if int(strValue)==1:
+      strToSet="OK"
+      cell.setBackground(QtGui.QBrush(QtCore.Qt.green))      
+    else:
+      strToSet="Not OK"
+      cell.setBackground(QtGui.QBrush(QtCore.Qt.red))      
+    cell.setData(strToSet,role=QtCore.Qt.DisplayRole)
+
+  def busyFunc(self,strValue,cell):
+    if int(strValue)==0:
+      strToSet="Ready"
+      cell.setBackground(QtGui.QBrush(QtCore.Qt.green))      
+    else:      
+      strToSet="Busy"
+      cell.setBackground(QtGui.QBrush(QtCore.Qt.red))      
+    cell.setData(strToSet,role=QtCore.Qt.DisplayRole)
+
+  def lowOKHighNotOKShowValFunc(self,strValue,cell):
+    if int(strValue)==0:
+      cell.setBackground(QtGui.QBrush(QtCore.Qt.green))      
+    else:      
+      cell.setBackground(QtGui.QBrush(QtCore.Qt.red))      
+    cell.setData(strValue,role=QtCore.Qt.DisplayRole)
+
+  def iLockFunc(self,strValue,cell):
+    if int(strValue)==0:
+      cell.setBackground(QtGui.QBrush(QtCore.Qt.green))
+      cell.setData("OK",role=QtCore.Qt.DisplayRole)
+      return
+    
+    switcher = {
+        1:  "Soft Bwd",
+        2:  "Soft Fwd",
+        3:  "Hard Bwd",
+        4:  "Hard Fwd",
+        5:  "No Execute",
+        6:  "Pos. Lag",
+        7:  "Both Lim.",
+        8:  "External",
+        9:  "Transform",
+        10: "Max Vel.",
+        11: "Cntrl High Lim.",
+        12: "Cntrl Inc at Lim.",
+        13: "Axis Error",
+        14: "Unexp. Lim.",
+        15: "Vel. diff",
+        16: "Hardware",
+        17: "PLC",
+    }
+    
+    strToSet=switcher.get(int(strValue),strValue)    
+    cell.setData(strToSet,role=QtCore.Qt.DisplayRole)
+    cell.setBackground(QtGui.QBrush(QtCore.Qt.red))      
+
+  def cmdDataStrFunc(self,strValue,cell):        
+    if self.command!=ECMC_COMMAND['MOVE_HOME']:
+      self.defaultStrFunc(strValue,cell)      
+      return
+      
+    switcher = {
+        0: "Not defined",
+        1: "Low Lim",
+        2: "High Lim",
+        3: "Low Lim, Home Sens",
+        4: "High Lim, Home Sens",
+        5: "Low Lim, Center Home Sens",
+        6: "High Lim, Center Home Sens",        
+        15: "Home Direct",
+        21: "Low Lim Part Abs",
+        22: "High Lim Part Abs",
+    }
+    
+    strToSet=switcher.get(int(strValue),strValue)
+    if strToSet==strValue:
+      cell.setBackground(QtGui.QBrush(QtCore.Qt.red))      
+    else:
+      cell.setBackground(QtGui.QBrush(QtCore.Qt.white))      
+    cell.setData(strToSet,role=QtCore.Qt.DisplayRole)
+
+  def covertStringToData(self,dataList):
     self.axId=int(dataList[0])
     self.posSet=float(dataList[1])
     self.posAct=float(dataList[2])
