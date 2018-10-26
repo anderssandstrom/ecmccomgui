@@ -4,11 +4,11 @@ import epics
 import numpy as np
 from PyQt5 import QtCore,QtWidgets, QtGui
 import random
-import matplotlib
-matplotlib.use('Qt5Agg')
-import matplotlib.pyplot as plt
+#import matplotlib as mpl
+#mpl.use('Qt5Agg')
+#import matplotlib.pyplot as plt
+#import matplotlib.lines
 from datetime import datetime
-import matplotlib.lines
 
 PARSE_ERROR_ELEMENT_COUNT_OUT_OF_RANGE = 1000
 ELEMENT_COUNT = 30
@@ -488,7 +488,7 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.fig = plt.figure()    
     self.ax = self.fig.add_subplot(111)    
     self.fig.canvas.draw()   # note that the first draw comes before setting data 
-    self.points = self.ax.plot(self.posAct, self.cycleCounter, 'o')[0]       
+    self.points = self.ax.plot(self.posAct, self.cycleCounter, 'or',)[0]       
     # cache the background
     self.axbackground = self.fig.canvas.copy_from_bbox(self.ax.bbox)        
     plt.ion()
@@ -504,6 +504,9 @@ class ecmcArrayStat(QtWidgets.QTableView):
     #self.ln.set_ydata(self.posAct)
     #plt.draw()
     #plt.pause(0.001)
+
+    #line = mpl.lines.Line2D(self.cycleCounter,self.posAct, color='red', animated=True)    
+    #self.ax.add_line(line)
     self.points.set_data(self.cycleCounter,self.posAct)
     self.fig.canvas.restore_region(self.axbackground)
     self.ax.draw_artist(self.points)
