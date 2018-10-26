@@ -4,6 +4,7 @@ import epics
 import numpy as np
 from PyQt5 import QtCore,QtWidgets, QtGui
 import random
+import ecmcGraphWrapper as graphWrap 
 #import matplotlib as mpl
 #mpl.use('Qt5Agg')
 #import matplotlib.pyplot as plt
@@ -189,6 +190,7 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.populate()    
     self.model.setHorizontalHeaderLabels(['Parameter', 'Value', ''])
     self.btnPlot=QtWidgets.QPushButton('Plot',default=False, autoDefault=False)    
+    self.graph=graphWrap.ecmcGraphWrapper(parent=self)
     self.show()
 
   def populate(self):
@@ -420,7 +422,7 @@ class ecmcArrayStat(QtWidgets.QTableView):
 
     if len(pvname)==0:
       raise RuntimeError("pvname must not be ''")
-    
+
     self.axisDiagPvName = pvname
     self.axisDiagPv = epics.PV(self.axisDiagPvName)
     self.axisDiagPv.add_callback(self.onChangeAxisDiagPv)
@@ -464,51 +466,9 @@ class ecmcArrayStat(QtWidgets.QTableView):
     return
 
   def startPlot(self):    
-    #self.fig, self.ax = plt.subplots(1, 1)
-    #self.ax.hold=1
-    #plt.ion() 
-    #plt.axis([-50,50,0,10])        
-    #plt.draw()
-    #self.background = self.fig.canvas.copy_from_bbox(self.ax.bbox)
-    #plt.pause(0.1)
-    #plt.plot_date(self.plotBuffer)    
-    #plt.plot(self.plotBuffer)
-    #plt.xlabel('time')
-    #plt.grid()
-    
-    #plt.show()
-    #plt.draw()
-    #plt.pause(0.01)
-    #self.fig=plt.figure() 
-    #self.ln, = plt.plot([])
-    #plt.ion()
-    #plt.show()   
-    #x = np.linspace(0,50., num=100)
-    #X,Y = np.meshgrid(x,x)
-    self.fig = plt.figure()    
-    self.ax = self.fig.add_subplot(111)    
-    self.fig.canvas.draw()   # note that the first draw comes before setting data 
-    self.points = self.ax.plot(self.posAct, self.cycleCounter, 'or',)[0]       
-    # cache the background
-    self.axbackground = self.fig.canvas.copy_from_bbox(self.ax.bbox)        
-    plt.ion()
-    plt.show()
+    self.graph.openWindow()
     self.startToPlot=True;  
 
-  def updateDataPlot(self):  
-    #self.points.set_data(self.posAct, self.cycleCounter)
-    #self.fig.canvas.restore_region(self.background) 
-    #self.ax.draw_artist(self.points)
-    #self.fig.canvas.blit(self.ax.bbox)            
-    #self.ln.set_xdata(self.cycleCounter)
-    #self.ln.set_ydata(self.posAct)
-    #plt.draw()
-    #plt.pause(0.001)
-
-    #line = mpl.lines.Line2D(self.cycleCounter,self.posAct, color='red', animated=True)    
-    #self.ax.add_line(line)
-    self.points.set_data(self.cycleCounter,self.posAct)
-    self.fig.canvas.restore_region(self.axbackground)
-    self.ax.draw_artist(self.points)
-    #self.fig.canvas.blit(self.ax.bbox)
-    plt.pause(0.001) 
+  def updateDataPlot(self): 
+    if self.startToPlot:   
+      self.graph.setData(self.cycleCounter,self.posAct)

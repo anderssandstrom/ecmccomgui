@@ -1,3 +1,4 @@
+#!/usr/bin/env python3.6
 import epics
 import sys
 from PyQt5 import QtWidgets, QtGui, QtCore
