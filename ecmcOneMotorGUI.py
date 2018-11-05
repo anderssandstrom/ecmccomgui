@@ -452,7 +452,7 @@ class MotorPanel(QtWidgets.QDialog):
             self.disconnect()
         
         self.controls['NAME'].setText(self.motorPvName)
-        self.motorPv = epics.Motor(str(self.motorPvName))   # verifies that self.motor_pv has RTYP='motor'
+        self.motorPv = epics.Motor(self.motorPvName)   # verifies that self.motor_pv has RTYP='motor'
 
         callback_dict = {
             #field:  callback function

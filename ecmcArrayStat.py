@@ -471,4 +471,4 @@ class ecmcArrayStat(QtWidgets.QTableView):
 
   def updateDataPlot(self): 
     if self.startToPlot:   
-      self.graph.setData(self.cycleCounter,self.posAct)
+      self.graph.setData(self.posAct)

@@ -12,9 +12,11 @@ class ecmcGraphWrapper(QtWidgets.QDialog):
       super().__init__(parent=parent)
       self.windowReady=0
       self.graph=None
-      self.xArr=np.zeros(ARRAY_BUFFER_SIZE)
+      self.xArr=range(-ARRAY_BUFFER_SIZE,0)
       self.yArr=np.zeros(ARRAY_BUFFER_SIZE)
       self.valuesInBuffer=0
+      print(str(self.xArr))      
+      
 
     def create_GUI(self):
       self.main_frame= QtWidgets.QFrame(self)
@@ -31,15 +33,13 @@ class ecmcGraphWrapper(QtWidgets.QDialog):
     def openWindow(self):
         self.create_GUI()
       
-    def setData(self, x, y):
+    def setData(self,y):
       if self.graph is not None:
-        self.valuesInBuffer=self.valuesInBuffer+1          
-        self.xArr=np.roll(self.xArr,-1)
+        
+        #self.xArr=np.roll(self.xArr,-1)
         self.yArr=np.roll(self.yArr,-1)
-        self.xArr[-1]=x
         self.yArr[-1]=y
-        if self.valuesInBuffer>ARRAY_BUFFER_SIZE:
-          self.valuesInBuffer=ARRAY_BUFFER_SIZE
+        self.valuesInBuffer=self.valuesInBuffer+1
 
         if self.valuesInBuffer<ARRAY_BUFFER_SIZE:
           #tmpX=self.xArr[-self.valuesInBuffer:-1]
