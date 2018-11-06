@@ -12,12 +12,10 @@ class ecmcGraphWrapper(QtWidgets.QDialog):
       super().__init__(parent=parent)
       self.windowReady=0
       self.graph=None
-      self.xArr=range(-ARRAY_BUFFER_SIZE,0)
+      self.xArr=np.arange(-ARRAY_BUFFER_SIZE+1,0+1)
       self.yArr=np.zeros(ARRAY_BUFFER_SIZE)
       self.valuesInBuffer=0
-      print(str(self.xArr))      
       
-
     def create_GUI(self):
       self.main_frame= QtWidgets.QFrame(self)
       self.main_layout = QtWidgets.QVBoxLayout()
@@ -27,6 +25,8 @@ class ecmcGraphWrapper(QtWidgets.QDialog):
       self.main_frame.setLayout(self.main_layout)
       self.main_frame.resize(800,600) 
       self.graph.resize(800,600) 
+      self.graph.setXSize([-ARRAY_BUFFER_SIZE, 0])
+      
 
       self.show()
 
@@ -49,8 +49,14 @@ class ecmcGraphWrapper(QtWidgets.QDialog):
           #print ("LEN Y:" +str(len(tmp)))          
           self.graph.setData(self.xArr[-self.valuesInBuffer:-1],self.yArr[-self.valuesInBuffer:-1])
         else:  
-          tmp=np.arange(self.valuesInBuffer-1)
-          #print ("LEN X:" +str(len(self.xArr)))
-          #print ("LEN Y:" +str(len(self.yArr)))          
+        #  tmp=np.arange(self.valuesInBuffer-1)
+        #  print ("LEN X:" +str(len(self.xArr)))
+        #  print ("LEN Y:" +str(len(self.yArr)))          
           self.graph.setData(self.xArr,self.yArr)
+        
+        #print ("LEN X:" +str(len(self.xArr)))
+        #print ("LEN Y:" +str(len(self.yArr)))
+        #print ("X:" +str(self.xArr))
+        #print ("Y:" +str(self.yArr))
+
 

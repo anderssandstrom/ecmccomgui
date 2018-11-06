@@ -15,12 +15,15 @@ class ecmcGraph(pg.GraphicsWindow):
         self.plotItem = self.addPlot(title="")        
         self.plotItem.setDownsampling(mode='peak')
         self.plotItem.setClipToView(True)
-        #self.plotDataItem = self.plotItem.plot([], pen=None,symbolBrush=(255,0,0), symbolSize=5, symbolPen=None)
-        self.plotItem.setRange(xRange=[-1000, 0])
-        self.plotDataItem = self.plotItem.plot([], pen=None)
+        self.plotDataItem = self.plotItem.plot([], pen=None,symbolBrush=(255,0,0), symbolSize=5, symbolPen=None)
+        
+        #self.plotDataItem = self.plotItem.plot([], pen=None)
 
     def setData(self, x, y):
-        self.plotDataItem.setData(x,y)
+        self.plotDataItem.setData(x,y)        
+
+    def setXSize(self, xSize):
+      self.plotItem.setRange(xRange=xSize)
 
 def main():
     app = QtWidgets.QApplication([])
