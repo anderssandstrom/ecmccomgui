@@ -25,7 +25,7 @@ class ecmcGraphWrapper(QtWidgets.QDialog):
       self.main_frame.setLayout(self.main_layout)
       self.main_frame.resize(800,600) 
       self.graph.resize(800,600) 
-      self.graph.setXSize([-ARRAY_BUFFER_SIZE, 0])
+      #self.graph.setXSize([-ARRAY_BUFFER_SIZE, 0])
       
 
       self.show()

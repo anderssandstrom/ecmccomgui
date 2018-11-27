@@ -20,7 +20,7 @@ class ecmcGraph(pg.GraphicsWindow):
         #self.plotDataItem = self.plotItem.plot([], pen=None)
 
     def setData(self, x, y):
-        self.plotDataItem.setData(x,y)        
+        self.plotDataItem.setData(y)        
 
     def setXSize(self, xSize):
       self.plotItem.setRange(xRange=xSize)
