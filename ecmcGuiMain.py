@@ -14,6 +14,8 @@ from ecmcMainWndDesigner import Ui_MainWindow
 # 3. sudo yum install qt5-qtbase-devel
 # 4. sudo python3.6 -m pip install numpy scipy matplotlib
 # 5. sudo pip3 install pyepics
+# 6. sudo yum install python3-matplotlib
+
 
 # Regenerate py from ui file:
 # pyuic5 ecmcMainWndDesigner.ui -o ecmcMainWndDesigner.py
@@ -25,48 +27,29 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
     super(ecmcMainWindow,self).__init__()
     self.ui = Ui_MainWindow()
     self.ui.setupUi(self)
-    self.ui.btnStart.clicked.connect(self.start)
     self.ui.pbStartMotorGUI.clicked.connect(self.showMotorGUI)
-    self.ui.linePvName.textChanged.connect(self.newPV)
-    self.diagPvName=""
-    self.motorPvName=""
+    self.ui.lineIOCPrefix.textChanged.connect(self.newIOCPrefix)
+    self.ui.lineAxisName.textChanged.connect(self.newIOCAxisName)
+    self.prefix=""
+    self.axisName=""
     print(sys.argv)
-    if(len(sys.argv)>1):
-      self.newPV(sys.argv[1])
-      self.ui.linePvName.setText(self.motorPvName)
-      self.motorPv = epics.PV(self.motorPvName)
-      self.diagPv = epics.PV(self.diagPvName)
-      print("####################MOTOR####################")
-      print(self.motorPv.get())
-      print(self.motorPv.count, self.motorPv.type)
-      print(self.motorPv.info)
-      print("####################DIAG#####################")
-      print(self.diagPv.get())
-      print(self.diagPv.count, self.diagPv.type)
-      print(self.diagPv.info)
-
-      self.arrayStat=ecmcArrayStat()      
+    if len(sys.argv)>1:
+      self.prefix=sys.argv[1]
+      self.ui.lineIOCPrefix.setText(self.prefix)
+      if len(sys.argv)>2:
+        self.axisName=sys.argv[2]
+        self.ui.lineAxisName.setText(self.axisName)
 
   def showMotorGUI(self):
-    self.dialog = MotorPanel(self,self.motorPvName)
-    self.dialog.resize(200, 100)
+    self.dialog = MotorPanel(self,self.prefix,self.axisName)
+    self.dialog.resize(500, 900)
     self.dialog.show()
+    
+  def newIOCPrefix(self,iocPrefix):
+    self.prefix=iocPrefix
 
-  def newPV(self,pvName):
-    self.diagPvName=pvName+"-Array-Stat"
-    self.motorPvName=pvName
-
-  def start(self):  
-    self.diagPv.add_callback(self.onChanges)
-
-  def paus(self):
-    self.diagPv.clear_callbacks()
- 
-  def onChanges(self,pvname=None, value=None, char_value=None, **kw):
-    errorCode=self.arrayStat.parseAxisStatArray(char_value)
-    if errorCode:
-      print("Parse failed with error code: " + str(errorCode))
-    print(self.arrayStat.printInfo())
+  def newIOCAxisName(self,axisName):
+    self.axisName=axisName
 
   def quit(self):
     self.close()
