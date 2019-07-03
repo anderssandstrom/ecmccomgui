@@ -268,7 +268,7 @@ class ecmcArrayStat(QtWidgets.QTableView):
     if int(strValue)==0:
       strToSet="Internal"
     else:
-      strToSet="Expression"
+      strToSet="PLC"
 
     cell.setData(strToSet,role=QtCore.Qt.DisplayRole)
 
@@ -342,6 +342,8 @@ class ecmcArrayStat(QtWidgets.QTableView):
         15: "Vel. diff",
         16: "Hardware",
         17: "PLC",
+        18: "PLC Bwd",
+        19: "PLC Fwd",
     }
     
     strToSet=switcher.get(int(strValue),strValue)    
