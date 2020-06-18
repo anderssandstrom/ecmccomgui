@@ -124,6 +124,8 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.velRaw=0
     self.cycleCounter=0
     self.error=0
+    self.errorCode=0
+    self.strTime=0
     self.command=0
     self.cmdData=0
     self.seqState=0
@@ -140,6 +142,7 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.lowLim=0
     self.highLim=0
     self.homeSensor=0
+    self.dataList=[]
     self.dataSourceConvFuncPoint = {
       0 :self.defaultStrFunc,
       1 :self.defaultStrFunc,
@@ -246,18 +249,18 @@ class ecmcArrayStat(QtWidgets.QTableView):
     #self.table.setHorizontalHeaderLabels(['Parameter', 'Value','Select'])
 
   def parseAxisStatArray(self,charData):
-    dataList=charData.split(',')
-    if len(dataList)!=ELEMENT_COUNT:
+    self.dataList=charData.split(',')
+    if len(self.dataList)!=ELEMENT_COUNT:
       return PARSE_ERROR_ELEMENT_COUNT_OUT_OF_RANGE
 
     #Update table view  
     for i in range(0,ELEMENT_COUNT):
-      if dataList[i] is not None:
-        if len(dataList[i])>0:                    
+      if self.dataList[i] is not None:
+        if len(self.dataList[i])>0:                    
           func=self.dataSourceConvFuncPoint[i]
-          func(dataList[i],self.stdItemArrayData[i])
+          func(self.dataList[i],self.stdItemArrayData[i])
     
-    self.covertStringToData(dataList)
+    self.covertStringToData(self.dataList)
     self.update()
     if self.startToPlot:
       self.updateDataPlot()
@@ -411,13 +414,13 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.plotBuffer.append(self.posAct)
 
   def onChangeAxisDiagPv(self,pvname=None, value=None, char_value=None,timestamp=None, **kw):
-    errorCode=self.parseAxisStatArray(char_value)
+    self.errorCode=self.parseAxisStatArray(char_value)
 
-    if errorCode:
-      print("Parse failed with error code: " + str(errorCode))    
+    if self.errorCode:
+      print("Parse failed with error code: " + str(self.errorCode))
     
-    strTime=datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S%f')
-    self.stdItemArrayData[TIMESTAMP_INDEX].setData(strTime,role=QtCore.Qt.DisplayRole)
+    self.strTime=datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S%f')
+    self.stdItemArrayData[TIMESTAMP_INDEX].setData(self.strTime,role=QtCore.Qt.DisplayRole)
 
 
   def connect(self, pvname):
