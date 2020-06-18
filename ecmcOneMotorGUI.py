@@ -589,7 +589,6 @@ class MotorPanel(QtWidgets.QDialog):
 
     def onReturnVAL(self):
         '''new target value was entered in this panel'''
-        print('New setpoint')
         if self.motorPv is not None:
             number = float(self.controls['VAL'].text())            
             #self.motorPv.move(number)
