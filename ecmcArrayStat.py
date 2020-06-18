@@ -4,7 +4,7 @@ import epics
 import numpy as np
 from PyQt5 import QtCore,QtWidgets, QtGui
 import random
-import ecmcGraphWrapper as graphWrap 
+#import ecmcGraphWrapper as graphWrap 
 #import matplotlib as mpl
 #mpl.use('Qt5Agg')
 #import matplotlib.pyplot as plt
@@ -190,7 +190,7 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.populate()    
     self.model.setHorizontalHeaderLabels(['Parameter', 'Value', ''])
     self.btnPlot=QtWidgets.QPushButton('Plot',default=False, autoDefault=False)    
-    self.graph=graphWrap.ecmcGraphWrapper(parent=self)
+    #self.graph=graphWrap.ecmcGraphWrapper(parent=self)
     self.show()
 
   def populate(self):
@@ -258,6 +258,7 @@ class ecmcArrayStat(QtWidgets.QTableView):
           func(dataList[i],self.stdItemArrayData[i])
     
     self.covertStringToData(dataList)
+    self.update()
     if self.startToPlot:
       self.updateDataPlot()
 
@@ -411,11 +412,12 @@ class ecmcArrayStat(QtWidgets.QTableView):
 
   def onChangeAxisDiagPv(self,pvname=None, value=None, char_value=None,timestamp=None, **kw):
     errorCode=self.parseAxisStatArray(char_value)
+
     if errorCode:
       print("Parse failed with error code: " + str(errorCode))    
     
     strTime=datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S%f')
-    self.stdItemArrayData[TIMESTAMP_INDEX].setData(strTime,role=QtCore.Qt.DisplayRole)          
+    self.stdItemArrayData[TIMESTAMP_INDEX].setData(strTime,role=QtCore.Qt.DisplayRole)
 
 
   def connect(self, pvname):
@@ -467,10 +469,10 @@ class ecmcArrayStat(QtWidgets.QTableView):
     print("homeSensor       :  " + str(self.homeSensor))
     return
 
-  def startPlot(self):    
-    self.graph.openWindow()
-    self.startToPlot=True;  
+  #def startPlot(self):    
+  #  self.graph.openWindow()
+  #  self.startToPlot=True;  
 
-  def updateDataPlot(self): 
-    if self.startToPlot:   
-      self.graph.setData(self.posAct)
+  #def updateDataPlot(self): 
+  #  if self.startToPlot:   
+  #    self.graph.setData(self.posAct)

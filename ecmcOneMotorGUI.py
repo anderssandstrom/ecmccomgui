@@ -589,9 +589,11 @@ class MotorPanel(QtWidgets.QDialog):
 
     def onReturnVAL(self):
         '''new target value was entered in this panel'''
+        print('New setpoint')
         if self.motorPv is not None:
-            number = float(self.controls['VAL'].text())
-            self.motorPv.move(number)
+            number = float(self.controls['VAL'].text())            
+            #self.motorPv.move(number)
+            self.motorPv.put('VAL',number)
 
     def onChangeCNEN(self, value = None, **kws):
         '''EPICS monitor on CNEN called this'''
