@@ -2,14 +2,23 @@
 import sys
 import epics
 import numpy as np
+
 from PyQt5 import QtCore,QtWidgets, QtGui
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtCore import QObject
+from PyQt5.QtGui import *
+
 import random
-#import ecmcGraphWrapper as graphWrap 
+import ecmcTrend
+#import ecmcGraphWrapper as graphWrap
 #import matplotlib as mpl
 #mpl.use('Qt5Agg')
 #import matplotlib.pyplot as plt
 #import matplotlib.lines
 from datetime import datetime
+import threading
+
 
 PARSE_ERROR_ELEMENT_COUNT_OUT_OF_RANGE = 1000
 ELEMENT_COUNT = 30
@@ -104,6 +113,23 @@ STYLES={
                    '''
 }
 
+# You need to setup a signal slot mechanism, to
+# send data to your GUI in a thread-safe way.
+# Believe me, if you don't do this right, things
+# go very very wrong..
+class comTable(QObject):
+    data_signal = pyqtSignal(str,float)
+
+''' End Class '''
+# You need to setup a signal slot mechanism, to
+# send data to your GUI in a thread-safe way.
+# Believe me, if you don't do this right, things
+# go very very wrong..
+class comTrend(QObject):
+    data_signal = pyqtSignal(float)
+
+''' End Class '''
+
 class ecmcArrayStat(QtWidgets.QTableView):
   def __init__(self,parent=None):
     super(ecmcArrayStat, self).__init__(parent)
@@ -183,6 +209,12 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.stdItemArraySelect=[]
     
     self.create_GUI()
+
+    self.comTable = comTable()    
+    self.comTable.data_signal.connect(self.updateGUI)
+
+    self.comTrend = comTrend()
+    self.comTrend.data_signal.connect(self.trend.addData_callbackFunc)
     return
 
   def create_GUI(self):
@@ -192,7 +224,10 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.table.setModel(self.model)  # SETTING THE MODEL    
     self.populate()    
     self.model.setHorizontalHeaderLabels(['Parameter', 'Value', ''])
-    self.btnPlot=QtWidgets.QPushButton('Plot',default=False, autoDefault=False)    
+    self.btnPlot=QtWidgets.QPushButton('Plot',default=False, autoDefault=False)
+    
+    self.trend=ecmcTrend.ecmcTrend()
+
     #self.graph=graphWrap.ecmcGraphWrapper(parent=self)
     self.show()
 
@@ -414,6 +449,16 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.plotBuffer.append(self.posAct)
 
   def onChangeAxisDiagPv(self,pvname=None, value=None, char_value=None,timestamp=None, **kw):
+    
+    #self.errorCode=self.parseAxisStatArray(char_value)
+    self.comTable.data_signal.emit(char_value,timestamp)
+    #if self.errorCode:
+    #  print("Parse failed with error code: " + str(self.errorCode))    
+    #self.strTime=datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S%f')
+    #self.stdItemArrayData[TIMESTAMP_INDEX].setData(self.strTime,role=QtCore.Qt.DisplayRole)
+
+  # All update of GUI here..
+  def updateGUI(self, char_value, timestamp):
     self.errorCode=self.parseAxisStatArray(char_value)
 
     if self.errorCode:
@@ -472,10 +517,12 @@ class ecmcArrayStat(QtWidgets.QTableView):
     print("homeSensor       :  " + str(self.homeSensor))
     return
 
-  #def startPlot(self):    
-  #  self.graph.openWindow()
-  #  self.startToPlot=True;  
+  def startPlot(self):
+    self.trend.show()
+    self.startToPlot=True;  
 
-  #def updateDataPlot(self): 
-  #  if self.startToPlot:   
-  #    self.graph.setData(self.posAct)
+  def updateDataPlot(self): 
+    if self.startToPlot:
+       self.comTrend.data_signal.emit(self.posAct)
+
+#      self.graph.setData(self.posAct)
