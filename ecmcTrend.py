@@ -27,6 +27,11 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 import time
 import threading
 
+# ADD buffer size
+# Auto zoom button
+# make clear button work
+# Y low and high working
+
 class ecmcTrend(QtWidgets.QDialog):
     def __init__(self):
         super(ecmcTrend, self).__init__()
