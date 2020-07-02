@@ -36,7 +36,7 @@ class ecmcTrend(QtWidgets.QDialog):
     def __init__(self):
         super(ecmcTrend, self).__init__()
         # Define the geometry of the main window
-        self.setGeometry(300, 300, 800, 400)
+        self.setGeometry(300, 300, 800, 600)
         self.setWindowTitle("ECMC: Plot")
         # Create FRAME_A
         self.FRAME_A = QFrame(self)
@@ -45,31 +45,47 @@ class ecmcTrend(QtWidgets.QDialog):
         self.FRAME_A.setLayout(self.LAYOUT_A)
         # self.setCentralWidget(self.FRAME_A)
         # Place the zoom button
-        self.lineEditHigh = QLineEdit(text = '100')
-        self.lineEditHigh.setFixedSize(100, 50)
-        self.lineEditHigh.textChanged.connect(self.lineEditHighAction)
+        self.lineEditZoomHigh = QLineEdit(text = '100')
+        self.lineEditZoomHigh.setFixedSize(100, 50)
+        #self.lineEditZoomHigh.returnPressed.connect(self.lineEditHighAction)
 
-        self.lineEditLow = QLineEdit(text = '-100')
-        self.lineEditLow.setFixedSize(100, 50)
-        self.lineEditLow.textChanged.connect(self.lineEditLowAction)
+        self.lineEditZoomLow = QLineEdit(text = '-100')
+        self.lineEditZoomLow.setFixedSize(100, 50)
+        #self.lineEditZoomLow.returnPressed.connect(self.lineEditLowAction)
 
-        self.zoomBtn = QPushButton(text = 'zoom')
+        self.zoomBtn = QPushButton(text = 'zoom auto')
         self.zoomBtn.setFixedSize(100, 50)
         self.zoomBtn.clicked.connect(self.zoomBtnAction)
 
-        self.clearBtn = QPushButton(text = 'clear')
-        self.clearBtn.setFixedSize(100, 50)
-        self.clearBtn.clicked.connect(self.clearBtnAction)
+        #self.clearBtn = QPushButton(text = 'clear')
+        #self.clearBtn.setFixedSize(100, 50)
+        #self.clearBtn.clicked.connect(self.clearBtnAction)
 
         self.pauseBtn = QPushButton(text = 'pause')
         self.pauseBtn.setFixedSize(100, 50)
         self.pauseBtn.clicked.connect(self.pauseBtnAction)
 
-        self.LAYOUT_A.addWidget(self.lineEditHigh, *(0,0))
-        self.LAYOUT_A.addWidget(self.zoomBtn, *(1,0))
-        self.LAYOUT_A.addWidget(self.clearBtn, *(2,0))
-        self.LAYOUT_A.addWidget(self.pauseBtn, *(3,0))
-        self.LAYOUT_A.addWidget(self.lineEditLow, *(4,0))
+        self.zoomLowBtn = QPushButton(text = '>')
+        self.zoomLowBtn.setFixedSize(100, 50)
+        self.zoomLowBtn.clicked.connect(self.zoomLowBtnAction)
+
+        self.zoomHighBtn = QPushButton(text = '>')
+        self.zoomHighBtn.setFixedSize(100, 50)
+        self.zoomHighBtn.clicked.connect(self.zoomHighBtnAction)
+        
+        self.spacerUpper = QSpacerItem(100,10)
+        self.spacerLower = QSpacerItem(100,10)
+        
+
+        self.LAYOUT_A.addWidget(self.lineEditZoomHigh, *(0,0))
+        self.LAYOUT_A.addWidget(self.zoomHighBtn, *(1,0))
+        self.LAYOUT_A.addItem(self.spacerUpper, *(2,0))
+        self.LAYOUT_A.addWidget(self.zoomBtn, *(3,0))
+        #self.LAYOUT_A.addWidget(self.clearBtn, *(4,0))
+        self.LAYOUT_A.addWidget(self.pauseBtn, *(4,0))
+        self.LAYOUT_A.addItem(self.spacerLower, *(5,0))
+        self.LAYOUT_A.addWidget(self.zoomLowBtn, *(6,0))
+        self.LAYOUT_A.addWidget(self.lineEditZoomLow, *(7,0))
 
         # Place the matplotlib figure
         self.myFig = CustomFigCanvas()
@@ -77,34 +93,47 @@ class ecmcTrend(QtWidgets.QDialog):
         self.toolbar = NavigationToolbar(self.myFig, self)
         self.LAYOUT_A.addWidget(self.toolbar, *(0,1))
         self.LAYOUT_A.addWidget(self.myFig, *(1,1))
-        # Add the callbackfunc to ..
-        #myDataLoop = threading.Thread(name = 'myDataLoop', target = dataSendLoop, daemon = True, args = (self.addData_callbackFunc,))
-        #myDataLoop.start()
-        #self.show()    
+        self.lineEditZoomLow.setText(str(self.myFig.getYLims()[0]))
+        self.lineEditZoomHigh.setText(str(self.myFig.getYLims()[1]))
+        
         return
 
-    def zoomBtnAction(self):
-        print("zoom in")
-        self.myFig.zoomIn(5)
+    def zoomBtnAction(self):        
+        self.myFig.zoomAuto()
+        self.lineEditZoomLow.setText(str(np.round(self.myFig.getYLims()[0]*100)/100))
+        self.lineEditZoomHigh.setText(str(np.round(self.myFig.getYLims()[1]*100)/100))
         return
 
-    def clearBtnAction(self):
-        print("clear")
-        self.myFig.clearData()
+    def zoomHighBtnAction(self):
+        value = float(self.lineEditZoomHigh.text())
+        self.myFig.zoomHigh(value)
         return
 
-    def pauseBtnAction(self):
-        print("pause")
+    def zoomLowBtnAction(self):
+        value = float(self.lineEditZoomLow.text())
+        self.myFig.zoomLow(value)
+        return
+
+    #def clearBtnAction(self):
+    #    print("clear")
+    #    self.myFig.clearData()
+    #    return
+
+    def pauseBtnAction(self):        
         self.myFig.pauseUpdate()
         return
 
     def lineEditHighAction(self):
         print("lineEditHighAction")
+        value = float(self.lineEditZoomHigh.text())
+        self.myFig.zoomHigh(value)
         #self.myFig.pauseUpdate()
         return
 
     def lineEditLowAction(self):
         print("lineEditLowAction")
+        value = float(self.lineEditZoomLow.text())
+        self.myFig.zoomLow(value)
         #self.myFig.pauseUpdate()
         return
 
@@ -119,11 +148,13 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
     def __init__(self):
         self.pause = 0
         self.addedData = []
+        self.exceptCount = 0
+        self.autoZoom =  False
         print(matplotlib.__version__)
         # The data
         self.xlim = 1000
         self.n = np.linspace(0, self.xlim - 1, self.xlim)
-        self.y = (self.n * 0.0) + 50
+        self.y = (self.n * 0.0)
         # The window
         self.fig = Figure(figsize=(5,5), dpi=100)
         self.ax1 = self.fig.add_subplot(111)        
@@ -146,9 +177,9 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
     def new_frame_seq(self):
         return iter(range(self.n.size))
 
-    def clearData(self):
-        print("clearData")
-        self.addedData = []
+    #def clearData(self):
+    #    print("clearData")
+    #    self.ax1.remove()
 
     def pauseUpdate(self):
         print("pause")        
@@ -163,32 +194,33 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
             l.set_data([], [])
         return
 
-    def addData(self, value):
-        #test auto zoom
-        bottom = self.ax1.get_ylim()[0]
-        top = self.ax1.get_ylim()[1]        
-        redraw = 0
-        if value>top:
-          top = value + (top-bottom)/10
-          redraw = 1
-          
-        if value<bottom:
-          bottom = value - (top-bottom)/10
-          redraw = 1
-        if redraw:
-          self.ax1.set_ylim(bottom,top)
-          self.draw()
-         
+    def addData(self, value):         
         if self.pause == 0:
           self.addedData.append(value)
-        
         return
 
-    def zoomIn(self, value):
-        bottom = self.ax1.get_ylim()[0]
+    def zoomAuto(self):
+        bottom = np.min(self.y)
+        top = np.max(self.y)
+        range = top - bottom
+        top += range * 0.1
+        bottom -= range *0.1
+        self.ax1.set_ylim(bottom,top)
+        self.draw()
+        return
+    
+    def zoomLow(self, value):
         top = self.ax1.get_ylim()[1]
-        bottom += value
-        top -= value
+        bottom = value
+        print('Top: ' + str(top) +', Bottom: ' + str(bottom)+ ', ylim: ' + str(self.ax1.get_ylim()))
+        self.ax1.set_ylim(bottom,top)
+        self.draw()
+        return
+
+    def zoomHigh(self, value):
+        bottom = self.ax1.get_ylim()[0]
+        top = value
+        print('Top: ' + str(top) +', Bottom: ' + str(bottom))
         self.ax1.set_ylim(bottom,top)
         self.draw()
         return
@@ -198,11 +230,14 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
         try:
             TimedAnimation._step(self, *args)
         except Exception as e:
-            self.abc += 1
-            print(str(self.abc))
+            self.exceptCount += 1
+            print(str(self.exceptCount))
             TimedAnimation._stop(self)
             pass
         return
+
+    def getYLims(self):
+        return self.ax1.get_ylim()
 
     def _draw_frame(self, framedata):
         margin = 2
