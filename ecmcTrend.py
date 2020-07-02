@@ -123,8 +123,8 @@ class ecmcTrend(QtWidgets.QDialog):
 
     def zoomBtnAction(self):        
         self.myFig.zoomAuto()
-        self.lineEditZoomLow.setText(str(np.round(self.myFig.getYLims()[0]*100)/100))
-        self.lineEditZoomHigh.setText(str(np.round(self.myFig.getYLims()[1]*100)/100))
+        #self.lineEditZoomLow.setText(str(np.round(self.myFig.getYLims()[0]*100)/100))
+        #self.lineEditZoomHigh.setText(str(np.round(self.myFig.getYLims()[1]*100)/100))
         return
 
     def zoomHighBtnAction(self):
@@ -229,6 +229,7 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
         top += range * 0.1
         bottom -= range *0.1
         self.ax1.set_ylim(bottom,top)
+        self.ax1.set_xlim(1,1000)
         self.draw()
         return
     

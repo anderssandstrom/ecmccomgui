@@ -23,6 +23,7 @@ import threading
 PARSE_ERROR_ELEMENT_COUNT_OUT_OF_RANGE = 1000
 ELEMENT_COUNT = 30
 TIMESTAMP_INDEX = 30
+TREND_DEFAULT_INDEX = 2
 
 ECMC_COMMAND = {
     'MOVE_VEL': 1,
@@ -134,7 +135,7 @@ class ecmcArrayStat(QtWidgets.QTableView):
   def __init__(self,parent=None):
     super(ecmcArrayStat, self).__init__(parent)
     self.background=None
-    self.plotBuffer=[]    
+    #self.plotBuffer=[]    
     self.startToPlot=False; 
     self.axId=0
     self.posSet=0
@@ -168,6 +169,8 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.lowLim=0
     self.highLim=0
     self.homeSensor=0
+    self.trendValue = 0
+    self.trendDataIndex = TREND_DEFAULT_INDEX # Pos-Act
     self.dataList=[]
     self.dataSourceConvFuncPoint = {
       0 :self.defaultStrFunc,
@@ -414,7 +417,7 @@ class ecmcArrayStat(QtWidgets.QTableView):
       cell.setBackground(QtGui.QBrush(QtCore.Qt.white))      
     cell.setData(strToSet,role=QtCore.Qt.DisplayRole)
 
-  def covertStringToData(self,dataList):
+  def covertStringToData(self,dataList):    
     self.axId=int(dataList[0])
     self.posSet=float(dataList[1])
     self.posAct=float(dataList[2])
@@ -445,8 +448,8 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.lowLim=int(dataList[27])
     self.highLim=int(dataList[28])
     self.homeSensor=int(dataList[29])
-
-    self.plotBuffer.append(self.posAct)
+    self.trendValue = float(dataList[self.trendDataIndex])
+    #self.plotBuffer.append(self.posAct)
 
   def onChangeAxisDiagPv(self,pvname=None, value=None, char_value=None,timestamp=None, **kw):
     
@@ -518,11 +521,17 @@ class ecmcArrayStat(QtWidgets.QTableView):
     return
 
   def startPlot(self):
+    self.trendDataIndex = self.checkPlotVar()
     self.trend.show()
     self.startToPlot=True;  
 
   def updateDataPlot(self): 
     if self.startToPlot:
-       self.comTrend.data_signal.emit(self.posAct)
-
-#      self.graph.setData(self.posAct)
+       self.comTrend.data_signal.emit(self.trendValue)
+  
+  # return first index of selected data (only support one var currently)
+  def checkPlotVar(self):
+    for i in range(0,ELEMENT_COUNT):
+      if self.stdItemArraySelect[i].checkState():
+        return i
+    return TREND_DEFAULT_INDEX
