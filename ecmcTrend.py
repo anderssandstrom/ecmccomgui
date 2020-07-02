@@ -28,74 +28,97 @@ import time
 import threading
 
 # ADD buffer size
-# Auto zoom button
-# make clear button work
-# Y low and high working
 
 class ecmcTrend(QtWidgets.QDialog):
     def __init__(self):
         super(ecmcTrend, self).__init__()
         # Define the geometry of the main window
-        self.setGeometry(300, 300, 800, 600)
+        self.setGeometry(300, 300, 900, 600)
         self.setWindowTitle("ECMC: Plot")
         # Create FRAME_A
-        self.FRAME_A = QFrame(self)
-        self.FRAME_A.setStyleSheet("QWidget { background-color: %s }" % QColor(210,210,235,255).name())
-        self.LAYOUT_A = QGridLayout()
-        self.FRAME_A.setLayout(self.LAYOUT_A)
-        # self.setCentralWidget(self.FRAME_A)
-        # Place the zoom button
-        self.lineEditZoomHigh = QLineEdit(text = '100')
+        self.main_frame= QtWidgets.QFrame(self)
+        self.main_layout = QtWidgets.QHBoxLayout()
+
+        self.left_frame = QFrame(self)
+        self.left_layout = QVBoxLayout()
+
+        self.right_frame = QFrame(self)
+        self.right_layout = QVBoxLayout()
+        
+        # Manual zoom High
+        self.zoomHigh_frame = QFrame(self)
+        self.zoomHigh_layout = QHBoxLayout()
+        self.lineEditZoomHigh = QLineEdit(text = '80')
         self.lineEditZoomHigh.setFixedSize(100, 50)
         #self.lineEditZoomHigh.returnPressed.connect(self.lineEditHighAction)
+        self.zoomHighBtn = QPushButton(text = '>')
+        self.zoomHighBtn.setFixedSize(10, 50)
+        self.zoomHighBtn.clicked.connect(self.zoomHighBtnAction)
+        self.zoomHigh_layout.addWidget(self.lineEditZoomHigh)
+        self.zoomHigh_layout.addWidget(self.zoomHighBtn)
+        self.zoomHigh_frame.setLayout(self.zoomHigh_layout)
 
-        self.lineEditZoomLow = QLineEdit(text = '-100')
-        self.lineEditZoomLow.setFixedSize(100, 50)
-        #self.lineEditZoomLow.returnPressed.connect(self.lineEditLowAction)
-
+        # Auto zoom
         self.zoomBtn = QPushButton(text = 'zoom auto')
         self.zoomBtn.setFixedSize(100, 50)
         self.zoomBtn.clicked.connect(self.zoomBtnAction)
-
+        
+        # Clear
         #self.clearBtn = QPushButton(text = 'clear')
         #self.clearBtn.setFixedSize(100, 50)
         #self.clearBtn.clicked.connect(self.clearBtnAction)
 
+        # Pause
         self.pauseBtn = QPushButton(text = 'pause')
         self.pauseBtn.setFixedSize(100, 50)
         self.pauseBtn.clicked.connect(self.pauseBtnAction)
 
+        # Manual zoom Low
+        self.zoomLow_frame = QFrame(self)
+        self.zoomLow_layout = QHBoxLayout()
+        self.lineEditZoomLow = QLineEdit(text = '-100')
+        self.lineEditZoomLow.setFixedSize(100, 50)
+        #self.lineEditZoomLow.returnPressed.connect(self.lineEditLowAction)
         self.zoomLowBtn = QPushButton(text = '>')
-        self.zoomLowBtn.setFixedSize(100, 50)
+        self.zoomLowBtn.setFixedSize(10, 50)
         self.zoomLowBtn.clicked.connect(self.zoomLowBtnAction)
+        self.zoomLow_layout.addWidget(self.lineEditZoomLow)
+        self.zoomLow_layout.addWidget(self.zoomLowBtn)
+        self.zoomLow_frame.setLayout(self.zoomLow_layout)
 
-        self.zoomHighBtn = QPushButton(text = '>')
-        self.zoomHighBtn.setFixedSize(100, 50)
-        self.zoomHighBtn.clicked.connect(self.zoomHighBtnAction)
-        
-        self.spacerUpper = QSpacerItem(100,10)
-        self.spacerLower = QSpacerItem(100,10)
-        
 
-        self.LAYOUT_A.addWidget(self.lineEditZoomHigh, *(0,0))
-        self.LAYOUT_A.addWidget(self.zoomHighBtn, *(1,0))
-        self.LAYOUT_A.addItem(self.spacerUpper, *(2,0))
-        self.LAYOUT_A.addWidget(self.zoomBtn, *(3,0))
-        #self.LAYOUT_A.addWidget(self.clearBtn, *(4,0))
-        self.LAYOUT_A.addWidget(self.pauseBtn, *(4,0))
-        self.LAYOUT_A.addItem(self.spacerLower, *(5,0))
-        self.LAYOUT_A.addWidget(self.zoomLowBtn, *(6,0))
-        self.LAYOUT_A.addWidget(self.lineEditZoomLow, *(7,0))
+        self.spacerTop = QSpacerItem(100,50)
+        self.spacerZoomUpper = QSpacerItem(100,10)
+        self.spacerZoomLower = QSpacerItem(100,10)
+        
+        self.left_layout.addItem(self.spacerTop)
+        self.left_layout.addWidget(self.zoomHigh_frame)
+        #self.left_layout.addWidget(self.lineEditZoomHigh)
+        #self.left_layout.addWidget(self.zoomHighBtn)
+        #self.left_layout.addItem(self.spacerZoomUpper)
+        self.left_layout.addWidget(self.zoomBtn)
+        #self.left_layout.addWidget(self.clearBtn)
+        self.left_layout.addWidget(self.pauseBtn)        
+        self.left_layout.addWidget(self.zoomLow_frame)
+        #self.left_layout.addItem(self.spacerZoomLower)
+        #self.left_layout.addWidget(self.zoomLowBtn)
+        #self.left_layout.addWidget(self.lineEditZoomLow)
 
         # Place the matplotlib figure
         self.myFig = CustomFigCanvas()
-        self.myFig.setFixedSize(500,300 )
+        self.myFig.setFixedSize(700,500 )
         self.toolbar = NavigationToolbar(self.myFig, self)
-        self.LAYOUT_A.addWidget(self.toolbar, *(0,1))
-        self.LAYOUT_A.addWidget(self.myFig, *(1,1))
+        self.right_layout.addWidget(self.toolbar)
+        self.right_layout.addWidget(self.myFig)
         self.lineEditZoomLow.setText(str(self.myFig.getYLims()[0]))
         self.lineEditZoomHigh.setText(str(self.myFig.getYLims()[1]))
         
+        self.left_frame.setLayout(self.left_layout)
+        self.right_frame.setLayout(self.right_layout)
+        self.main_layout.addWidget(self.left_frame)
+        self.main_layout.addWidget(self.right_frame)
+        self.main_frame.setLayout(self.main_layout)
+
         return
 
     def zoomBtnAction(self):        
@@ -179,7 +202,7 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
 
     #def clearData(self):
     #    print("clearData")
-    #    self.ax1.remove()
+    #    self.y = []
 
     def pauseUpdate(self):
         print("pause")        
@@ -211,8 +234,7 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
     
     def zoomLow(self, value):
         top = self.ax1.get_ylim()[1]
-        bottom = value
-        print('Top: ' + str(top) +', Bottom: ' + str(bottom)+ ', ylim: ' + str(self.ax1.get_ylim()))
+        bottom = value        
         self.ax1.set_ylim(bottom,top)
         self.draw()
         return
@@ -220,7 +242,6 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
     def zoomHigh(self, value):
         bottom = self.ax1.get_ylim()[0]
         top = value
-        print('Top: ' + str(top) +', Bottom: ' + str(bottom))
         self.ax1.set_ylim(bottom,top)
         self.draw()
         return
