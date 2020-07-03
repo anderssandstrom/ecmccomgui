@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>929</width>
-    <height>310</height>
+    <width>348</width>
+    <height>211</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,32 +18,11 @@
     <item row="0" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <layout class="QVBoxLayout" name="pvLayout">
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>PV name:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit"/>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pbStartpvTrend">
-          <property name="text">
-           <string>Open PV Trend</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
        <layout class="QVBoxLayout" name="motorLayout">
         <item>
          <widget class="QLabel" name="lblPrefix">
           <property name="text">
-           <string>IOC Prefix:</string>
+           <string>ioc prefix</string>
           </property>
          </widget>
         </item>
@@ -53,17 +32,17 @@
         <item>
          <widget class="QLabel" name="label">
           <property name="text">
-           <string>Axis Name:</string>
+           <string>pv name</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineAxisName"/>
+         <widget class="QLineEdit" name="linepvName"/>
         </item>
         <item>
          <widget class="QPushButton" name="pbStartMotorGUI">
           <property name="text">
-           <string>Open Motor GUI</string>
+           <string>open gui</string>
           </property>
          </widget>
         </item>

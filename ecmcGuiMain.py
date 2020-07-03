@@ -24,34 +24,32 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
   def __init__(self):
     
     super(ecmcMainWindow,self).__init__()
-    #self.ui=uic.loadUi('ecmcMainWndDesigner.ui', self) # Load the .ui file
     self.ui = Ui_MainWindow()
     self.ui.setupUi(self)
     self.ui.pbStartMotorGUI.clicked.connect(self.showMotorGUI)
     self.ui.lineIOCPrefix.textChanged.connect(self.newIOCPrefix)
-    self.ui.lineAxisName.textChanged.connect(self.newIOCAxisName)    
+    self.ui.linepvName.textChanged.connect(self.newIOCpvName)    
     self.prefix=""
-    self.axisName=""
-    
+    self.pvName=""    
 
-    print(sys.argv)
+    
     if len(sys.argv)>1:
       self.prefix=sys.argv[1]
       self.ui.lineIOCPrefix.setText(self.prefix)
       if len(sys.argv)>2:
-        self.axisName=sys.argv[2]
-        self.ui.lineAxisName.setText(self.axisName)
+        self.pvName=sys.argv[2]
+        self.ui.linepvName.setText(self.pvName)
 
   def showMotorGUI(self):
-    self.dialog = MotorPanel(self,self.prefix,self.axisName)
+    self.dialog = MotorPanel(self,self.prefix,self.pvName)
     self.dialog.resize(500, 900)
     self.dialog.show()
     
   def newIOCPrefix(self,iocPrefix):
     self.prefix=iocPrefix
 
-  def newIOCAxisName(self,axisName):
-    self.axisName=axisName
+  def newIOCpvName(self,pvName):
+    self.pvName=pvName
 
   def quit(self):
     self.close()
