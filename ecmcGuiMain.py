@@ -1,7 +1,7 @@
 #!/usr/bin/python3.6
 # coding: utf-8
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets,uic
 import numpy as np
 import epics
 from ecmcArrayStat import *
@@ -18,20 +18,22 @@ from ecmcMainWndDesigner import Ui_MainWindow
 
 
 # Regenerate py from ui file:
-# pyuic5 ecmcMainWndDesigner.ui -o ecmcMainWndDesigner.py
-
-# run with python3.6 ecmcGuiMain.py
+# pyuic5 -x ecmcMainWndDesigner.ui -o ecmcMainWndDesigner.py
 
 class ecmcMainWindow(QtWidgets.QMainWindow):
   def __init__(self):
+    
     super(ecmcMainWindow,self).__init__()
+    #self.ui=uic.loadUi('ecmcMainWndDesigner.ui', self) # Load the .ui file
     self.ui = Ui_MainWindow()
     self.ui.setupUi(self)
     self.ui.pbStartMotorGUI.clicked.connect(self.showMotorGUI)
     self.ui.lineIOCPrefix.textChanged.connect(self.newIOCPrefix)
-    self.ui.lineAxisName.textChanged.connect(self.newIOCAxisName)
+    self.ui.lineAxisName.textChanged.connect(self.newIOCAxisName)    
     self.prefix=""
     self.axisName=""
+    
+
     print(sys.argv)
     if len(sys.argv)>1:
       self.prefix=sys.argv[1]

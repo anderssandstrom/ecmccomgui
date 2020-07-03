@@ -136,7 +136,7 @@ class ecmcTrend(QtWidgets.QDialog):
         return
 
     def setBufferSizeBtnAction(self):
-        print("Buffer size")
+        #print("Buffer size")
         value = float(self.lineBufferSize.text())
         self.myFig.setBufferSize(value)
 
@@ -166,14 +166,14 @@ class ecmcTrend(QtWidgets.QDialog):
         return
 
     def lineEditHighAction(self):
-        print("lineEditHighAction")
+        #print("lineEditHighAction")
         value = float(self.lineEditZoomHigh.text())
         self.myFig.zoomHigh(value)
         #self.myFig.pauseUpdate()
         return
 
     def lineEditLowAction(self):
-        print("lineEditLowAction")
+        #print("lineEditLowAction")
         value = float(self.lineEditZoomLow.text())
         self.myFig.zoomLow(value)
         #self.myFig.pauseUpdate()
@@ -225,7 +225,7 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
     #    self.y = []
 
     def setBufferSize(self, bufferSize):
-        if(bufferSize<=0):
+        if bufferSize<1000 :
             print("Buffer size out of range: " + str(bufferSize))
             return
         fillValue = self.y[0]
@@ -240,14 +240,13 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
         else:
             #self.y = np.resize(self.y,self.xlim)
             self.y = self.y[oldSize-self.xlim:-1]
-            print( "Length: " + str(len(self.y)))
+            #print( "Length: " + str(len(self.y)))
 
         self.ax1.set_xlim(1,self.xlim)
         self.draw()
 
 
-    def pauseUpdate(self):
-        print("pause")
+    def pauseUpdate(self):        
         if self.pause:
           self.pause = 0
         else:
