@@ -48,7 +48,7 @@ class ecmcTrend(QtWidgets.QDialog):
         # Manual zoom High
         self.zoomHigh_frame = QFrame(self)
         self.zoomHigh_layout = QHBoxLayout()
-        self.lineEditZoomHigh = QLineEdit(text = '80')
+        self.lineEditZoomHigh = QLineEdit(text = '100')
         self.lineEditZoomHigh.setFixedSize(100, 50)
         #self.lineEditZoomHigh.returnPressed.connect(self.lineEditHighAction)
         self.zoomHighBtn = QPushButton(text = '>')
@@ -86,6 +86,19 @@ class ecmcTrend(QtWidgets.QDialog):
         self.zoomLow_layout.addWidget(self.zoomLowBtn)
         self.zoomLow_frame.setLayout(self.zoomLow_layout)
 
+        # Buffer size
+        self.bufferSize_frame = QFrame(self)
+        self.bufferSize_layout = QHBoxLayout()
+        self.lineBufferSize = QLineEdit(text = '1000')
+        self.lineBufferSize.setFixedSize(100, 50)
+        #self.lineEditZoomHigh.returnPressed.connect(self.lineEditHighAction)
+        self.setBufferSizeBtn = QPushButton(text = '>')
+        self.setBufferSizeBtn.setFixedSize(10, 50)
+        self.setBufferSizeBtn.clicked.connect(self.setBufferSizeBtnAction)
+        self.bufferSize_layout.addWidget(self.lineBufferSize)
+        self.bufferSize_layout.addWidget(self.setBufferSizeBtn)
+        self.bufferSize_frame.setLayout(self.bufferSize_layout)
+
 
         self.spacerTop = QSpacerItem(100,50)
         self.spacerZoomUpper = QSpacerItem(100,10)
@@ -97,6 +110,7 @@ class ecmcTrend(QtWidgets.QDialog):
         #self.left_layout.addWidget(self.zoomHighBtn)
         #self.left_layout.addItem(self.spacerZoomUpper)
         self.left_layout.addWidget(self.zoomBtn)
+        self.left_layout.addWidget(self.bufferSize_frame)
         #self.left_layout.addWidget(self.clearBtn)
         self.left_layout.addWidget(self.pauseBtn)        
         self.left_layout.addWidget(self.zoomLow_frame)
@@ -120,6 +134,11 @@ class ecmcTrend(QtWidgets.QDialog):
         self.main_frame.setLayout(self.main_layout)
 
         return
+
+    def setBufferSizeBtnAction(self):
+        print("Buffer size")
+        value = float(self.lineBufferSize.text())
+        self.myFig.setBufferSize(value)
 
     def zoomBtnAction(self):        
         self.myFig.zoomAuto()
@@ -193,6 +212,7 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
         self.ax1.set_xlim(0, self.xlim - 1)
         self.ax1.set_ylim(-100, 100)
         self.ax1.grid()
+        self.firstUpdatedData = True
         FigureCanvas.__init__(self, self.fig)
         TimedAnimation.__init__(self, self.fig, interval = 50, blit = True)
         return
@@ -204,8 +224,30 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
     #    print("clearData")
     #    self.y = []
 
+    def setBufferSize(self, bufferSize):
+        if(bufferSize<=0):
+            print("Buffer size out of range: " + str(bufferSize))
+            return
+        fillValue = self.y[0]
+        oldSize = self.xlim
+        self.xlim = int(bufferSize)
+        self.n = np.linspace(0, self.xlim - 1, self.xlim)        
+        
+        if self.xlim > oldSize:
+            tempArray = np.full(self.xlim - oldSize,fillValue)
+            self.y = np.concatenate((tempArray, self.y))
+            #self.y[0:(self.xlim-oldSize)]=fillValue        
+        else:
+            #self.y = np.resize(self.y,self.xlim)
+            self.y = self.y[oldSize-self.xlim:-1]
+            print( "Length: " + str(len(self.y)))
+
+        self.ax1.set_xlim(1,self.xlim)
+        self.draw()
+
+
     def pauseUpdate(self):
-        print("pause")        
+        print("pause")
         if self.pause:
           self.pause = 0
         else:
@@ -219,7 +261,7 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
 
     def addData(self, value):         
         if self.pause == 0:
-          self.addedData.append(value)
+            self.addedData.append(value)            
         return
 
     def zoomAuto(self):
@@ -229,7 +271,7 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
         top += range * 0.1
         bottom -= range *0.1
         self.ax1.set_ylim(bottom,top)
-        self.ax1.set_xlim(1,1000)
+        self.ax1.set_xlim(1,self.xlim)
         self.draw()
         return
     
@@ -256,6 +298,7 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
             print(str(self.exceptCount))
             TimedAnimation._stop(self)
             pass
+
         return
 
     def getYLims(self):
@@ -263,11 +306,16 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
 
     def _draw_frame(self, framedata):
         margin = 2
+            
         while(len(self.addedData) > 0):
             self.y = np.roll(self.y, -1)
             self.y[-1] = self.addedData[0]
+            if self.firstUpdatedData:
+                if len(self.addedData) > 0:
+                    self.y[0:-1] = self.addedData[0] # Set entire array to start value
+                    self.firstUpdatedData = False
             del(self.addedData[0])
-
+        
         self.line1.set_data(self.n[ 0 : self.n.size - margin ], self.y[ 0 : self.n.size - margin ])
         self.line1_tail.set_data(np.append(self.n[-10:-1 - margin], self.n[-1 - margin]), np.append(self.y[-10:-1 - margin], self.y[-1 - margin]))
         self.line1_head.set_data(self.n[-1 - margin], self.y[-1 - margin])
