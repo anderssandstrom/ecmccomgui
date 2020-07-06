@@ -35,9 +35,9 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
     self.pv=None
     
     if len(sys.argv)>1:
-      self.prefix=sys.argv[1]
-      self.ui.lineIOCPrefix.setText(self.prefix)
-      if len(sys.argv)>2:
+      self.pvPrefix=sys.argv[1]
+      self.ui.lineIOCPrefix.setText(self.pvPrefix)
+      if len(sys.argv)>2:       
         self.pvName=sys.argv[2]
         self.ui.linepvName.setText(self.pvName)
 
@@ -49,19 +49,19 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
     if pos < 0:
       pv  = epics.PV(entirePvName + '.RTYP')
       if pv.get() == 'motor':
-        self.showMotorGUI()
+        self.showMotorGUI(self.pvPrefix, self.pvName)
         return
 
     # Normal PV
-    self.showGuiPv()
+    self.showGuiPv(self.pvPrefix+self.pvName)
 
-  def showMotorGUI(self):
-    self.dialog = MotorPanel(self,self.prefix,self.pvName)
+  def showMotorGUI(self,pvPrefix,pvName):
+    self.dialog = MotorPanel(self,pvPrefix,pvName)
     self.dialog.resize(500, 900)
     self.dialog.show()
     
-  def showGuiPv(self):
-    dialog = ecmcTrendPv.ecmcTrendPv(self.prefix,self.pvName)
+  def showGuiPv(self, pvName):
+    dialog = ecmcTrendPv.ecmcTrendPv(pvName)
     dialog.show()
 
   def newIOCPrefix(self,iocPrefix):

@@ -37,11 +37,9 @@ class comTrend(QObject):
     data_signal = pyqtSignal(float)
 
 class ecmcTrendPv(QtWidgets.QDialog):
-    def __init__(self,pvPrefix=None,pvName=None):
-        print("Prefix" + pvPrefix + ", Name: " + pvName)        
+    def __init__(self,pvName=None):        
         super(ecmcTrendPv, self).__init__()
-        
-        self.pvPrefix = pvPrefix
+                
         self.pvName = pvName        
 
         # Define the geometry of the main window
@@ -129,8 +127,7 @@ class ecmcTrendPv(QtWidgets.QDialog):
         self.main_layout.addWidget(self.right_frame)
         self.main_frame.setLayout(self.main_layout)
 
-        self.fullPvName = self.pvPrefix + self.pvName
-        self.connectPv(self.fullPvName) # Epics
+        self.connectPv(self.pvName) # Epics
         self.comTrend = comTrend()
         self.comTrend.data_signal.connect(self.addData_callbackFunc) # update trend
         return
@@ -141,7 +138,7 @@ class ecmcTrendPv(QtWidgets.QDialog):
             if len(pvname)==0:
                 raise RuntimeError("pvname must not be ''")
 
-        self.pv = epics.PV(self.fullPvName)
+        self.pv = epics.PV(self.pvName)
         self.pv.add_callback(self.onChangePv)
     
     def onChangePv(self,pvname=None, value=None, char_value=None,timestamp=None, **kw):
