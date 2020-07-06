@@ -229,7 +229,7 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.model.setHorizontalHeaderLabels(['Parameter', 'Value', ''])
     self.btnPlot=QtWidgets.QPushButton('Plot',default=False, autoDefault=False)
     
-    self.trend=ecmcTrendMotor.ecmcTrendMotor()
+    self.trend=ecmcTrendMotor.ecmcTrendMotor("ecmc plot")
 
     #self.graph=graphWrap.ecmcGraphWrapper(parent=self)
     self.show()

@@ -15,6 +15,7 @@
 import sys
 import os
 import epics
+import ecmcRTCanvas
 from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets
 
@@ -43,7 +44,7 @@ class ecmcTrendPv(QtWidgets.QDialog):
         self.pvName = pvName        
 
         # Define the geometry of the main window
-        self.setGeometry(300, 300, 900, 600)
+        self.setGeometry(300, 300, 900, 700)
         self.setWindowTitle("ECMC: Plot")        
         self.main_frame= QtWidgets.QFrame(self)
         self.main_layout = QtWidgets.QHBoxLayout()
@@ -56,14 +57,16 @@ class ecmcTrendPv(QtWidgets.QDialog):
         
         # Manual zoom High
         self.zoomHigh_frame = QFrame(self)
-        self.zoomHigh_layout = QHBoxLayout()
+        self.zoomHigh_layout = QGridLayout()
+        self.lblYMax= QLabel(text = "y-max:")
         self.lineEditZoomHigh = QLineEdit(text = '100')
         self.lineEditZoomHigh.setFixedSize(100, 50)
         self.zoomHighBtn = QPushButton(text = '>')
         self.zoomHighBtn.setFixedSize(10, 50)
         self.zoomHighBtn.clicked.connect(self.zoomHighBtnAction)
-        self.zoomHigh_layout.addWidget(self.lineEditZoomHigh)
-        self.zoomHigh_layout.addWidget(self.zoomHighBtn)
+        self.zoomHigh_layout.addWidget(self.lblYMax,0,0,alignment = Qt.AlignRight | Qt.AlignBottom)
+        self.zoomHigh_layout.addWidget(self.lineEditZoomHigh,1,0,alignment = Qt.AlignRight | Qt.AlignTop)
+        self.zoomHigh_layout.addWidget(self.zoomHighBtn,1,1,alignment = Qt.AlignLeft | Qt.AlignTop)
         self.zoomHigh_frame.setLayout(self.zoomHigh_layout)
 
         # Auto zoom
@@ -78,26 +81,30 @@ class ecmcTrendPv(QtWidgets.QDialog):
 
         # Manual zoom Low
         self.zoomLow_frame = QFrame(self)
-        self.zoomLow_layout = QHBoxLayout()
+        self.zoomLow_layout = QGridLayout()
+        self.lblYMin= QLabel(text = "y-min:")
         self.lineEditZoomLow = QLineEdit(text = '-100')
         self.lineEditZoomLow.setFixedSize(100, 50)        
         self.zoomLowBtn = QPushButton(text = '>')
         self.zoomLowBtn.setFixedSize(10, 50)
         self.zoomLowBtn.clicked.connect(self.zoomLowBtnAction)
-        self.zoomLow_layout.addWidget(self.lineEditZoomLow)
-        self.zoomLow_layout.addWidget(self.zoomLowBtn)
+        self.zoomLow_layout.addWidget(self.lblYMin,0,0,alignment = Qt.AlignRight | Qt.AlignBottom)
+        self.zoomLow_layout.addWidget(self.lineEditZoomLow,1,0,alignment = Qt.AlignRight | Qt.AlignTop)
+        self.zoomLow_layout.addWidget(self.zoomLowBtn,1,1,alignment = Qt.AlignLeft | Qt.AlignTop)
         self.zoomLow_frame.setLayout(self.zoomLow_layout)
 
         # Buffer size
         self.bufferSize_frame = QFrame(self)
-        self.bufferSize_layout = QHBoxLayout()
+        self.bufferSize_layout = QGridLayout()
+        self.lblBufferSize= QLabel(text = "Buffer size []")
         self.lineBufferSize = QLineEdit(text = '1000')
         self.lineBufferSize.setFixedSize(100, 50)
         self.setBufferSizeBtn = QPushButton(text = '>')
         self.setBufferSizeBtn.setFixedSize(10, 50)
         self.setBufferSizeBtn.clicked.connect(self.setBufferSizeBtnAction)
-        self.bufferSize_layout.addWidget(self.lineBufferSize)
-        self.bufferSize_layout.addWidget(self.setBufferSizeBtn)
+        self.bufferSize_layout.addWidget(self.lblBufferSize,0,0,alignment = Qt.AlignRight | Qt.AlignBottom) # row, col
+        self.bufferSize_layout.addWidget(self.lineBufferSize, 1,0,alignment = Qt.AlignRight | Qt.AlignTop)
+        self.bufferSize_layout.addWidget(self.setBufferSizeBtn, 1,1,alignment = Qt.AlignLeft | Qt.AlignTop)
         self.bufferSize_frame.setLayout(self.bufferSize_layout)
 
 
@@ -105,19 +112,18 @@ class ecmcTrendPv(QtWidgets.QDialog):
         self.spacerZoomUpper = QSpacerItem(100,10)
         self.spacerZoomLower = QSpacerItem(100,10)
         
-        self.left_layout.addItem(self.spacerTop)
         self.left_layout.addWidget(self.zoomHigh_frame)
-        self.left_layout.addWidget(self.zoomBtn)
-        self.left_layout.addWidget(self.bufferSize_frame)
+        self.left_layout.addWidget(self.zoomBtn)        
         self.left_layout.addWidget(self.pauseBtn)        
         self.left_layout.addWidget(self.zoomLow_frame)
 
         # Place the matplotlib figure
-        self.myFig = CustomFigCanvas()
+        self.myFig = ecmcRTCanvas.ecmcRTCanvas(self.pvName)
         self.myFig.setFixedSize(700,500 )
         self.toolbar = NavigationToolbar(self.myFig, self)
         self.right_layout.addWidget(self.toolbar)
         self.right_layout.addWidget(self.myFig)
+        self.right_layout.addWidget(self.bufferSize_frame)
         self.lineEditZoomLow.setText(str(self.myFig.getYLims()[0]))
         self.lineEditZoomHigh.setText(str(self.myFig.getYLims()[1]))
         
@@ -126,6 +132,7 @@ class ecmcTrendPv(QtWidgets.QDialog):
         self.main_layout.addWidget(self.left_frame)
         self.main_layout.addWidget(self.right_frame)
         self.main_frame.setLayout(self.main_layout)
+        ###
 
         self.connectPv(self.pvName) # Epics
         self.comTrend = comTrend()
@@ -178,132 +185,4 @@ class ecmcTrendPv(QtWidgets.QDialog):
 
     def addData_callbackFunc(self, value):
         self.myFig.addData(value)
-        return
-
-class CustomFigCanvas(FigureCanvas, TimedAnimation):
-    def __init__(self):
-        self.pause = 0
-        self.addedData = []
-        self.exceptCount = 0
-        self.autoZoom =  False
-        print(matplotlib.__version__)
-        # The data
-        self.xlim = 1000
-        self.n = np.linspace(0, self.xlim - 1, self.xlim)
-        self.y = (self.n * 0.0)
-        # The window
-        self.fig = Figure(figsize=(5,5), dpi=100)
-        self.ax1 = self.fig.add_subplot(111)        
-        # self.ax1 settings
-        self.ax1.set_xlabel('time')
-        self.ax1.set_ylabel('data')
-        self.line1 = Line2D([], [], color='blue')
-        self.line1_tail = Line2D([], [], color='red', linewidth=2)
-        self.line1_head = Line2D([], [], color='red', marker='o', markeredgecolor='r')
-        self.ax1.add_line(self.line1)
-        self.ax1.add_line(self.line1_tail)
-        self.ax1.add_line(self.line1_head)
-        self.ax1.set_xlim(0, self.xlim - 1)
-        self.ax1.set_ylim(-100, 100)
-        self.ax1.grid()
-        self.firstUpdatedData = True
-        FigureCanvas.__init__(self, self.fig)
-        TimedAnimation.__init__(self, self.fig, interval = 50, blit = True)
-        return
-
-    def new_frame_seq(self):
-        return iter(range(self.n.size))
-
-    def setBufferSize(self, bufferSize):
-        if bufferSize<1000 :
-            print("Buffer size out of range: " + str(bufferSize))
-            return
-        fillValue = self.y[0]
-        oldSize = self.xlim
-        self.xlim = int(bufferSize)
-        self.n = np.linspace(0, self.xlim - 1, self.xlim)        
-        
-        if self.xlim > oldSize:
-            tempArray = np.full(self.xlim - oldSize,fillValue)
-            self.y = np.concatenate((tempArray, self.y))
-        else:
-            self.y = self.y[oldSize-self.xlim:-1]
-
-        self.ax1.set_xlim(1,self.xlim)
-        self.draw()
-
-
-    def pauseUpdate(self):        
-        if self.pause:
-          self.pause = 0
-        else:
-          self.pause = 1
-
-    def _init_draw(self):
-        lines = [self.line1, self.line1_tail, self.line1_head]
-        for l in lines:
-            l.set_data([], [])
-        return
-
-    def addData(self, value):
-        if self.pause == 0:
-            self.addedData.append(value)            
-        return
-
-    def zoomAuto(self):
-        bottom = np.min(self.y)
-        top = np.max(self.y)
-        range = top - bottom
-        top += range * 0.1
-        bottom -= range *0.1
-        self.ax1.set_ylim(bottom,top)
-        self.ax1.set_xlim(1,self.xlim)
-        self.draw()
-        return
-    
-    def zoomLow(self, value):
-        top = self.ax1.get_ylim()[1]
-        bottom = value        
-        self.ax1.set_ylim(bottom,top)
-        self.draw()
-        return
-
-    def zoomHigh(self, value):
-        bottom = self.ax1.get_ylim()[0]
-        top = value
-        self.ax1.set_ylim(bottom,top)
-        self.draw()
-        return
-
-    def _step(self, *args):
-        # Extends the _step() method for the TimedAnimation class.
-        try:
-            TimedAnimation._step(self, *args)
-        except Exception as e:
-            self.exceptCount += 1
-            print(str(self.exceptCount))
-            TimedAnimation._stop(self)
-            pass
-
-        return
-
-    def getYLims(self):
-        return self.ax1.get_ylim()
-
-    def _draw_frame(self, framedata):
-        margin = 2
-            
-        while(len(self.addedData) > 0):
-            self.y = np.roll(self.y, -1)
-            self.y[-1] = self.addedData[0]
-            if self.firstUpdatedData:
-                if len(self.addedData) > 0:
-                    self.y[0:-1] = self.addedData[0] # Set entire array to start value
-                    self.firstUpdatedData = False
-            del(self.addedData[0])
-        
-        self.line1.set_data(self.n[ 0 : self.n.size - margin ], self.y[ 0 : self.n.size - margin ])
-        self.line1_tail.set_data(np.append(self.n[-10:-1 - margin], self.n[-1 - margin]), np.append(self.y[-10:-1 - margin], self.y[-1 - margin]))
-        self.line1_head.set_data(self.n[-1 - margin], self.y[-1 - margin])
-        self._drawn_artists = [self.line1, self.line1_tail, self.line1_head]
         return
