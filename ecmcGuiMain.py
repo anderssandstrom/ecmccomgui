@@ -7,6 +7,7 @@ import epics
 from ecmcArrayStat import *
 from ecmcOneMotorGUI import *
 from ecmcMainWndDesigner import Ui_MainWindow
+import ecmcTrendPv
 
 # Needed packages:
 # 1. sudo yum -y install https://rhel7.iuscommunity.org/ius-release.rpm
@@ -60,9 +61,8 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
     self.dialog.show()
     
   def showGuiPv(self):
-    print("Normal PV")
-    #create new window:
-    
+    dialog = ecmcTrendPv.ecmcTrendPv(self.prefix,self.pvName)
+    dialog.show()
 
   def newIOCPrefix(self,iocPrefix):
     self.prefix=iocPrefix

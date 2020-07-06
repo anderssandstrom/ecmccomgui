@@ -1,14 +1,20 @@
-###################################################################
-#                                                                 #
-#                    PLOT A LIVE GRAPH (PyQt5)                    #
-#                  -----------------------------                  #
-#            EMBED A MATPLOTLIB ANIMATION INSIDE YOUR             #
-#            OWN GUI!                                             #
-#                                                                 #
-###################################################################
+#*************************************************************************
+# Copyright (c) 2020 European Spallation Source ERIC
+# ecmc is distributed subject to a Software License Agreement found
+# in file LICENSE that is included with this distribution. 
+#
+#   ecmcTrendPv.py
+#
+#  Created on: July 6, 2020
+#      Author: Anders Sandström
+#    
+#  Heavily inspired by: https://exceptionshub.com/real-time-plotting-in-while-loop-with-matplotlib.html
+#
+#*************************************************************************
 
 import sys
 import os
+import epics
 from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets
 
@@ -27,15 +33,20 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 import time
 import threading
 
-# ADD buffer size
+class comTrend(QObject):
+    data_signal = pyqtSignal(float)
 
-class ecmcTrend(QtWidgets.QDialog):
-    def __init__(self):
-        super(ecmcTrend, self).__init__()
+class ecmcTrendPv(QtWidgets.QDialog):
+    def __init__(self,pvPrefix=None,pvName=None):
+        print("Prefix" + pvPrefix + ", Name: " + pvName)        
+        super(ecmcTrendPv, self).__init__()
+        
+        self.pvPrefix = pvPrefix
+        self.pvName = pvName        
+
         # Define the geometry of the main window
         self.setGeometry(300, 300, 900, 600)
-        self.setWindowTitle("ECMC: Plot")
-        # Create FRAME_A
+        self.setWindowTitle("ECMC: Plot")        
         self.main_frame= QtWidgets.QFrame(self)
         self.main_layout = QtWidgets.QHBoxLayout()
 
@@ -50,7 +61,6 @@ class ecmcTrend(QtWidgets.QDialog):
         self.zoomHigh_layout = QHBoxLayout()
         self.lineEditZoomHigh = QLineEdit(text = '100')
         self.lineEditZoomHigh.setFixedSize(100, 50)
-        #self.lineEditZoomHigh.returnPressed.connect(self.lineEditHighAction)
         self.zoomHighBtn = QPushButton(text = '>')
         self.zoomHighBtn.setFixedSize(10, 50)
         self.zoomHighBtn.clicked.connect(self.zoomHighBtnAction)
@@ -63,11 +73,6 @@ class ecmcTrend(QtWidgets.QDialog):
         self.zoomBtn.setFixedSize(100, 50)
         self.zoomBtn.clicked.connect(self.zoomBtnAction)
         
-        # Clear
-        #self.clearBtn = QPushButton(text = 'clear')
-        #self.clearBtn.setFixedSize(100, 50)
-        #self.clearBtn.clicked.connect(self.clearBtnAction)
-
         # Pause
         self.pauseBtn = QPushButton(text = 'pause')
         self.pauseBtn.setFixedSize(100, 50)
@@ -77,8 +82,7 @@ class ecmcTrend(QtWidgets.QDialog):
         self.zoomLow_frame = QFrame(self)
         self.zoomLow_layout = QHBoxLayout()
         self.lineEditZoomLow = QLineEdit(text = '-100')
-        self.lineEditZoomLow.setFixedSize(100, 50)
-        #self.lineEditZoomLow.returnPressed.connect(self.lineEditLowAction)
+        self.lineEditZoomLow.setFixedSize(100, 50)        
         self.zoomLowBtn = QPushButton(text = '>')
         self.zoomLowBtn.setFixedSize(10, 50)
         self.zoomLowBtn.clicked.connect(self.zoomLowBtnAction)
@@ -91,7 +95,6 @@ class ecmcTrend(QtWidgets.QDialog):
         self.bufferSize_layout = QHBoxLayout()
         self.lineBufferSize = QLineEdit(text = '1000')
         self.lineBufferSize.setFixedSize(100, 50)
-        #self.lineEditZoomHigh.returnPressed.connect(self.lineEditHighAction)
         self.setBufferSizeBtn = QPushButton(text = '>')
         self.setBufferSizeBtn.setFixedSize(10, 50)
         self.setBufferSizeBtn.clicked.connect(self.setBufferSizeBtnAction)
@@ -106,17 +109,10 @@ class ecmcTrend(QtWidgets.QDialog):
         
         self.left_layout.addItem(self.spacerTop)
         self.left_layout.addWidget(self.zoomHigh_frame)
-        #self.left_layout.addWidget(self.lineEditZoomHigh)
-        #self.left_layout.addWidget(self.zoomHighBtn)
-        #self.left_layout.addItem(self.spacerZoomUpper)
         self.left_layout.addWidget(self.zoomBtn)
         self.left_layout.addWidget(self.bufferSize_frame)
-        #self.left_layout.addWidget(self.clearBtn)
         self.left_layout.addWidget(self.pauseBtn)        
         self.left_layout.addWidget(self.zoomLow_frame)
-        #self.left_layout.addItem(self.spacerZoomLower)
-        #self.left_layout.addWidget(self.zoomLowBtn)
-        #self.left_layout.addWidget(self.lineEditZoomLow)
 
         # Place the matplotlib figure
         self.myFig = CustomFigCanvas()
@@ -133,17 +129,30 @@ class ecmcTrend(QtWidgets.QDialog):
         self.main_layout.addWidget(self.right_frame)
         self.main_frame.setLayout(self.main_layout)
 
+        self.fullPvName = self.pvPrefix + self.pvName
+        self.connectPv(self.fullPvName) # Epics
+        self.comTrend = comTrend()
+        self.comTrend.data_signal.connect(self.addData_callbackFunc) # update trend
         return
 
+    def connectPv(self, pvname):
+        if pvname is None:            
+            raise RuntimeError("pvname must not be 'None'")
+            if len(pvname)==0:
+                raise RuntimeError("pvname must not be ''")
+
+        self.pv = epics.PV(self.fullPvName)
+        self.pv.add_callback(self.onChangePv)
+    
+    def onChangePv(self,pvname=None, value=None, char_value=None,timestamp=None, **kw):
+        self.comTrend.data_signal.emit(value)
+
     def setBufferSizeBtnAction(self):
-        #print("Buffer size")
         value = float(self.lineBufferSize.text())
         self.myFig.setBufferSize(value)
 
     def zoomBtnAction(self):        
         self.myFig.zoomAuto()
-        #self.lineEditZoomLow.setText(str(np.round(self.myFig.getYLims()[0]*100)/100))
-        #self.lineEditZoomHigh.setText(str(np.round(self.myFig.getYLims()[1]*100)/100))
         return
 
     def zoomHighBtnAction(self):
@@ -156,35 +165,23 @@ class ecmcTrend(QtWidgets.QDialog):
         self.myFig.zoomLow(value)
         return
 
-    #def clearBtnAction(self):
-    #    print("clear")
-    #    self.myFig.clearData()
-    #    return
-
     def pauseBtnAction(self):        
         self.myFig.pauseUpdate()
         return
 
     def lineEditHighAction(self):
-        #print("lineEditHighAction")
         value = float(self.lineEditZoomHigh.text())
         self.myFig.zoomHigh(value)
-        #self.myFig.pauseUpdate()
         return
 
     def lineEditLowAction(self):
-        #print("lineEditLowAction")
         value = float(self.lineEditZoomLow.text())
         self.myFig.zoomLow(value)
-        #self.myFig.pauseUpdate()
         return
 
     def addData_callbackFunc(self, value):
         self.myFig.addData(value)
         return
-
-''' End Class '''
-
 
 class CustomFigCanvas(FigureCanvas, TimedAnimation):
     def __init__(self):
@@ -220,10 +217,6 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
     def new_frame_seq(self):
         return iter(range(self.n.size))
 
-    #def clearData(self):
-    #    print("clearData")
-    #    self.y = []
-
     def setBufferSize(self, bufferSize):
         if bufferSize<1000 :
             print("Buffer size out of range: " + str(bufferSize))
@@ -236,11 +229,8 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
         if self.xlim > oldSize:
             tempArray = np.full(self.xlim - oldSize,fillValue)
             self.y = np.concatenate((tempArray, self.y))
-            #self.y[0:(self.xlim-oldSize)]=fillValue        
         else:
-            #self.y = np.resize(self.y,self.xlim)
             self.y = self.y[oldSize-self.xlim:-1]
-            #print( "Length: " + str(len(self.y)))
 
         self.ax1.set_xlim(1,self.xlim)
         self.draw()
@@ -258,7 +248,7 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
             l.set_data([], [])
         return
 
-    def addData(self, value):         
+    def addData(self, value):
         if self.pause == 0:
             self.addedData.append(value)            
         return

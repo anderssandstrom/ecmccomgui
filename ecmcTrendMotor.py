@@ -1,3 +1,16 @@
+#*************************************************************************
+# Copyright (c) 2020 European Spallation Source ERIC
+# ecmc is distributed subject to a Software License Agreement found
+# in file LICENSE that is included with this distribution. 
+#
+#  ecmcTrendMotor.py
+#
+#  Created on: July 6, 2020
+#      Author: Anders Sandström
+#    
+#  Heavily inspired by: https://exceptionshub.com/real-time-plotting-in-while-loop-with-matplotlib.html
+#
+#*************************************************************************
 
 import sys
 import os
@@ -98,17 +111,10 @@ class ecmcTrendMotor(QtWidgets.QDialog):
         
         self.left_layout.addItem(self.spacerTop)
         self.left_layout.addWidget(self.zoomHigh_frame)
-        #self.left_layout.addWidget(self.lineEditZoomHigh)
-        #self.left_layout.addWidget(self.zoomHighBtn)
-        #self.left_layout.addItem(self.spacerZoomUpper)
         self.left_layout.addWidget(self.zoomBtn)
         self.left_layout.addWidget(self.bufferSize_frame)
-        #self.left_layout.addWidget(self.clearBtn)
         self.left_layout.addWidget(self.pauseBtn)        
         self.left_layout.addWidget(self.zoomLow_frame)
-        #self.left_layout.addItem(self.spacerZoomLower)
-        #self.left_layout.addWidget(self.zoomLowBtn)
-        #self.left_layout.addWidget(self.lineEditZoomLow)
 
         # Place the matplotlib figure
         self.myFig = CustomFigCanvas()
@@ -128,14 +134,11 @@ class ecmcTrendMotor(QtWidgets.QDialog):
         return
 
     def setBufferSizeBtnAction(self):
-        #print("Buffer size")
         value = float(self.lineBufferSize.text())
         self.myFig.setBufferSize(value)
 
     def zoomBtnAction(self):        
         self.myFig.zoomAuto()
-        #self.lineEditZoomLow.setText(str(np.round(self.myFig.getYLims()[0]*100)/100))
-        #self.lineEditZoomHigh.setText(str(np.round(self.myFig.getYLims()[1]*100)/100))
         return
 
     def zoomHighBtnAction(self):
@@ -148,27 +151,18 @@ class ecmcTrendMotor(QtWidgets.QDialog):
         self.myFig.zoomLow(value)
         return
 
-    #def clearBtnAction(self):
-    #    print("clear")
-    #    self.myFig.clearData()
-    #    return
-
     def pauseBtnAction(self):        
         self.myFig.pauseUpdate()
         return
 
     def lineEditHighAction(self):
-        #print("lineEditHighAction")
         value = float(self.lineEditZoomHigh.text())
         self.myFig.zoomHigh(value)
-        #self.myFig.pauseUpdate()
         return
 
     def lineEditLowAction(self):
-        #print("lineEditLowAction")
         value = float(self.lineEditZoomLow.text())
         self.myFig.zoomLow(value)
-        #self.myFig.pauseUpdate()
         return
 
     def addData_callbackFunc(self, value):
@@ -212,10 +206,6 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
     def new_frame_seq(self):
         return iter(range(self.n.size))
 
-    #def clearData(self):
-    #    print("clearData")
-    #    self.y = []
-
     def setBufferSize(self, bufferSize):
         if bufferSize<1000 :
             print("Buffer size out of range: " + str(bufferSize))
@@ -228,11 +218,8 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
         if self.xlim > oldSize:
             tempArray = np.full(self.xlim - oldSize,fillValue)
             self.y = np.concatenate((tempArray, self.y))
-            #self.y[0:(self.xlim-oldSize)]=fillValue        
         else:
-            #self.y = np.resize(self.y,self.xlim)
             self.y = self.y[oldSize-self.xlim:-1]
-            #print( "Length: " + str(len(self.y)))
 
         self.ax1.set_xlim(1,self.xlim)
         self.draw()
