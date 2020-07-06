@@ -32,9 +32,9 @@ class Ui_MainWindow(object):
         self.linepvName = QtWidgets.QLineEdit(self.centralwidget)
         self.linepvName.setObjectName("linepvName")
         self.motorLayout.addWidget(self.linepvName)
-        self.pbStartMotorGUI = QtWidgets.QPushButton(self.centralwidget)
-        self.pbStartMotorGUI.setObjectName("pbStartMotorGUI")
-        self.motorLayout.addWidget(self.pbStartMotorGUI)
+        self.pbStartGUI = QtWidgets.QPushButton(self.centralwidget)
+        self.pbStartGUI.setObjectName("pbStartGUI")
+        self.motorLayout.addWidget(self.pbStartGUI)
         self.horizontalLayout.addLayout(self.motorLayout)
         self.gridLayout.addLayout(self.horizontalLayout, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -52,7 +52,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "ECMC"))
         self.lblPrefix.setText(_translate("MainWindow", "ioc prefix"))
         self.label.setText(_translate("MainWindow", "pv name"))
-        self.pbStartMotorGUI.setText(_translate("MainWindow", "open gui"))
+        self.pbStartGUI.setText(_translate("MainWindow", "open gui"))
         self.actionExit.setText(_translate("MainWindow", "Exit"))
 
 

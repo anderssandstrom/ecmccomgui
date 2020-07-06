@@ -10,7 +10,7 @@ from PyQt5.QtCore import QObject
 from PyQt5.QtGui import *
 
 import random
-import ecmcTrend
+import ecmcTrendMotor
 #import ecmcGraphWrapper as graphWrap
 #import matplotlib as mpl
 #mpl.use('Qt5Agg')
@@ -229,7 +229,7 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.model.setHorizontalHeaderLabels(['Parameter', 'Value', ''])
     self.btnPlot=QtWidgets.QPushButton('Plot',default=False, autoDefault=False)
     
-    self.trend=ecmcTrend.ecmcTrend()
+    self.trend=ecmcTrendMotor.ecmcTrendMotor()
 
     #self.graph=graphWrap.ecmcGraphWrapper(parent=self)
     self.show()

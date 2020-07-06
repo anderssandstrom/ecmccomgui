@@ -26,12 +26,12 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
     super(ecmcMainWindow,self).__init__()
     self.ui = Ui_MainWindow()
     self.ui.setupUi(self)
-    self.ui.pbStartMotorGUI.clicked.connect(self.showMotorGUI)
+    self.ui.pbStartGUI.clicked.connect(self.showGUI)
     self.ui.lineIOCPrefix.textChanged.connect(self.newIOCPrefix)
     self.ui.linepvName.textChanged.connect(self.newIOCpvName)    
     self.prefix=""
     self.pvName=""    
-
+    self.pv=None
     
     if len(sys.argv)>1:
       self.prefix=sys.argv[1]
@@ -40,11 +40,30 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
         self.pvName=sys.argv[2]
         self.ui.linepvName.setText(self.pvName)
 
+  def showGUI(self):
+    entirePvName = self.prefix+self.pvName    
+    pos = entirePvName.rfind('.')
+    
+    # Check if motor
+    if pos < 0:
+      pv  = epics.PV(entirePvName + '.RTYP')
+      if pv.get() == 'motor':
+        self.showMotorGUI()
+        return
+
+    # Normal PV
+    self.showGuiPv()
+
   def showMotorGUI(self):
     self.dialog = MotorPanel(self,self.prefix,self.pvName)
     self.dialog.resize(500, 900)
     self.dialog.show()
     
+  def showGuiPv(self):
+    print("Normal PV")
+    #create new window:
+    
+
   def newIOCPrefix(self,iocPrefix):
     self.prefix=iocPrefix
 

@@ -40,7 +40,7 @@
          <widget class="QLineEdit" name="linepvName"/>
         </item>
         <item>
-         <widget class="QPushButton" name="pbStartMotorGUI">
+         <widget class="QPushButton" name="pbStartGUI">
           <property name="text">
            <string>open gui</string>
           </property>
