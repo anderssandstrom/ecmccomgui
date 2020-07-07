@@ -3,7 +3,7 @@
 # ecmc is distributed subject to a Software License Agreement found
 # in file LICENSE that is included with this distribution. 
 #
-#  ecmcTrendMotor.py
+#  ecmcTrend.py
 #
 #  Created on: July 6, 2020
 #      Author: Anders Sandström
@@ -17,7 +17,6 @@ import os
 import ecmcRTCanvas
 from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets
-
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import functools
@@ -33,14 +32,12 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 import time
 import threading
 
-# ADD buffer size
-
-class ecmcTrendMotor(QtWidgets.QDialog):
-    def __init__(self, title):
-        super(ecmcTrendMotor, self).__init__()
+class ecmcTrend(QtWidgets.QDialog):
+    def __init__(self):
+        super(ecmcTrend, self).__init__()
         # Define the geometry of the main window
         self.setGeometry(300, 300, 900, 700)
-        self.setWindowTitle("ECMC: Plot")        
+        self.setWindowTitle("ecmc plot")        
         self.main_frame= QtWidgets.QFrame(self)
         self.main_layout = QtWidgets.QHBoxLayout()
 
@@ -113,7 +110,7 @@ class ecmcTrendMotor(QtWidgets.QDialog):
         self.left_layout.addWidget(self.zoomLow_frame)
 
         # Place the matplotlib figure
-        self.myFig = ecmcRTCanvas.ecmcRTCanvas(title)
+        self.myFig = ecmcRTCanvas.ecmcRTCanvas("ecmc plot")
         self.myFig.setFixedSize(700,500 )
         self.toolbar = NavigationToolbar(self.myFig, self)
         self.right_layout.addWidget(self.toolbar)
