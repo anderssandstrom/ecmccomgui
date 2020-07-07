@@ -369,7 +369,6 @@ class MotorPanel(QtWidgets.QDialog):
         left_layout.addWidget(tweak_label)        
 
         tweak_frame = QtWidgets.QFrame(self)
-        #tweak_frame.setStyleSheet("margin:5px; border:1px solid rgb(255, 255, 255);")
         tweak_layout = QtWidgets.QHBoxLayout()
         for field in ['TWR', '/10', 'TWV', '*10', 'TWF']:
             tweak_layout.addWidget(self.controls[field])
@@ -546,7 +545,6 @@ class MotorPanel(QtWidgets.QDialog):
         if self.motorPv is not None:
             for field in ['VAL', 'RBV', 'DESC', 'EGU', 'TWV', 'DMOV', 'HLS', 'LLS']:
                 self.motorPv.clear_callback(attr=field)
-            #self.motorPv.disconnect()   # There is no disconnect() method!
             self.motorPv = None
             for field in ['DESC', 'NAME', 'EGU', 'RBV', 'VAL', 'TWV']:
                 self.controls[field].setText(BLANK)
@@ -639,14 +637,12 @@ class MotorPanel(QtWidgets.QDialog):
         '''new target velocity was entered in this panel'''
         if self.motorPv is not None:
             number = float(self.controls['VELO'].text())
-            #self.motorPv.move(number)
             self.motorPv.put('VELO',number)
 
     def onReturnJVEL(self):
         '''new target jog velocity was entered in this panel'''
         if self.motorPv is not None:
             number = float(self.controls['JVEL'].text())
-            #self.motorPv.move(number)
             self.motorPv.put('JVEL',number)
 
     def onChangeCNEN(self, value = None, **kws):
