@@ -528,7 +528,7 @@ class MotorPanel(QtWidgets.QDialog):
         self.onChangeHOMF(value=self.motorPv.get('HOMF'))
         self.onChangeMSTA(value=self.motorPv.get('MSTA'))
         self.onChangeVELO(value=self.motorPv.get('VELO'))
-        self.onChangeVELO(value=self.motorPv.get('JVEL'))
+        self.onChangeJVEL(value=self.motorPv.get('JVEL'))
         
         # additional records
         self.axisErrorResetPv = epics.PV(self.axisErrorResetPvName)
