@@ -27,12 +27,22 @@
          </widget>
         </item>
         <item>
+         <widget class="QComboBox" name="comboPrefix"/>
+        </item>
+        <item>
          <widget class="QLineEdit" name="lineIOCPrefix"/>
         </item>
         <item>
          <widget class="QLabel" name="label">
           <property name="text">
            <string>pv name</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboPvName">
+          <property name="currentText">
+           <string/>
           </property>
          </widget>
         </item>

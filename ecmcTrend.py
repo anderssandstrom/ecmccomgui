@@ -37,7 +37,7 @@ class ecmcTrend(QtWidgets.QDialog):
         super(ecmcTrend, self).__init__()
         # Define the geometry of the main window
         self.setGeometry(300, 300, 900, 700)
-        self.setWindowTitle("ecmc plot")        
+        self.setWindowTitle("ecmc plot")
         self.main_frame= QtWidgets.QFrame(self)
         self.main_layout = QtWidgets.QHBoxLayout()
 
@@ -168,4 +168,5 @@ class ecmcTrend(QtWidgets.QDialog):
     
     def setTitle(self,label):
         self.myFig.setTitle(label)
+        self.setWindowTitle("ecmc plot: " + label)
 

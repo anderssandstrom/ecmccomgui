@@ -29,7 +29,27 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
     self.ui.setupUi(self)
     self.ui.pbStartGUI.clicked.connect(self.showGUI)
     self.ui.lineIOCPrefix.textChanged.connect(self.newIOCPrefix)
-    self.ui.linepvName.textChanged.connect(self.newIOCpvName)    
+    self.ui.linepvName.textChanged.connect(self.newIOCpvName)
+
+    self.ui.comboPrefix.currentIndexChanged.connect(self.newPrefixComboIndex)
+    self.ui.comboPrefix.addItem("IOC_TEST:")
+    self.ui.comboPrefix.addItem("IOC:")
+    self.ui.comboPrefix.addItem("IOC2:")
+    self.ui.comboPrefix.addItem("IOC_SLIT:")
+    self.ui.comboPrefix.setToolTip("Predefined IOC prefix. Choose one to use..")
+
+    self.ui.comboPvName.currentIndexChanged.connect(self.newPvComboIndex)
+    self.ui.comboPvName.addItem("Axis1")
+    self.ui.comboPvName.addItem("Axis2")
+    self.ui.comboPvName.addItem("MCU-thread-latency-max")
+    self.ui.comboPvName.addItem("MCU-thread-latency-min")
+    self.ui.comboPvName.addItem("MCU-thread-period-max")
+    self.ui.comboPvName.addItem("MCU-thread-period-min")
+    self.ui.comboPvName.addItem("MCU-thread-send-max")
+    self.ui.comboPvName.addItem("MCU-thread-send-min")
+    self.ui.comboPvName.addItem("ec0-domainfailcountertotal")
+    self.ui.comboPrefix.setToolTip("Predefined pv names. Choose one to use..")
+
     self.prefix=""
     self.pvName=""    
     self.pv=None
@@ -69,6 +89,14 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
 
   def newIOCpvName(self,pvName):
     self.pvName=pvName
+
+  def newPrefixComboIndex(self,index):
+    self.pvPrefix=self.ui.comboPrefix.itemText(index)
+    self.ui.lineIOCPrefix.setText(self.pvPrefix)
+
+  def newPvComboIndex(self,index):    
+    self.pvName=self.ui.comboPvName.itemText(index)
+    self.ui.linepvName.setText(self.pvName)
 
   def quit(self):
     self.close()
