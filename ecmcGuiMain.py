@@ -55,28 +55,30 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
     self.pv=None
     
     if len(sys.argv)>1:
-      self.pvPrefix=sys.argv[1]
-      self.ui.lineIOCPrefix.setText(self.pvPrefix)
+      self.prefix=sys.argv[1]
+      self.ui.lineIOCPrefix.setText(self.prefix)
       if len(sys.argv)>2:       
         self.pvName=sys.argv[2]
         self.ui.linepvName.setText(self.pvName)
 
   def showGUI(self):
-    entirePvName = self.prefix+self.pvName    
+    self.prefix=self.ui.lineIOCPrefix.text()
+    self.pvName=self.ui.linepvName.text()
+    entirePvName = self.prefix+self.pvName
     pos = entirePvName.rfind('.')
     
     # Check if motor
     if pos < 0:
       pv  = epics.PV(entirePvName + '.RTYP')
       if pv.get() == 'motor':
-        self.showMotorGUI(self.pvPrefix, self.pvName)
+        self.showMotorGUI(self.prefix, self.pvName)
         return
 
     # Normal PV
-    self.showGuiPv(self.pvPrefix+self.pvName)
+    self.showGuiPv(self.prefix+self.pvName)
 
-  def showMotorGUI(self,pvPrefix,pvName):
-    self.dialog = MotorPanel(self,pvPrefix,pvName)
+  def showMotorGUI(self,prefix,pvName):
+    self.dialog = MotorPanel(self,prefix,pvName)
     self.dialog.resize(500, 900)
     self.dialog.show()
     
@@ -91,8 +93,8 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
     self.pvName=pvName
 
   def newPrefixComboIndex(self,index):
-    self.pvPrefix=self.ui.comboPrefix.itemText(index)
-    self.ui.lineIOCPrefix.setText(self.pvPrefix)
+    self.prefix=self.ui.comboPrefix.itemText(index)
+    self.ui.lineIOCPrefix.setText(self.prefix)
 
   def newPvComboIndex(self,index):    
     self.pvName=self.ui.comboPvName.itemText(index)
