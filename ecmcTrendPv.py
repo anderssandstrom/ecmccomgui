@@ -186,3 +186,9 @@ class ecmcTrendPv(QtWidgets.QDialog):
     def addData_callbackFunc(self, value):
         self.myFig.addData(value)
         return
+    
+    def setYLabel(self,label):
+        self.myFig.setYLabel(label)
+    
+    def setTitle(self,label):
+        self.myFig.setTitle(label)

@@ -161,3 +161,9 @@ class ecmcRTCanvas(FigureCanvas, TimedAnimation):
         self.line1_head.set_data(self.n[-1 - margin], self.y[-1 - margin])
         self._drawn_artists = [self.line1, self.line1_tail, self.line1_head]
         return
+
+    def setYLabel(self,label):
+        self.ax1.set_ylabel(label)
+
+    def setTitle(self,label):
+        self.ax1.set_title(label)

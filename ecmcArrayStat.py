@@ -135,7 +135,6 @@ class ecmcArrayStat(QtWidgets.QTableView):
   def __init__(self,parent=None):
     super(ecmcArrayStat, self).__init__(parent)
     self.background=None
-    #self.plotBuffer=[]    
     self.startToPlot=False; 
     self.axId=0
     self.posSet=0
@@ -222,16 +221,12 @@ class ecmcArrayStat(QtWidgets.QTableView):
 
   def create_GUI(self):
     self.table = QtWidgets.QTableView(self)  # SELECTING THE VIEW
-    #self.table.setGeometry(0, 0, 575, 575)
     self.model = QtGui.QStandardItemModel(self)  # SELECTING THE MODEL - FRAMEWORK THAT HANDLES QUERIES AND EDITS
     self.table.setModel(self.model)  # SETTING THE MODEL    
     self.populate()    
     self.model.setHorizontalHeaderLabels(['Parameter', 'Value', ''])
-    self.btnPlot=QtWidgets.QPushButton('Plot',default=False, autoDefault=False)
-    
+    self.btnPlot=QtWidgets.QPushButton('Plot',default=False, autoDefault=False)    
     self.trend=ecmcTrendMotor.ecmcTrendMotor("ecmc plot")
-
-    #self.graph=graphWrap.ecmcGraphWrapper(parent=self)
     self.show()
 
   def populate(self):
@@ -449,16 +444,9 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.highLim=int(dataList[28])
     self.homeSensor=int(dataList[29])
     self.trendValue = float(dataList[self.trendDataIndex])
-    #self.plotBuffer.append(self.posAct)
 
   def onChangeAxisDiagPv(self,pvname=None, value=None, char_value=None,timestamp=None, **kw):
-    
-    #self.errorCode=self.parseAxisStatArray(char_value)
     self.comTable.data_signal.emit(char_value,timestamp)
-    #if self.errorCode:
-    #  print("Parse failed with error code: " + str(self.errorCode))    
-    #self.strTime=datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S%f')
-    #self.stdItemArrayData[TIMESTAMP_INDEX].setData(self.strTime,role=QtCore.Qt.DisplayRole)
 
   # All update of GUI here..
   def updateGUI(self, char_value, timestamp):
@@ -481,6 +469,7 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.axisDiagPvName = pvname
     self.axisDiagPv = epics.PV(self.axisDiagPvName)
     self.axisDiagPv.add_callback(self.onChangeAxisDiagPv)
+    self.trend.setTitle(self.axisDiagPvName)
     
 
   def disconnect(self):
@@ -521,7 +510,8 @@ class ecmcArrayStat(QtWidgets.QTableView):
     return
 
   def startPlot(self):
-    self.trendDataIndex = self.checkPlotVar()
+    self.trendDataIndex, label = self.checkPlotVar()
+    self.trend.setYLabel(label)
     self.trend.show()
     self.startToPlot=True;  
 
@@ -533,5 +523,6 @@ class ecmcArrayStat(QtWidgets.QTableView):
   def checkPlotVar(self):
     for i in range(0,ELEMENT_COUNT):
       if self.stdItemArraySelect[i].checkState():
-        return i
-    return TREND_DEFAULT_INDEX
+        return i, self.stdItemArrayName[i].text()
+
+    return TREND_DEFAULT_INDEX, self.stdItemArrayName[TREND_DEFAULT_INDEX].text()

@@ -166,4 +166,9 @@ class ecmcTrendMotor(QtWidgets.QDialog):
         self.myFig.addData(value)
         return
 
-''' End Class '''
+    def setYLabel(self,label):
+        self.myFig.setYLabel(label)
+    
+    def setTitle(self,label):
+        self.myFig.setTitle(label)
+
