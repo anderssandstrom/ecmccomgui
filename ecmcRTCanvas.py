@@ -164,6 +164,8 @@ class ecmcRTCanvas(FigureCanvas, TimedAnimation):
 
     def setYLabel(self,label):
         self.ax1.set_ylabel(label)
+        self.draw()
 
     def setTitle(self,label):
         self.ax1.set_title(label)
+        self.draw()
