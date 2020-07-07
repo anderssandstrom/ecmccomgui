@@ -41,13 +41,13 @@ class ecmcRTCanvas(FigureCanvas, TimedAnimation):
         print(matplotlib.__version__)
         # The data
         self.xlim = 1000
-        self.n = np.linspace(0, self.xlim - 1, self.xlim)
+        self.n = np.linspace(-(self.xlim - 1), 0, self.xlim)
         self.y = (self.n * 0.0)
         # The window
         self.fig = Figure(figsize=(5,5), dpi=100)
         self.ax1 = self.fig.add_subplot(111)        
         # self.ax1 settings
-        self.ax1.set_xlabel('time')
+        self.ax1.set_xlabel('samples')
         self.ax1.set_ylabel('data')
         self.ax1.set_title(title)
         self.line1 = Line2D([], [], color='blue')
@@ -56,7 +56,7 @@ class ecmcRTCanvas(FigureCanvas, TimedAnimation):
         self.ax1.add_line(self.line1)
         self.ax1.add_line(self.line1_tail)
         self.ax1.add_line(self.line1_head)
-        self.ax1.set_xlim(0, self.xlim - 1)
+        self.ax1.set_xlim(-(self.xlim - 1),0)
         self.ax1.set_ylim(-100, 100)
         self.ax1.grid()        
         self.firstUpdatedData = True
@@ -75,7 +75,7 @@ class ecmcRTCanvas(FigureCanvas, TimedAnimation):
         fillValue = self.y[0]
         oldSize = self.xlim
         self.xlim = int(bufferSize)
-        self.n = np.linspace(0, self.xlim - 1, self.xlim)        
+        self.n = np.linspace(-(self.xlim - 1),0,self.xlim)        
         
         if self.xlim > oldSize:
             tempArray = np.full(self.xlim - oldSize,fillValue)
@@ -83,7 +83,7 @@ class ecmcRTCanvas(FigureCanvas, TimedAnimation):
         else:
             self.y = self.y[oldSize-self.xlim:-1]
 
-        self.ax1.set_xlim(1,self.xlim)
+        self.ax1.set_xlim(-(self.xlim-1), 1)
         self.draw()
 
 
@@ -111,7 +111,7 @@ class ecmcRTCanvas(FigureCanvas, TimedAnimation):
         top += range * 0.1
         bottom -= range *0.1
         self.ax1.set_ylim(bottom,top)
-        self.ax1.set_xlim(1,self.xlim)
+        self.ax1.set_xlim(-(self.xlim-1), 1)
         self.draw()
         return
     
