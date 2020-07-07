@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(348, 211)
+        MainWindow.resize(346, 293)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
@@ -39,6 +39,8 @@ class Ui_MainWindow(object):
         self.linepvName = QtWidgets.QLineEdit(self.centralwidget)
         self.linepvName.setObjectName("linepvName")
         self.motorLayout.addWidget(self.linepvName)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.motorLayout.addItem(spacerItem)
         self.pbStartGUI = QtWidgets.QPushButton(self.centralwidget)
         self.pbStartGUI.setObjectName("pbStartGUI")
         self.motorLayout.addWidget(self.pbStartGUI)

@@ -51,6 +51,7 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
     self.ui.comboPvName.addItem("MCU-thread-send-max")
     self.ui.comboPvName.addItem("MCU-thread-send-min")
     self.ui.comboPvName.addItem("ec0-domainfailcountertotal")
+    self.ui.comboPvName.addItem("MCU-ErrId")
     self.ui.comboPvName.setToolTip("Predefined pv-names. Choose one to use..")
 
     self.prefix=""

@@ -99,7 +99,7 @@ class ecmcRTCanvas(FigureCanvas, TimedAnimation):
             l.set_data([], [])
         return
 
-    def addData(self, value):         
+    def addData(self, value):      
         if self.pause == 0:
             self.addedData.append(value)            
         return
@@ -145,15 +145,15 @@ class ecmcRTCanvas(FigureCanvas, TimedAnimation):
         return self.ax1.get_ylim()
 
     def _draw_frame(self, framedata):
-        margin = 2
-            
+        margin = 2        
         while(len(self.addedData) > 0):
             self.y = np.roll(self.y, -1)
             self.y[-1] = self.addedData[0]
-            if self.firstUpdatedData:
+            if self.firstUpdatedData:                
                 if len(self.addedData) > 0:
                     self.y[0:-1] = self.addedData[0] # Set entire array to start value
                     self.firstUpdatedData = False
+                    self.zoomAuto()
             del(self.addedData[0])
         
         self.line1.set_data(self.n[ 0 : self.n.size - margin ], self.y[ 0 : self.n.size - margin ])
