@@ -40,7 +40,9 @@ TOOLTIPS = {
         'JOGF': 'JOGF: jog forward',
         'HOMR': 'HOMR: Home reverse',
         'HOMF': 'HOMF: Home forward',     
-        'MSTA': 'MSTA: Status'   
+        'MSTA': 'MSTA: Status',
+        'JVEL': 'JVEL: Jog velocity',
+        'VELO': 'VELO: Velocity (positioning)'
 }
 STYLES = {      ### http://doc.qt.digia.com/qt/stylesheet-reference.html
     'self': '''
@@ -266,6 +268,31 @@ STYLES = {      ### http://doc.qt.digia.com/qt/stylesheet-reference.html
                    max-height: 40px;
                    }
            ''',
+   
+   'VELO': '''
+       QLineEdit { 
+              background-color: white;
+              text-align: right;
+              width: 80px;
+              min-width: 80px;
+              max-width: 80px;
+              height: 40px;
+              min-height: 40px;
+              max-height: 40px;
+              }
+      ''',
+   'JVEL': '''
+       QLineEdit { 
+              background-color: white;
+              text-align: right;
+              width: 80px;
+              min-width: 80px;
+              max-width: 80px;
+              height: 40px;
+              min-height: 40px;
+              max-height: 40px;
+              }
+      ''',
 
 }
 
@@ -308,7 +335,9 @@ class MotorPanel(QtWidgets.QDialog):
         self.controls['*10'] = QtWidgets.QPushButton('*10',default=False, autoDefault=False)
         self.controls['/10'] = QtWidgets.QPushButton('/10',default=False, autoDefault=False)
         self.controls['CNEN'] = QtWidgets.QPushButton('CNEN',default=False, autoDefault=False)
-        self.controls['ArrayStat']=ecmcArrayStat(self)        
+        self.controls['ArrayStat']=ecmcArrayStat(self)
+        self.controls['JVEL'] = QtWidgets.QLineEdit()
+        self.controls['VELO'] = QtWidgets.QLineEdit()
         self.controls['ErrRst'] = QtWidgets.QPushButton('Reset Error',default=False, autoDefault=False)
         self.controls['JOGR'] = QtWidgets.QPushButton('JOGR',default=False, autoDefault=False)
         self.controls['JOGF'] = QtWidgets.QPushButton('JOGF',default=False, autoDefault=False)
@@ -324,7 +353,7 @@ class MotorPanel(QtWidgets.QDialog):
    
         left_frame = QtWidgets.QFrame(self)
         left_layout = QtWidgets.QVBoxLayout()
-        for field in ['NAME','DESC', 'EGU', 'RBV', 'VAL','MSTA']:
+        for field in ['NAME','DESC', 'EGU', 'RBV', 'VAL','VELO','MSTA']:
             tmp_frame = QtWidgets.QFrame(self)
             tmp_layout = QtWidgets.QHBoxLayout()
             tmp_label=QtWidgets.QLabel()
@@ -352,7 +381,14 @@ class MotorPanel(QtWidgets.QDialog):
         jog_label= QtWidgets.QLabel()
         jog_label.setText('JOG:')
         left_layout.addWidget(jog_label)        
-
+        jvel_frame = QtWidgets.QFrame(self)
+        jvel_layout = QtWidgets.QHBoxLayout()
+        jvel_label=QtWidgets.QLabel()
+        jvel_label.setText('JVEL' + ':')
+        jvel_layout.addWidget(jvel_label)
+        jvel_layout.addWidget(self.controls['JVEL'])
+        jvel_frame.setLayout(jvel_layout)
+        left_layout.addWidget(jvel_frame)
         jog_frame = QtWidgets.QFrame(self)
         jog_layout = QtWidgets.QHBoxLayout()
         jog_layout.addWidget(self.controls['JOGR'])
@@ -384,7 +420,6 @@ class MotorPanel(QtWidgets.QDialog):
 
         right_frame = QtWidgets.QFrame(self)
         right_layout = QtWidgets.QVBoxLayout()
-        #self.controls['ArrayStat'].setMinimumSize(200,500)
         right_layout.addWidget(self.controls['ArrayStat'])
         right_layout.addWidget(self.controls['PLOT'])
         right_frame.setLayout(right_layout);
@@ -393,7 +428,7 @@ class MotorPanel(QtWidgets.QDialog):
         main_frame.setLayout(main_layout)
 
         self.setLayout(main_layout)
-        self.setWindowTitle("ECMC: Axis Control")
+        self.setWindowTitle("ecmc: axis control")
         
 
     def apply_styles(self):
@@ -401,7 +436,7 @@ class MotorPanel(QtWidgets.QDialog):
         for field in ['DESC', 'NAME', 'EGU', 'RBV', 'VAL', 
                       'STOP','CNEN','TWV', 'TWF', 'TWR', '*10', 
                       '/10','ArrayStat','ErrRst','JOGR','JOGF',
-                      'HOMR','HOMF','MSTA']:
+                      'HOMR','HOMF','MSTA','JVEL','VELO']:
             if field in STYLES:
                 self.controls[field].setStyleSheet(STYLES[field])
             if field in TOOLTIPS:
@@ -412,6 +447,7 @@ class MotorPanel(QtWidgets.QDialog):
     def create_actions(self):
         '''define actions'''
         self.controls['VAL'].returnPressed.connect(self.onReturnVAL)
+        self.controls['VELO'].returnPressed.connect(self.onReturnVELO)
         self.controls['TWV'].returnPressed.connect(self.onReturnTWV)
         self.controls['TWR'].clicked.connect(self.onPushTWR)
         self.controls['TWF'].clicked.connect(self.onPushTWF)
@@ -420,6 +456,7 @@ class MotorPanel(QtWidgets.QDialog):
         self.controls['STOP'].clicked.connect(self.onPushSTOP)
         self.controls['CNEN'].clicked.connect(self.onPushCNEN)
         self.controls['ErrRst'].clicked.connect(self.onPushErrRst)
+        self.controls['JVEL'].returnPressed.connect(self.onReturnJVEL)
         self.controls['JOGR'].clicked.connect(self.onPushJOGR)
         self.controls['JOGF'].clicked.connect(self.onPushJOGF)
         self.controls['HOMR'].clicked.connect(self.onPushHOMR)
@@ -460,6 +497,7 @@ class MotorPanel(QtWidgets.QDialog):
             'EGU':  self.onChangeEGU,
             'RBV':  self.onChangeRBV,
             'VAL':  self.onChangeVAL,
+            'VELO':  self.onChangeVELO,
             'TWV':  self.onChangeTWV,
             'DMOV': self.onChangeDMOV,
             'HLS':  self.onChangeHLS,
@@ -467,9 +505,10 @@ class MotorPanel(QtWidgets.QDialog):
             'CNEN': self.onChangeCNEN,            
             'JOGR': self.onChangeJOGR,
             'JOGF': self.onChangeJOGF,
+            'JVEL':  self.onChangeJVEL,
             'HOMR': self.onChangeHOMR,
             'HOMF': self.onChangeHOMF,
-            'MSTA': self.onChangeMSTA,
+            'MSTA': self.onChangeMSTA,            
         }
         for field, func in callback_dict.items():
             self.motorPv.set_callback(attr=field, callback=func)
@@ -488,6 +527,8 @@ class MotorPanel(QtWidgets.QDialog):
         self.onChangeHOMR(value=self.motorPv.get('HOMR'))
         self.onChangeHOMF(value=self.motorPv.get('HOMF'))
         self.onChangeMSTA(value=self.motorPv.get('MSTA'))
+        self.onChangeVELO(value=self.motorPv.get('VELO'))
+        self.onChangeVELO(value=self.motorPv.get('JVEL'))
         
         # additional records
         self.axisErrorResetPv = epics.PV(self.axisErrorResetPvName)
@@ -594,6 +635,20 @@ class MotorPanel(QtWidgets.QDialog):
             #self.motorPv.move(number)
             self.motorPv.put('VAL',number)
 
+    def onReturnVELO(self):
+        '''new target velocity was entered in this panel'''
+        if self.motorPv is not None:
+            number = float(self.controls['VELO'].text())
+            #self.motorPv.move(number)
+            self.motorPv.put('VELO',number)
+
+    def onReturnJVEL(self):
+        '''new target jog velocity was entered in this panel'''
+        if self.motorPv is not None:
+            number = float(self.controls['JVEL'].text())
+            #self.motorPv.move(number)
+            self.motorPv.put('JVEL',number)
+
     def onChangeCNEN(self, value = None, **kws):
         '''EPICS monitor on CNEN called this'''
         field='CNEN'
@@ -681,6 +736,20 @@ class MotorPanel(QtWidgets.QDialog):
     def onChangeVAL(self, value=None, **kws):
         '''EPICS monitor on VAL called this'''
         field='VAL'
+        if value is not None:
+            self.controls[field].setText(str(value))
+            self.controls[field].setAlignment(QtCore.Qt.AlignRight)
+
+    def onChangeVELO(self, value=None, **kws):
+        '''EPICS monitor on VELO called this'''
+        field='VELO'
+        if value is not None:
+            self.controls[field].setText(str(value))
+            self.controls[field].setAlignment(QtCore.Qt.AlignRight)
+
+    def onChangeJVEL(self, value=None, **kws):
+        '''EPICS monitor on JVEL called this'''
+        field='JVEL'
         if value is not None:
             self.controls[field].setText(str(value))
             self.controls[field].setAlignment(QtCore.Qt.AlignRight)
