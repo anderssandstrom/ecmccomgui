@@ -49,7 +49,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "ECMC"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "ecmc"))
         self.lblPrefix.setText(_translate("MainWindow", "ioc prefix"))
         self.label.setText(_translate("MainWindow", "pv name"))
         self.pbStartGUI.setText(_translate("MainWindow", "open gui"))
