@@ -8,6 +8,7 @@ from ecmcArrayStat import *
 from ecmcOneMotorGUI import *
 from ecmcMainWndDesigner import Ui_MainWindow
 import ecmcTrendPv
+import time
 
 # Needed packages:
 # 1. sudo yum -y install https://rhel7.iuscommunity.org/ius-release.rpm
@@ -25,10 +26,15 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
   def __init__(self):
     
     super(ecmcMainWindow,self).__init__()
+    self.prefix=""
+    self.pvName=""
+    self.pv=None
+
     self.ui = Ui_MainWindow()
     self.ui.setupUi(self)
     self.ui.pbStartGUI.clicked.connect(self.showGUI)
-    self.ui.pbStartGUI.setToolTip("Start GUI for ioc-prefix + pv-name")
+    self.ui.pbStartGUI.setToolTip("Start GUI for ioc-prefix + pv-name")    
+
     self.ui.lineIOCPrefix.textChanged.connect(self.newIOCPrefix)
     self.ui.lineIOCPrefix.setToolTip("Enter ioc-prefix to to use.")
     self.ui.linepvName.textChanged.connect(self.newIOCpvName)
@@ -39,6 +45,7 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
     self.ui.comboPrefix.addItem("IOC:")
     self.ui.comboPrefix.addItem("IOC2:")
     self.ui.comboPrefix.addItem("IOC_SLIT:")
+    self.ui.comboPrefix.addItem("TEST")
     self.ui.comboPrefix.setToolTip("Predefined ioc-prefix. Choose one to use..")
 
     self.ui.comboPvName.currentIndexChanged.connect(self.newPvComboIndex)
@@ -52,11 +59,10 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
     self.ui.comboPvName.addItem("MCU-thread-send-min")
     self.ui.comboPvName.addItem("ec0-domainfailcountertotal")
     self.ui.comboPvName.addItem("MCU-ErrId")
-    self.ui.comboPvName.setToolTip("Predefined pv-names. Choose one to use..")
+    self.ui.comboPvName.addItem("ec0-s2-EL2808-BO1")
+    self.ui.comboPvName.addItem("ec0-s2-EL2808-BO2")
 
-    self.prefix=""
-    self.pvName=""    
-    self.pv=None
+    self.ui.comboPvName.setToolTip("Predefined pv-names. Choose one to use..")    
     
     if len(sys.argv)>1:
       self.prefix=sys.argv[1]
@@ -66,14 +72,33 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
         self.ui.linepvName.setText(self.pvName)
 
   def showGUI(self):
+    self.ui.pbStartGUI.setText("Connecting to: " + self.prefix + self.pvName + "...")
+    self.ui.pbStartGUI.setEnabled(False)
+    self.ui.pbStartGUI.update()
+    QtCore.QCoreApplication.processEvents()
+
     self.prefix=self.ui.lineIOCPrefix.text()
     self.pvName=self.ui.linepvName.text()
     entirePvName = self.prefix+self.pvName
     pos = entirePvName.rfind('.')
     
-    # Check if motor
+    # ensure record/pv exist
+    
+    pvtest  = epics.PV(entirePvName)
+    connected = pvtest.wait_for_connection(timeout=10)
+    self.ui.pbStartGUI.setEnabled(True)
+    self.ui.pbStartGUI.setText("Start GUI for: " + self.prefix + self.pvName)
+    self.ui.pbStartGUI.update()
+    QtCore.QCoreApplication.processEvents()
+    if not(connected):
+      print("Timeout. Could not connect to: " + entirePvName + ". Probably not a valid PV name.")  
+      return
+    del(pvtest)
+    
+
+    # Check if motor    
     if pos < 0:
-      pv  = epics.PV(entirePvName + '.RTYP')
+      pv  = epics.PV(entirePvName + '.RTYP')      
       if pv.get() == 'motor':
         self.showMotorGUI(self.prefix, self.pvName)
         return
@@ -92,17 +117,21 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
 
   def newIOCPrefix(self,iocPrefix):
     self.prefix=iocPrefix
+    self.ui.pbStartGUI.setText("Start GUI for: " + self.prefix + self.pvName)
 
   def newIOCpvName(self,pvName):
     self.pvName=pvName
+    self.ui.pbStartGUI.setText("Start GUI for: " + self.prefix + self.pvName)
 
   def newPrefixComboIndex(self,index):
     self.prefix=self.ui.comboPrefix.itemText(index)
     self.ui.lineIOCPrefix.setText(self.prefix)
+    self.ui.pbStartGUI.setText("Start GUI for: " + self.prefix + self.pvName)
 
   def newPvComboIndex(self,index):    
     self.pvName=self.ui.comboPvName.itemText(index)
     self.ui.linepvName.setText(self.pvName)
+    self.ui.pbStartGUI.setText("Start GUI for: " + self.prefix + self.pvName)
 
   def quit(self):
     self.close()

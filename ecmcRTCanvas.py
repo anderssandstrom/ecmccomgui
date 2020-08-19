@@ -101,12 +101,17 @@ class ecmcRTCanvas(FigureCanvas, TimedAnimation):
 
     def addData(self, value):      
         if self.pause == 0:
-            self.addedData.append(value)            
+            self.addedData.append(value)
+
         return
 
     def zoomAuto(self):
         bottom = np.min(self.y)
         top = np.max(self.y)
+        # ensure different values
+        if bottom == top:
+            top = bottom +1
+
         range = top - bottom
         top += range * 0.1
         bottom -= range *0.1
@@ -145,7 +150,7 @@ class ecmcRTCanvas(FigureCanvas, TimedAnimation):
         return self.ax1.get_ylim()
 
     def _draw_frame(self, framedata):
-        margin = 2        
+        margin = 1        
         while(len(self.addedData) > 0):
             self.y = np.roll(self.y, -1)
             self.y[-1] = self.addedData[0]
@@ -154,12 +159,13 @@ class ecmcRTCanvas(FigureCanvas, TimedAnimation):
                     self.y[0:-1] = self.addedData[0] # Set entire array to start value
                     self.firstUpdatedData = False
                     self.zoomAuto()
-            del(self.addedData[0])
+            del(self.addedData[0])            
         
         self.line1.set_data(self.n[ 0 : self.n.size - margin ], self.y[ 0 : self.n.size - margin ])
         self.line1_tail.set_data(np.append(self.n[-10:-1 - margin], self.n[-1 - margin]), np.append(self.y[-10:-1 - margin], self.y[-1 - margin]))
         self.line1_head.set_data(self.n[-1 - margin], self.y[-1 - margin])
         self._drawn_artists = [self.line1, self.line1_tail, self.line1_head]
+
         return
 
     def setYLabel(self,label):

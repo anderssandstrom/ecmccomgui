@@ -38,6 +38,7 @@ import threading
 class comTrend(QObject):
     data_signal = pyqtSignal(float)
 
+
 class ecmcTrendPv(ecmcTrend.ecmcTrend):
     def __init__(self,pvName=None):        
         super(ecmcTrendPv, self).__init__()
@@ -54,8 +55,12 @@ class ecmcTrendPv(ecmcTrend.ecmcTrend):
             if len(pvname)==0:
                 raise RuntimeError("pvname must not be ''")
 
-        self.pv = epics.PV(self.pvName)
+        self.pv = epics.PV(self.pvName)        
         self.pv.add_callback(self.onChangePv)
     
     def onChangePv(self,pvname=None, value=None, char_value=None,timestamp=None, **kw):
         self.comTrend.data_signal.emit(value)
+    
+    def writePV(self,value):
+        self.pv.put(value)
+        self.myFig.addData(value)                

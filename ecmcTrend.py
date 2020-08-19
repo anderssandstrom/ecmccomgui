@@ -85,6 +85,20 @@ class ecmcTrend(QtWidgets.QDialog):
         self.zoomLow_layout.addWidget(self.zoomLowBtn,1,1,alignment = Qt.AlignLeft | Qt.AlignTop)
         self.zoomLow_frame.setLayout(self.zoomLow_layout)
 
+        # Write PV
+        self.pvPut_frame = QFrame(self)
+        self.pvPut_layout = QGridLayout()
+        self.lblYMin= QLabel(text = "Write PV:")
+        self.lineEditpvPut = QLineEdit(text = '0')
+        self.lineEditpvPut.setFixedSize(100, 50)        
+        self.pvPutBtn = QPushButton(text = '>')
+        self.pvPutBtn.setFixedSize(10, 50)
+        self.pvPutBtn.clicked.connect(self.pvPutBtnAction)
+        self.pvPut_layout.addWidget(self.lblYMin,0,0,alignment = Qt.AlignRight | Qt.AlignBottom)
+        self.pvPut_layout.addWidget(self.lineEditpvPut,1,0,alignment = Qt.AlignRight | Qt.AlignTop)
+        self.pvPut_layout.addWidget(self.pvPutBtn,1,1,alignment = Qt.AlignLeft | Qt.AlignTop)
+        self.pvPut_frame.setLayout(self.pvPut_layout)
+
         # Buffer size
         self.bufferSize_frame = QFrame(self)
         self.bufferSize_layout = QGridLayout()
@@ -108,6 +122,7 @@ class ecmcTrend(QtWidgets.QDialog):
         self.left_layout.addWidget(self.zoomBtn)        
         self.left_layout.addWidget(self.pauseBtn)        
         self.left_layout.addWidget(self.zoomLow_frame)
+        self.left_layout.addWidget(self.pvPut_frame)
 
         # Place the matplotlib figure
         self.myFig = ecmcRTCanvas.ecmcRTCanvas("ecmc plot")
@@ -144,6 +159,11 @@ class ecmcTrend(QtWidgets.QDialog):
         value = float(self.lineEditZoomLow.text())
         self.myFig.zoomLow(value)
         return
+
+    def pvPutBtnAction(self):
+        value = float(self.lineEditpvPut.text())
+        self.writePV(value)
+        return        
 
     def pauseBtnAction(self):        
         self.myFig.pauseUpdate()
