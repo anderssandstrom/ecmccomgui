@@ -88,8 +88,7 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
     connected = pvtest.wait_for_connection(timeout=10)
     self.ui.pbStartGUI.setEnabled(True)
     self.ui.pbStartGUI.setText("Start GUI for: " + self.prefix + self.pvName)
-    self.ui.pbStartGUI.update()
-    QtCore.QCoreApplication.processEvents()
+    self.ui.pbStartGUI.update()    
     if not(connected):
       print("Timeout. Could not connect to: " + entirePvName + ". Probably not a valid PV name.")  
       return

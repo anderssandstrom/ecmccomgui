@@ -750,8 +750,7 @@ class MotorPanel(QtWidgets.QDialog):
             self.controls[field].setText(str(value))
             self.controls[field].setAlignment(QtCore.Qt.AlignRight)
 
-    def onChangeCntrlErrorIdPv(self,pvname=None, value=None, char_value=None, **kw):
-        print("onChangeCntrlErrorIdPv"+ char_value )
+    def onChangeCntrlErrorIdPv(self,pvname=None, value=None, char_value=None, **kw):        
         self.cntrlErrorMsg=self.cntrlErrorMsgPv.get(as_string=True)
         print("new Error message: " +str(self.cntrlErrorMsg))
 

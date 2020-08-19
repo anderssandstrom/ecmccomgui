@@ -35,16 +35,17 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 import time
 import threading
 
+
 class comTrend(QObject):
     data_signal = pyqtSignal(float)
 
 
 class ecmcTrendPv(ecmcTrend.ecmcTrend):
     def __init__(self,pvName=None):        
-        super(ecmcTrendPv, self).__init__()
+        super(ecmcTrendPv, self).__init__()        
         self.pvName = pvName
         self.connectPv(self.pvName) # Epics
-        self.comTrend = comTrend()
+        self.comTrend = comTrend()        
         self.comTrend.data_signal.connect(self.addData_callbackFunc) # update trend
         self.setTitle(pvName)
         return
