@@ -43,10 +43,12 @@ class comTrend(QObject):
 class ecmcTrendPv(ecmcTrend.ecmcTrend):
     def __init__(self,pvName=None):        
         super(ecmcTrendPv, self).__init__()        
-        self.pvName = pvName
-        self.connectPv(self.pvName) # Epics
         self.comTrend = comTrend()        
         self.comTrend.data_signal.connect(self.addData_callbackFunc) # update trend
+        self.startval = 0
+        self.pvName = pvName
+        self.connectPv(self.pvName) # Epics
+
         self.setTitle(pvName)
         return
 
@@ -55,13 +57,15 @@ class ecmcTrendPv(ecmcTrend.ecmcTrend):
             raise RuntimeError("pvname must not be 'None'")
             if len(pvname)==0:
                 raise RuntimeError("pvname must not be ''")
-
-        self.pv = epics.PV(self.pvName)        
+        self.pv = epics.PV(self.pvName)
+        self.startval = self.pv.get()
         self.pv.add_callback(self.onChangePv)
+        self.myFig.addData(self.startval)
+        QCoreApplication.processEvents()
     
     def onChangePv(self,pvname=None, value=None, char_value=None,timestamp=None, **kw):
         self.comTrend.data_signal.emit(value)
-    
+
     def writePV(self,value):
         self.pv.put(value)
-        self.myFig.addData(value)                
+        self.myFig.addData(value)

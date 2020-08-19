@@ -61,6 +61,8 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
     self.ui.comboPvName.addItem("MCU-ErrId")
     self.ui.comboPvName.addItem("ec0-s2-EL2808-BO1")
     self.ui.comboPvName.addItem("ec0-s2-EL2808-BO2")
+    self.ui.comboPvName.addItem("ec0-s3-EL5002-CH1-PosAct")
+
 
     self.ui.comboPvName.setToolTip("Predefined pv-names. Choose one to use..")    
     
