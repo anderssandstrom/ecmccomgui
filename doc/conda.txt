@@ -1,0 +1,10 @@
+
+## CENTOS
+
+# first install conda.. (not sure how just now, installed before and do not remeber)
+
+conda create --name ecmccomgui_py35 python=3.5
+conda activate ecmccomgui_py35
+pip install pyqt5
+pip install matplotlib
+pip install numpy
