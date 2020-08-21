@@ -189,4 +189,11 @@ class ecmcTrend(QtWidgets.QDialog):
     def setTitle(self,label):
         self.myFig.setTitle(label)
         self.setWindowTitle("ecmc plot: " + label)
+    
+    def enablePut(self,enable):
+        self.pvPut_frame.setEnabled(enable)
+        self.pvPutBtn.setEnabled(enable)
+        self.lineEditpvPut.setEnabled(enable)
+        QCoreApplication.processEvents()
+
 

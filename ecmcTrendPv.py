@@ -48,7 +48,6 @@ class ecmcTrendPv(ecmcTrend.ecmcTrend):
         self.startval = 0
         self.pvName = pvName
         self.connectPv(self.pvName) # Epics
-
         self.setTitle(pvName)
         return
 

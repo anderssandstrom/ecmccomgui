@@ -227,6 +227,8 @@ class ecmcArrayStat(QtWidgets.QTableView):
     self.model.setHorizontalHeaderLabels(['Parameter', 'Value', ''])
     self.btnPlot=QtWidgets.QPushButton('Plot',default=False, autoDefault=False)    
     self.trend=ecmcTrend.ecmcTrend()
+    # Disable put button
+    self.trend.enablePut(False)
     self.trend.setTitle("ecmc plot")
     self.show()
 
