@@ -60,7 +60,11 @@ If the type of the pv is "motor" then the following GUI for the EPICS motor reco
 
 ## Generic GUI window
 
-The plot window have a few controls:
+The genric window can be used to both read and write to the PV choosen.
+
+The actual value can be seen in the plot window and writes to the PV can be done using the controls in the lower left corner of the window.
+
+The controls of the window are explained in the below table:
 
 Item | Field | Description
 --- | --- | --- |
@@ -81,7 +85,9 @@ In addition to these buttons there are also some functionalites for zooming and 
 
 ## Motor GUI window
 
-The GUI is devided into two panels:
+The motor GUI is designed to both control and see status of ecmc motors (using motor record).
+
+The motor GUI is devided into two panels:
 
 * The left panel is for control and EPICS motor record specific status and control.
 
@@ -150,9 +156,9 @@ Item | Field | Description | R/W
 30 | homeSensor |Status of home/reference sensor (if any) | R
 31 | Timestamp | EPICS timestamp of data | R
 
-The checkboxes are used to select a field for plotting (note: only one field can be selected currentlly).
+The checkboxes are used to select a field for plotting (note: only one field can be selected currently).
 
-To, for instance, plot the actula positon:
+To, for instance, plot the actual positon:
 
 1. Check the checkbox on the same line as "actPos"
 
