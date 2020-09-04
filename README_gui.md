@@ -24,11 +24,23 @@ python ecmcGuiMain.py
 ```
 ![Start GUI](doc/gui/startGUI_small.png)
 
-5. Choose process variable (PV = IOC_TEST:Axis1):
+5. Choose process variable:
+
+Some examples are listed in the dropdown lists. However, any PV name can be entered.
+
+The available PV names you can reach can be listed with the "dbl" command in the iocsh of the running ioc.
+
+Example of motor PV = IOC_TEST:Axis1
 
 ioc prefix: "IOC_TEST:"
 
 pv name: "Axis1"
+
+Example ethercat PV = IOC_TEST:ec0-s3-EL5002-CH1-PosAct
+
+ioc prefix: "IOC_TEST:"
+
+pv name: "ec0-s3-EL5002-CH1-PosAct"
 
 ![Start GUI](doc/gui/mainGUI_small.png)
 
@@ -36,9 +48,17 @@ pv name: "Axis1"
 
 press the "open gui" button
 
-The following GUI for the EPICS motor record should appear:
+Depending on the PV type different GUI windows will appear.
+
+If the type of the pv is "motor" then the following GUI for the EPICS motor record should appear:
 
 ![Motor GUI](doc/gui/motorGUI_small.png)
+
+If the type of the pv is a normal scalar then the following GUI should appear:
+
+![Generic GUI](doc/gui/plot_small.png)
+
+## Motor GUI window
 
 The GUI is devided into two panels:
 
