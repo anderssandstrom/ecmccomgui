@@ -1,4 +1,4 @@
-# ecmc_avs_fat_sat: PYQT GUI
+# PYQT GUI
 
 All data is accessiblie in the iocsh but sometimes it's simpler with a graphical GUI. The graphical GUI is generic and can be used to control motors and to read/write data. 
 
