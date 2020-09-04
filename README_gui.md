@@ -42,7 +42,7 @@ ioc prefix: "IOC_TEST:"
 
 pv name: "ec0-s3-EL5002-CH1-PosAct"
 
-![Start GUI](doc/gui/mainGUI_small.png)
+![Start GUI](doc/pics/ecmcGuiMain_small.png)
 
 6. Start GUI for stepper axis:
 
@@ -52,11 +52,12 @@ Depending on the PV type different GUI windows will appear.
 
 If the type of the pv is "motor" then the following GUI for the EPICS motor record should appear:
 
-![Motor GUI](doc/gui/motorGUI_small.png)
+![Motor GUI](doc/pics/ecmcMotorGui_small.png)
 
 If the type of the pv is a normal scalar then the following GUI should appear:
 
-![Generic GUI](doc/gui/plot_small.png)
+![Generic GUI](doc/pics/ecmcPvTrend_small.png)
+
 
 ## Motor GUI window
 
@@ -139,7 +140,7 @@ To, for instance, plot the actula positon:
 
 A new window will appear with a plot of the selected parameter:
 
-![Plot GUI](doc/gui/plot_small.png)
+![Plot GUI](doc/pics/ecmcTrend_small.png)
 
 The plot window have a few controls:
 Item | Field | Description
