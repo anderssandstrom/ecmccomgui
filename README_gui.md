@@ -30,34 +30,54 @@ Some examples are listed in the dropdown lists. However, any PV name can be ente
 
 The available PV names you can reach can be listed with the "dbl" command in the iocsh of the running ioc.
 
-Example of motor PV = IOC_TEST:Axis1
-
-ioc prefix: "IOC_TEST:"
-
-pv name: "Axis1"
-
 Example ethercat PV = IOC_TEST:ec0-s3-EL5002-CH1-PosAct
 
 ioc prefix: "IOC_TEST:"
 
 pv name: "ec0-s3-EL5002-CH1-PosAct"
 
+Example of motor PV = IOC_TEST:Axis1
+
+ioc prefix: "IOC_TEST:"
+
+pv name: "Axis1"
+
 ![Start GUI](doc/pics/ecmcGuiMain_small.png)
 
-6. Start GUI for stepper axis:
+6. Start GUI for the choosen:
 
 press the "open gui" button
 
-Depending on the PV type different GUI windows will appear.
+Depending on the PV-type, different GUI windows will appear.
+
+If the type of the pv is a normal scalar then the following generic GUI should appear:
+
+![Generic GUI](doc/pics/ecmcPvTrend_small.png)
 
 If the type of the pv is "motor" then the following GUI for the EPICS motor record should appear:
 
 ![Motor GUI](doc/pics/ecmcMotorGui_small.png)
 
-If the type of the pv is a normal scalar then the following GUI should appear:
+## Generic GUI window
 
-![Generic GUI](doc/pics/ecmcPvTrend_small.png)
+The plot window have a few controls:
 
+Item | Field | Description
+--- | --- | --- |
+1 | Ymax group | Controls to set maximum y-axis value
+2 | Ymax text input | Desired maximum y-axis value
+3 | Ymax set button ">"  | Press to set re-zoom the plot based on Ymax text input
+4 | Zoom auto  | Auto zoom of y axis
+5 | Freeze  | Enable/disable update of plot
+6 | Ymin group | Controls to set minimum y-axis value
+7 | Ymin text input | Desired minimum y-axis value
+8 | Ymin set button ">"  | Press to set re-zoom the plot based on Ymin text input
+9 | Write PV group  | Controls to allow write to the selected process variable (greyed out if not allowd)
+10 | Write PV text input  | Enter value to write to the selected process variable
+11 | Write PV button ">"  | Issue write command to selected PV
+12 | Buffer size | Set buffer size of plot (number of values to show)
+
+In addition to these buttons there are also some functionalites for zooming and storing plots in the top part of the plot window. For additional information on these buttons plese checkout matplotlib.
 
 ## Motor GUI window
 
@@ -142,30 +162,14 @@ A new window will appear with a plot of the selected parameter:
 
 ![Plot GUI](doc/pics/ecmcTrend_small.png)
 
-The plot window have a few controls:
-Item | Field | Description
---- | --- | --- |
-1 | Ymax group | Controls to set maximum y-axis value
-2 | Ymax text input | Desired maximum y-axis value
-3 | Ymax set button ">"  | Press to set re-zoom the plot based on Ymax text input
-4 | Zoom auto  | Auto zoom of y axis
-5 | Freeze  | Enable/disable update of plot
-6 | Ymin group | Controls to set minimum y-axis value
-7 | Ymin text input | Desired minimum y-axis value
-8 | Ymin set button ">"  | Press to set re-zoom the plot based on Ymin text input
-9 | Write PV group  | Controls to allow write to the selected process variable (greyed out if not allowd)
-10 | Write PV text input  | Enter value to write to the selected process variable
-11 | Write PV button ">"  | Issue write command to selected PV
-12 | Buffer size | Set buffer size of plot (number of values to show)
+The functionalities of this window is explained above in the chapter "Generic GUI window"
 
-In addition to these buttons there are also some functionalites for zooming and storing plots in the top part of the plot window. For additional information on these buttons plese checkout matplotlib.
+### Operation of the motor GUI
 
-## Start motion commands:
-
-### Stop motion:
+#### Stop motion:
 The motor can be stopped by pressing the "STOP" button (or in worst case CNEN button (not good for electronics) or E-Stop button).
 
-### Start a positioning command:
+#### Start a positioning command:
 
 1. Ensure that it is safe for the motor to be powered and move. Always have the E-stop within reach.
 2. Ensure that there are no error code. If error, try to reset by the "Reset Error"
@@ -174,7 +178,7 @@ The motor can be stopped by pressing the "STOP" button (or in worst case CNEN bu
 5. Enter a new target position in the "VAL" field. The motor should start rotating twoards the new target position.
 6. The motor can be stopped by pressing the "STOP" button (or in worst case CNEN button (not good for electronics) or E-Stop button).
 
-### Start a relative positioning command:
+#### Start a relative positioning command:
 
 1. Ensure that it is safe for the motor to be powered and move. Always have the E-stop within reach.
 2. Ensure that there are no error code. If error, try to reset by the "Reset Error"
@@ -184,7 +188,7 @@ The motor can be stopped by pressing the "STOP" button (or in worst case CNEN bu
 6. Press the tweek forward button (">>") to move forward or the tweak backward button ("<<")to move backward the selected distance.
 6. The motor can be stopped by pressing the "STOP" button (or in worst case CNEN button (not good for electronics) or E-Stop button).
 
-### Start a jog (constant velocity) command:
+#### Start a jog (constant velocity) command:
 
 1. Ensure that it is safe for the motor to be powered and move. Always have the E-stop within reach.
 2. Ensure that there are no error code. If error, try to reset by the "Reset Error"
