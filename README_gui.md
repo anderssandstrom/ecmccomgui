@@ -48,6 +48,8 @@ pv name: "Axis1"
 
 press the "open gui" button
 
+note: The GUI supports multiple open windows for different PV:s (a new window will be created each time the "open gui"- button is pressed with a valid PV). 
+
 Depending on the PV-type, different GUI windows will appear.
 
 If the type of the pv is a normal scalar then the following generic GUI should appear:
@@ -170,7 +172,7 @@ A new window will appear with a plot of the selected parameter:
 
 The functionalities of this window is explained above in the chapter "Generic GUI window"
 
-### Operation of the motor GUI
+### Operation of motors
 
 #### Stop motion:
 The motor can be stopped by pressing the "STOP" button (or in worst case CNEN button (not good for electronics) or E-Stop button).
