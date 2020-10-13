@@ -55,14 +55,24 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.fftPluginId = fftPluginId
         self.fftPluginOrigId = fftPluginId
         self.allowSave = False
+        
         if prefix is None or fftPluginId is None:
+          self.offline = True
+          self.pause = True
+          self.enable = False           
+        else:
+          #Check for connection else go offline
+          self.buildPvNames()
+          pvtest  = epics.PV(self.pvNameSpectY)
+          connected = pvtest.wait_for_connection(timeout=2)
+          if connected:
+            self.offline = False
+            self.pause = False
+          else: 
             self.offline = True
             self.pause = True
-            self.enable = False           
-        else:
-            self.buildPvNames()
-            self.offline = False
-            self.pause = False            
+            self.enable = False
+          pvtest.disconnect()
 
         # Callbacks through signals
         self.comSignalSpectX = comSignal()

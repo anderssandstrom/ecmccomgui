@@ -8,6 +8,7 @@ from ecmcArrayStat import *
 from ecmcOneMotorGUI import *
 from ecmcMainWndDesigner import Ui_MainWindow
 from ecmcFFTMainGui import *
+from ecmcScopeMainGui import *
 import ecmcTrendPv
 import time
 
@@ -60,10 +61,11 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
     self.ui.comboPvName.addItem("MCU-thread-send-min")
     self.ui.comboPvName.addItem("ec0-domainfailcountertotal")
     self.ui.comboPvName.addItem("MCU-ErrId")
-    self.ui.comboPvName.addItem("FFT-0")
     self.ui.comboPvName.addItem("ec0-s2-EL2808-BO1")
     self.ui.comboPvName.addItem("ec0-s2-EL2808-BO2")
     self.ui.comboPvName.addItem("ec0-s3-EL5002-CH1-PosAct")
+    self.ui.comboPvName.addItem("FFT-0")
+    self.ui.comboPvName.addItem("Scope-0")
     self.ui.comboPvName.setToolTip("Predefined pv-names. Choose one to use..")    
     
     if len(sys.argv)>1:
@@ -74,10 +76,15 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
         self.ui.linepvName.setText(self.pvName)
 
   def showGUI(self):
+    
     #Check and start FFT gui
     if self.showGuiFFT(self.prefix, self.pvName):
       return
-          
+
+    #Check and start Scope gui
+    if self.showGuiScope(self.prefix, self.pvName):
+      return
+
     # See if scalar or motor
     self.ui.pbStartGUI.setText("Connecting to: " + self.prefix + self.pvName + "...")
     self.ui.pbStartGUI.setEnabled(False)
@@ -128,6 +135,17 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
       if np.size(pvNameTemp)==2:
         if pvNameTemp[1].isdigit():
           self.dialog = ecmcFFTMainGui(prefix,int(pvNameTemp[1]))
+          self.dialog.show()
+          return 1
+    return 0
+
+  def showGuiScope(self, prefix, pvName):
+    # Check if FFT gui
+    if pvName.find('Scope-') == 0 and len(prefix) > 0:
+      pvNameTemp = pvName.split('-')
+      if np.size(pvNameTemp)==2:
+        if pvNameTemp[1].isdigit():
+          self.dialog = ecmcScopeMainGui(prefix,int(pvNameTemp[1]))
           self.dialog.show()
           return 1
     return 0
