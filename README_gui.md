@@ -210,8 +210,10 @@ The motor can be stopped by pressing the "STOP" button (or in worst case CNEN bu
 6. The motor can be stopped by pressing the "STOP" button (or in worst case CNEN button (not good for electronics) or E-Stop button).
 
 
-## FFT GUI window
-A simple tool, [ecmcFFTMainGui.py](ecmcFFTMainGui.py), to visualize the calculated spectrum, rawdata and also plugin controls can be found in the tools directory. The GUI connects to the plugin records over pypics framwork.
+## FFT Plugin GUI
+A simple tool, [ecmcFFTMainGui.py](ecmcFFTMainGui.py), to visualize the calculated spectrum, rawdata and controls for a ecmc [FFT plugin](https://github.com/anderssandstrom/e3-ecmcPlugin_FFT) is included in this repo. 
+
+The GUI connects to the plugin records over pypics framwork.
 
 Example: ecmcFFTMainGui.py help printout
 ```
@@ -232,11 +234,8 @@ python ecmcFFTMainGui.py IOC_TEST:  0
 ```
 ![ecmcFFTMainGui](doc/pics/ecmcFFTMainGui.png)
 
-## Scope GUI window
-
-A simple pyqt gui is provided to visualize and control the scope ([GUI](tools/ecmcScopeMainGui.py)).
-The gui are included in the ecmccomgui repo:
-https://github.com/anderssandstrom/ecmccomgui
+## Scope plugin GUI
+A simple tool, [ecmcScopeMainGui.py](ecmcFFTScopeGui.py), to visualize the rawdata and controls for a ecmc [Scope plugin](https://github.com/anderssandstrom/e3-ecmcPlugin_Scope) is included in this repo. The GUI connects to the plugin records over pypics framwork.
 
 The tool recives data from the EPICS records by pyepics framework.
 
