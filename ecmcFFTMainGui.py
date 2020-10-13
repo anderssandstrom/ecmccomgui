@@ -85,7 +85,6 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.comSignalEnable.data_signal.connect(self.callbackFuncEnable)
         self.comSignalMode = comSignal()
         self.comSignalMode.data_signal.connect(self.callbackFuncMode)
-
         self.pause = 0
 
         # Data
@@ -509,6 +508,7 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         # refresh canvas 
         self.canvas.draw()
         self.allowSave = True
+        self.saveBtn.setEnabled(True)
         self.axRaw.autoscale(enable=True)
 
 def printOutHelp():
