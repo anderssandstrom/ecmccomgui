@@ -52,13 +52,21 @@ class ecmcScopeMainGui(QtWidgets.QDialog):
         self.scopePluginOrigId = scopePluginId # For restore
         self.allowSave = False
         if prefix is None or scopePluginId is None:
+          self.offline = True
+          self.pause = True
+          self.enable = False           
+        else:
+          self.buildPvNames()
+          pvtest  = epics.PV(self.pvNameRawDataY)
+          connected = pvtest.wait_for_connection(timeout=2)
+          if connected:
+            self.offline = False
+            self.pause = False
+          else: 
             self.offline = True
             self.pause = True
-            self.enable = False           
-        else:
-            self.buildPvNames()
-            self.offline = False
-            self.pause = False            
+            self.enable = False
+          pvtest.disconnect()
 
         # Callbacks through signals
         self.comSignalMissTriggCnt = comSignal()
