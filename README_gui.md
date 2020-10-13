@@ -50,15 +50,19 @@ press the "open gui" button
 
 note: The GUI supports multiple open windows for different PV:s (a new window will be created each time the "open gui"- button is pressed with a valid PV). 
 
-Depending on the PV-type, different GUI windows will appear.
+Depending on the PV-type, different GUI windows will appear:
 
-If the type of the pv is a normal scalar then the following generic GUI should appear:
+1. If the type of the pv is a normal scalar then the following generic GUI should appear:
 
 ![Generic GUI](doc/pics/ecmcPvTrend_small.png)
 
-If the type of the pv is "motor" then the following GUI for the EPICS motor record should appear:
+2. If the type of the pv is "motor" then the following GUI for the EPICS motor record should appear:
 
 ![Motor GUI](doc/pics/ecmcMotorGui_small.png)
+
+3. If the selected type is "FFT-<<id>>" then a GUI for the selcted plugin type and <<id>> will be displayed (see ecmcFFTMainGUI below). 
+
+4. If the selected type is "Scope-<<id>>" then a GUI for the selcted plugin type and <<id>> will be displayed (see ecmcScopeGUI below). 
 
 ## Generic GUI window
 
@@ -205,3 +209,54 @@ The motor can be stopped by pressing the "STOP" button (or in worst case CNEN bu
 5. Press the "JOGF" button for forward motion or the "JOGR" button for backward motion.
 6. The motor can be stopped by pressing the "STOP" button (or in worst case CNEN button (not good for electronics) or E-Stop button).
 
+
+## FFT GUI window
+A simple tool, [ecmcFFTMainGui.py](ecmcFFTMainGui.py), to visualize the calculated spectrum, rawdata and also plugin controls can be found in the tools directory. The GUI connects to the plugin records over pypics framwork.
+
+Example: ecmcFFTMainGui.py help printout
+```
+python ecmcFFTMainGui.py 
+ecmcFFTMainGui: Plots waveforms of FFT data (updates on Y data callback). 
+python ecmcFFTMainGui.py <prefix> <fftId>
+<prefix>:  Ioc prefix ('IOC_TEST:')
+<fftId> :  Id of fft plugin ('0')
+example : python ecmcFFTMainGui.py 'IOC_TEST:' '0'
+Will connect to Pvs: <prefix>Plugin-FFT<fftId>-*
+```
+
+Example: Start ecmcFFMainTGui.py for:
+* predix="IOC_TEST:"
+* fftPluginId=0  (the first loaded FFT plugin in the ioc)
+```
+python ecmcFFTMainGui.py IOC_TEST:  0
+```
+![ecmcFFTMainGui](docs/pics/ecmcFFTMainGui.png)
+
+
+## Scope GUI window
+
+A simple pyqt gui is provided to visualize and control the scope ([GUI](tools/ecmcScopeMainGui.py)).
+The gui are included in the ecmccomgui repo:
+https://github.com/anderssandstrom/ecmccomgui
+
+The tool recives data from the EPICS records by pyepics framework.
+
+Help screen of ecmcScopeMainGui.py
+```
+$ python ecmcScopeMainGui.py
+ecmcScopeMainGui: Plots waveforms of FFT data (updates on Y data callback). 
+python ecmcScopeMainGui.py <prefix> <fftId>
+<prefix>  : Ioc prefix ('IOC_TEST:')
+<scopeId> : Id of scope plugin ('0')
+example   : python ecmcScopeMainGui.py 'IOC_TEST:' '0'
+Will connect to Pvs: <prefix>Plugin-Scope<scopeId>-*
+
+```
+Example: Start ecmcFFMainTGui.py for:
+* predix="IOC_TEST:"
+* scopePluginId=0 (the first loaded Scope plugin in the ioc)
+
+```
+python ecmcScopeMainGui.py 'IOC_TEST:' '0'
+```
+![ecmcScopeMainGui](docs/pics/ecmcScopeMainGui.png)
