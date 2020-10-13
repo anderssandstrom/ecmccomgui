@@ -230,8 +230,7 @@ Example: Start ecmcFFMainTGui.py for:
 ```
 python ecmcFFTMainGui.py IOC_TEST:  0
 ```
-![ecmcFFTMainGui](docs/pics/ecmcFFTMainGui.png)
-
+![ecmcFFTMainGui](doc/pics/ecmcFFTMainGui.png)
 
 ## Scope GUI window
 
@@ -259,4 +258,5 @@ Example: Start ecmcFFMainTGui.py for:
 ```
 python ecmcScopeMainGui.py 'IOC_TEST:' '0'
 ```
-![ecmcScopeMainGui](docs/pics/ecmcScopeMainGui.png)
+![ecmcScopeMainGui](doc/pics/ecmcScopeMainGui.png)
+
