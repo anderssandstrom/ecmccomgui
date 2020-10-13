@@ -99,7 +99,7 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
     # ensure record/pv exist
     
     pvtest  = epics.PV(entirePvName)
-    connected = pvtest.wait_for_connection(timeout=10)
+    connected = pvtest.wait_for_connection(timeout=2)
     self.ui.pbStartGUI.setEnabled(True)
     self.ui.pbStartGUI.setText("Start GUI for: " + self.prefix + self.pvName)
     self.ui.pbStartGUI.update()    
