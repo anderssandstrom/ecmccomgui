@@ -14,7 +14,7 @@ source activate ecmccomgui_py35
 3. Go to GUI repo:
 ```
 cd
-cd source/ecmccomgui
+cd sources/ecmccomgui
 ```
 
 4. Start GUI:
