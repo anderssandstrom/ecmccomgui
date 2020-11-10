@@ -169,7 +169,11 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         else:
            self.modeCombo.setEnabled(True)
            # Check actual value of pvs
-           if(self.pvEnable.get()>0):
+           enable = self.pvEnable.get()
+           if enable is None:
+             print("pvEnable.get() failed")
+             return
+           if(enable>0):
              self.enableBtn.setStyleSheet("background-color: green")
              self.enable = True
            else:
@@ -177,9 +181,25 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
              self.enable = False
    
            self.sourceStr = self.pvSource.get(as_string=True)
+           if self.sourceStr is None:
+             print("pvSource.get() failed")
+             return
+
            self.sampleRate = self.pvSampleRate.get()
+           if self.sampleRate is None:
+              print("pvSampleRate.get() failed")
+              return
+
            self.NFFT = self.pvNFFT.get()        
-           self.mode = self.pvMode.get()        
+           if self.NFFT is None:
+             print("pvNFFT.get() failed")
+             return
+
+           self.mode = self.pvMode.get()    
+           if self.mode is None:
+             print("pvMode.get() failed")
+             return
+
            self.modeStr = "NO_MODE"
            self.triggBtn.setEnabled(False) # Only enable if mode = TRIGG = 2
            if self.mode == 1:
