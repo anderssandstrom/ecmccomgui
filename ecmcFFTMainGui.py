@@ -41,6 +41,8 @@ import threading
 # IOC_TEST:Plugin-FFT0-PreProc-Data-Act 
 # IOC_TEST:Plugin-FFT0-Spectrum-Amp-Act x
 # IOC_TEST:Plugin-FFT0-Spectrum-X-Axis-Act x
+# IOC_TEST:Plugin-FFT2-BuffIdAct
+
 
 
 class comSignal(QObject):
@@ -85,6 +87,10 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.comSignalEnable.data_signal.connect(self.callbackFuncEnable)
         self.comSignalMode = comSignal()
         self.comSignalMode.data_signal.connect(self.callbackFuncMode)
+        self.comSignalBuffIdAct = comSignal()
+        self.comSignalBuffIdAct.data_signal.connect(self.callbackFuncBuffIdAct)
+
+        
         self.pause = 0
 
         # Data
@@ -123,7 +129,7 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.saveBtn.clicked.connect(self.saveBtnAction)
         self.enableBtn = QPushButton(text = 'enable FFT')
         self.enableBtn.setFixedSize(100, 50)
-        self.enableBtn.clicked.connect(self.enableBtnAction)            
+        self.enableBtn.clicked.connect(self.enableBtnAction)
         self.triggBtn = QPushButton(text = 'trigg FFT')
         self.triggBtn.setFixedSize(100, 50)
         self.triggBtn.clicked.connect(self.triggBtnAction)            
@@ -131,8 +137,14 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.modeCombo.setFixedSize(100, 50)
         self.modeCombo.currentIndexChanged.connect(self.newModeIndexChanged)
         self.modeCombo.addItem("CONT")
-        self.modeCombo.addItem("TRIGG")
-
+        self.modeCombo.addItem("TRIGG")    
+        self.progressBar = QProgressBar()
+        self.progressBar.reset()
+        self.progressBar.setMinimum(0)
+        self.progressBar.setMaximum(100) #100%
+        self.progressBar.setValue(0)
+        self.progressBar.setFixedHeight(20)
+    
         # Fix layout
         self.setGeometry(300, 300, 900, 700)
   
@@ -153,7 +165,8 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         frameControl.setLayout(layoutControl)
 
 
-        layoutVert.addWidget(frameControl) 
+        layoutVert.addWidget(frameControl)
+        layoutVert.addWidget(self.progressBar)
         self.setLayout(layoutVert)                
 
     def setStatusOfWidgets(self):
@@ -226,6 +239,7 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
            self.pvnNameSampleRate = self.buildPvName('SampleRate-Act') # IOC_TEST:Plugin-FFT0-SampleRate-Act
            self.pvnNameNFFT = self.buildPvName('NFFT') # IOC_TEST:Plugin-FFT0-NFFT
            self.pvnNameMode = self.buildPvName('Mode-RB') # IOC_TEST:Plugin-FFT0-Mode-RB
+           self.pvNameBuffIdAct= self.buildPvName('BuffIdAct')# IOC_TEST:Plugin-FFT2-BuffIdAct
 
     def buildPvName(self, suffixname):
         return self.pvPrefixStr + 'Plugin-FFT' + str(self.fftPluginId) + '-' + suffixname 
@@ -278,7 +292,12 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
             raise RuntimeError("pvname mode must not be 'None'")
         if len(self.pvnNameMode)==0:
             raise RuntimeError("pvname mode must not be ''")
-        
+
+        if self.pvNameBuffIdAct is None:
+            raise RuntimeError("pvname buffactid must not be 'None'")
+        if len(self.pvNameBuffIdAct)==0:
+            raise RuntimeError("pvname buffactid must not be ''")
+                
         self.pvSpectX = epics.PV(self.pvNameSpectX)
         self.pvSpectY = epics.PV(self.pvNameSpectY)
         self.pvRawData = epics.PV(self.pvNameRawDataY)
@@ -288,11 +307,13 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.pvSampleRate = epics.PV(self.pvnNameSampleRate)
         self.pvNFFT = epics.PV(self.pvnNameNFFT)
         self.pvMode = epics.PV(self.pvnNameMode)
+        self.pvBuffIdAct = epics.PV(self.pvNameBuffIdAct)
         self.pvSpectX.add_callback(self.onChangePvSpectX)
         self.pvSpectY.add_callback(self.onChangePvSpectY)
         self.pvRawData.add_callback(self.onChangePvrawData)
         self.pvEnable.add_callback(self.onChangePvEnable)
         self.pvMode.add_callback(self.onChangePvMode)
+        self.pvBuffIdAct.add_callback(self.onChangePvBuffIdAct)
         QCoreApplication.processEvents()
     
     ###### Pv monitor callbacks
@@ -319,7 +340,12 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
     def onChangePvrawData(self,pvname=None, value=None, char_value=None,timestamp=None, **kw):
         if self.pause: 
             return
-        self.comSignalRawData.data_signal.emit(value)        
+        self.comSignalRawData.data_signal.emit(value)    
+
+    def onChangePvBuffIdAct(self,pvname=None, value=None, char_value=None,timestamp=None, **kw):
+        if self.pause: 
+            return
+        self.comSignalBuffIdAct.data_signal.emit(value)
 
     ###### Signal callbacks    
     def callbackFuncMode(self, value):
@@ -368,6 +394,10 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
 
             self.rawdataY = value
             self.plotRaw()
+        return
+
+    def callbackFuncBuffIdAct(self, value):        
+        self.progressBar.setValue(value/self.NFFT*100)
         return
 
     ###### Widget callbacks
@@ -443,8 +473,8 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         # trigg draw
         self.comSignalMode.data_signal.emit(self.mode)
         self.comSignalSpectX.data_signal.emit(self.spectX)
-        self.comSignalSpectY.data_signal.emit(self.spectY)        
-        self.comSignalRawData.data_signal.emit(self.rawdataY)        
+        self.comSignalSpectY.data_signal.emit(self.spectY)
+        self.comSignalRawData.data_signal.emit(self.rawdataY)
         
         self.setStatusOfWidgets()
         return
