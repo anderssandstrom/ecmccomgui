@@ -8,14 +8,14 @@ from caPVArrayLib import caPVArray
 from caMonitorArrayParserLib import caMonitorArrayParser 
  
 def printOutHelp():
-  print "python plotCaMonitor.py [<filename>]"
-  print "example: python plotCaMonitor.py xx.txt"
-  print "example stdin: cat data.log | grep -E 'thread|CPU' | python plotCaMonitor.py" 
+  print ("python plotCaMonitor.py [<filename>]")
+  print ("example: python plotCaMonitor.py xx.txt")
+  print ("example stdin: cat data.log | grep -E 'thread|CPU' | python plotCaMonitor.py" )
 
 def main():
   # Check args
   if len(sys.argv)>1:
-    print sys.argv[1] 
+    print(sys.argv[1] )
     pos1=sys.argv[1].find('-h')
     if(pos1>=0):
       printOutHelp()
@@ -53,11 +53,11 @@ def main():
     pvToAddDataTo.setValues(timeVal,data)    
     if newPv:       
       pvs.append(pvToAddDataTo)
-      print "Added PV: " + pvName
+      print("Added PV: " + pvName)
   
-  print  "Statistics: "  
+  print("Statistics: ")
   legend=[]
-  print pvs
+  print (pvs)
 
   for pv in pvs: 
     timeSet, dataSet=pv.getData()
@@ -73,7 +73,7 @@ def main():
      
     x=timeSet
     y=dataSet
-    print legStr
+    print (legStr)
     plt.plot(x,y,'o-')
 
   plt.legend(legend)

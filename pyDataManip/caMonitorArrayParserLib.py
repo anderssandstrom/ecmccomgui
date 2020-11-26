@@ -23,36 +23,36 @@ class caMonitorArrayParser:
     if len(line.split()) == 3: 
       pos1=line.rfind('<undefined>')
       if pos1<=0 or not self.lastTimeStampSet:
-        print "Ignoring line: " + line + " (Undefined timestamp and no fallback timestamp set)."
+        print ("Ignoring line: " + line + " (Undefined timestamp and no fallback timestamp set).")
         return 0
-      print "Warning: Time stamp undefined. Using last valid timestamp (" +line +")."
+      print("Warning: Time stamp undefined. Using last valid timestamp (" +line +").")
       return 1 
 
     pos1=line.rfind(':')
     if pos1<0:      
-      print "Ignoring line: " + line + " (Missing timestamp \":\")."
+      print("Ignoring line: " + line + " (Missing timestamp \":\").")
       return 0
 
     if(line.count('-')<2):
-      print "Ignoring line: " + line + " (Missing timestamp \":\")."
+      print("Ignoring line: " + line + " (Missing timestamp \":\").")
       return 0
 
     if(line.count(':')<2):
-      print "Ignoring line: " + line + " (Missing timestamp \":\")."
+      print("Ignoring line: " + line + " (Missing timestamp \":\").")
       return 0
     
     pos1=line.rfind('Not connected')
     if pos1>=0:
-      print "Ignoring line: " + line + " (\"Not connected\")."
+      print("Ignoring line: " + line + " (\"Not connected\").")
       return 0
 
     pos1=line.rfind('*')
     if pos1>=0:
-      print "Ignoring line: " + line + " (Invalid char \"*\")."
+      print("Ignoring line: " + line + " (Invalid char \"*\").")
       return 0
 
     if len(line.split()) < 4: 
-      print "Ignoring line: " + line + " (not three columns"
+      print("Ignoring line: " + line + " (not three columns")
       return 0
 
     #Check time low limit
@@ -78,14 +78,14 @@ class caMonitorArrayParser:
 
   def setLowTimeLimit(self,timeLimitStr):
     if len(timeLimitStr)==0:
-      print "Warning: invalid time limit: " + timeLimitStr
+      print("Warning: invalid time limit: " + timeLimitStr)
       return
     self.timeLowLimit=self.getTimeFromString(timeLimitStr)
     self.timeLowLimtSet = 1
 
   def setHighTimeLimit(self,timeLimitStr):
     if len(timeLimitStr)==0:
-      print "Warning: invalid time limit: " + timeLimitStr
+      print("Warning: invalid time limit: " + timeLimitStr)
       return
     self.timeHighLimit=self.getTimeFromString(timeLimitStr)
     self.timeHighLimtSet = 1
@@ -138,4 +138,4 @@ class caMonitorArrayParser:
     data = data + self.turns * modulofactor
 
     # print new string to std out
-    print mylist[0:2] + data.str()
+    print(mylist[0:2] + data.str())

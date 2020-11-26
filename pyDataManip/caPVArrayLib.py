@@ -53,7 +53,7 @@ class caPVArray:
   def calcDeModValue(self,modulofactor):
     
     if self.dataSetLength <=1:
-        print "Error: Data set size to small." 
+        print ("Error: Data set size to small." )
     
     
     timeSet, localdataSet=self.getData()
@@ -95,35 +95,35 @@ class caPVArray:
 
   def printDeLinValues(self):
     for i in range(1,self.getLength()):
-      print self.name + " " + self.timeSet[i].strftime("%Y-%m-%d %H:%M:%S.%f") + " " + str(self.dataSetDeLin[i])
+      print (self.name + " " + self.timeSet[i].strftime("%Y-%m-%d %H:%M:%S.%f") + " " + str(self.dataSetDeLin[i]))
 
   def printDownSample(self,downSampleFactor):
     localTimeSet, localDataSet=self.getData()
-    #print "Length: " + str(self.getLength())+ "  " + str(localDataSet.size) + "  " + str(localTimeSet.size)    
+    #print ("Length: " + str(self.getLength())+ "  " + str(localDataSet.size) + "  " + str(localTimeSet.size))
     for i in range(1,self.getLength(),int(downSampleFactor)):
-      print self.name + " " + localTimeSet[i].strftime("%Y-%m-%d %H:%M:%S.%f") + " " + str(localDataSet[i])
+      print (self.name + " " + localTimeSet[i].strftime("%Y-%m-%d %H:%M:%S.%f") + " " + str(localDataSet[i]))
 
   def printValues(self):
     localTimeSet, localDataSet=self.getData()    
     
     for i in range(1,self.getLength()):
-      print self.name + " " + localTimeSet[i].strftime("%Y-%m-%d %H:%M:%S.%f") + " " + str(localDataSet[i])
+      print (self.name + " " + localTimeSet[i].strftime("%Y-%m-%d %H:%M:%S.%f") + " " + str(localDataSet[i]))
 
   def printDiff(self):
     localTimeSet, localDataSet=self.getData()    
     if self.getLength()<2:
-      print "diff Error: To short data array."
+      print ("diff Error: To short data array.")
     for i in range(2,self.getLength()):
-      print self.name + " " + localTimeSet[i].strftime("%Y-%m-%d %H:%M:%S.%f") + " " + str(localDataSet[i-1]-localDataSet[i])
+      print (self.name + " " + localTimeSet[i].strftime("%Y-%m-%d %H:%M:%S.%f") + " " + str(localDataSet[i-1]-localDataSet[i]))
 
   def printScaleValues(self):
     for i in range(1,self.getLength()):
-      print self.name + " " + str(self.timeSet[i].strftime("%Y-%m-%d %H:%M:%S.%f") ) + " " + str(self.dataSetScale[i])
+      print (self.name + " " + str(self.timeSet[i].strftime("%Y-%m-%d %H:%M:%S.%f") ) + " " + str(self.dataSetScale[i]))
 
   def printDeModValues(self):
     for i in range(1,self.getLength()):
-      print self.name + " " + str(self.timeSet[i].strftime("%Y-%m-%d %H:%M:%S.%f") ) + " " + str(self.dataSetMod[i])
+      print (self.name + " " + str(self.timeSet[i].strftime("%Y-%m-%d %H:%M:%S.%f") ) + " " + str(self.dataSetMod[i]))
 
   def printAddValues(self):
     for i in range(1,self.getLength()):
-      print self.name + " " + str(self.timeSet[i].strftime("%Y-%m-%d %H:%M:%S.%f") ) + " " + str(self.dataSetAdd[i])
+      print (self.name + " " + str(self.timeSet[i].strftime("%Y-%m-%d %H:%M:%S.%f") ) + " " + str(self.dataSetAdd[i]))
