@@ -396,8 +396,9 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
             self.plotRaw()
         return
 
-    def callbackFuncBuffIdAct(self, value):        
-        self.progressBar.setValue(value/self.NFFT*100)
+    def callbackFuncBuffIdAct(self, value):
+        if(self.NFFT>0):
+          self.progressBar.setValue(value/self.NFFT*100)
         return
 
     ###### Widget callbacks
