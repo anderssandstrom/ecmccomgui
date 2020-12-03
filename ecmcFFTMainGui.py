@@ -509,7 +509,7 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         return
 
     def saveBtnAction(self):
-        fname = QFileDialog.getSaveFileName(self, 'Save file', '.', "Data files (*.npz)")
+        fname = QFileDialog.getSaveFileName(self, 'Save file', self.path, "Data files (*.npz)")
         if fname is None:
             return
         if np.size(fname) != 2:            
@@ -531,6 +531,7 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
                  fftPluginId              = self.fftPluginId
                  )
 
+        self.path = os.path.dirname(os.path.abspath(fname[0]))
 
         return
 
