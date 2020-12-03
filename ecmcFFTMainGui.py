@@ -590,8 +590,6 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         if self.axRaw is None:
            self.axRaw = self.figure.add_subplot(211)
 
-        #if autozoom:
-           #self.axRaw.autoscale(enable=False)  # trigger change
 
         # plot data 
         if self.plottedLineRaw is not None:
@@ -631,7 +629,7 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.canvas.draw()
         self.allowSave = True
         self.saveBtn.setEnabled(True)
-        self.axRaw.autoscale(enable=True)
+        self.axRaw.autoscale(enable=False)
 
 def printOutHelp():
   print("ecmcFFTMainGui: Plots waveforms of FFT data (updates on Y data callback). ")
