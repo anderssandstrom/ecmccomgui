@@ -13,6 +13,7 @@
 #*************************************************************************
 
 import sys
+import os
 import epics
 from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets
@@ -57,7 +58,7 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.fftPluginId = fftPluginId
         self.fftPluginOrigId = fftPluginId
         self.allowSave = False
-        
+        self.path =  '.'
         if prefix is None or fftPluginId is None:
           self.offline = True
           self.pause = True
@@ -465,13 +466,14 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
            self.pauseBtn.setStyleSheet("background-color: red")
            QCoreApplication.processEvents()
                    
-        fname = QFileDialog.getOpenFileName(self, 'Open file', '.', "Data files (*.npz)")
+        fname = QFileDialog.getOpenFileName(self, 'Open file', self.path, "Data files (*.npz)")
         if fname is None:
             return
         if np.size(fname) != 2:            
             return
         if len(fname[0])<=0:
-            return        
+            return
+        self.path = os.path.dirname(os.path.abspath(fname[0]))     
         
         npzfile = np.load(fname[0])
 
