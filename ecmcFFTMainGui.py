@@ -126,7 +126,10 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.enableBtn.clicked.connect(self.enableBtnAction)            
         self.triggBtn = QPushButton(text = 'trigg FFT')
         self.triggBtn.setFixedSize(100, 50)
-        self.triggBtn.clicked.connect(self.triggBtnAction)            
+        self.triggBtn.clicked.connect(self.triggBtnAction)
+        self.zoomBtn = QPushButton(text = 'auto zoom')
+        self.zoomBtn.setFixedSize(100, 50)
+        self.zoomBtn.clicked.connect(self.zoomBtnAction)
         self.modeCombo = QComboBox()
         self.modeCombo.setFixedSize(100, 50)
         self.modeCombo.currentIndexChanged.connect(self.newModeIndexChanged)
@@ -145,6 +148,7 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         layoutControl.addWidget(self.enableBtn)
         layoutControl.addWidget(self.triggBtn)
         layoutControl.addWidget(self.modeCombo)
+        layoutControl.addWidget(self.zoomBtn)        
         layoutControl.addWidget(self.saveBtn)
         layoutControl.addWidget(self.openBtn)
 
@@ -379,6 +383,25 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.pvTrigg.put(True)
         return
 
+    def zoomBtnAction(self):
+        
+        if self.rawdataY is None:
+            return
+        if self.rawdataX is None:
+            return
+        if self.spectY is None:
+            return
+        if self.spectX is None:
+            return
+
+        # Spect                
+        self.axSpect.autoscale(enable=True)
+        self.plotSpect(True)
+        # rawdata
+        self.plotRaw(True)
+
+        return
+
     def newModeIndexChanged(self,index):
         if index==0 or index==1:
             if not self.offline and self.pvMode is not None:
@@ -427,6 +450,9 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.comSignalRawData.data_signal.emit(self.rawdataY)        
         
         self.setStatusOfWidgets()
+        
+        self.zoomBtnAction()
+
         return
 
     def saveBtnAction(self):
@@ -456,7 +482,7 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         return
 
     ###### Plotting
-    def plotSpect(self):
+    def plotSpect(self, autozoom=False):
         if self.spectX is None:
             return
         if self.spectY is None:
@@ -480,17 +506,41 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
            self.axSpect.set_xlabel(self.pvNameSpectX +' [' + self.pvSpectX.units + ']')
            self.axSpect.set_ylabel(self.pvNameSpectY +' [' + self.pvSpectY.units + ']')
 
+        if autozoom:
+           ymin = np.min(self.spectY)
+           ymax = np.max(self.spectY)
+           # ensure different values
+           if ymin == ymax:
+               ymin = ymin - 1
+               ymax = ymax + 1   
+           range = ymax - ymin
+           ymax += range * 0.1
+           ymin -= range * 0.1
+           xmin = np.min(self.spectX)
+           xmax = np.max(self.spectX)
+           if xmin == xmax:
+               xmin = xmin - 1
+               xmax = xmax + 1
+           range = xmax - xmin
+           xmax += range * 0.02
+           xmin -= range * 0.02
+           self.axSpect.set_ylim(ymin,ymax)
+           self.axSpect.set_xlim(xmin,xmax)
+
         # refresh canvas 
         self.canvas.draw()
         self.axSpect.autoscale(enable=False)
 
-    def plotRaw(self):
+    def plotRaw(self, autozoom=False):
         if self.rawdataY is None:
             return
         
         # create an axis for spectrum
         if self.axRaw is None:
            self.axRaw = self.figure.add_subplot(211)
+
+        #if autozoom:
+           #self.axRaw.autoscale(enable=False)  # trigger change
 
         # plot data 
         if self.plottedLineRaw is not None:
@@ -505,6 +555,27 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         else:
            self.axRaw.set_ylabel(self.pvNameRawDataY +' [' + self.pvRawData.units + ']') 
 
+        if autozoom:
+           ymin = np.min(self.rawdataY)
+           ymax = np.max(self.rawdataY)
+           # ensure different values
+           if ymin == ymax:
+               ymin=ymin-1
+               ymax=ymax+1
+           range = ymax - ymin
+           ymax += range * 0.1
+           ymin -= range * 0.1
+           xmin = np.min(self.rawdataX)
+           xmax = np.max(self.rawdataX)
+           if xmin == xmax:
+               xmin = xmin - 1
+               xmax = xmax + 1
+           range = xmax - xmin
+           xmax += range * 0.02
+           xmin -= range * 0.02
+           self.axRaw.set_ylim(ymin,ymax)
+           self.axRaw.set_xlim(xmin,xmax)
+    
         # refresh canvas 
         self.canvas.draw()
         self.allowSave = True
