@@ -59,6 +59,8 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.fftPluginOrigId = fftPluginId
         self.allowSave = False
         self.path =  '.'
+        self.unitRawY = "[]"
+        self.unitSpectY = "[]"
         if prefix is None or fftPluginId is None:
           self.offline = True
           self.pause = True
@@ -319,6 +321,12 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.pvEnable.add_callback(self.onChangePvEnable)
         self.pvMode.add_callback(self.onChangePvMode)
         self.pvBuffIdAct.add_callback(self.onChangePvBuffIdAct)
+        if not self.pvRawData is None:
+          self.unitRawY = '[' + self.pvRawData.units + ']'
+          
+        if not  self.pvSpectY is None:                  
+          self.unitSpectY= '[' + self.pvSpectY.units + ']'    
+
         QCoreApplication.processEvents()
     
     ###### Pv monitor callbacks
@@ -492,8 +500,12 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.NFFT         = npzfile['NFFT']            
         self.mode         = npzfile['mode']            
         self.pvPrefixStr  = str(npzfile['pvPrefixStr'])
-        self.fftPluginId  = npzfile['fftPluginId']     
-        
+        self.fftPluginId  = npzfile['fftPluginId']
+        if 'unitRawY' in npzfile:
+          self.unitRawY = str(npzfile['unitRawY'])
+        if 'unitSpectY' in npzfile:
+          self.unitSpectY = str(npzfile['unitSpectY'])
+
         self.buildPvNames()
         
         # trigg draw
@@ -527,8 +539,10 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
                  sampleRate               = self.sampleRate,
                  NFFT                     = self.NFFT,
                  mode                     = self.mode,
-                 pvPrefixStr                   = self.pvPrefixStr,
-                 fftPluginId              = self.fftPluginId
+                 pvPrefixStr              = self.pvPrefixStr,
+                 fftPluginId              = self.fftPluginId,
+                 unitRawY                 = self.unitRawY,
+                 unitSpectY               = self.unitSpectY
                  )
 
         self.path = os.path.dirname(os.path.abspath(fname[0]))
@@ -553,12 +567,9 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.plottedLineSpect, = self.axSpect.plot(self.spectX,self.spectY, 'b*-') 
         self.axSpect.grid(True)
 
-        if self.offline: # No units offline
-           self.axSpect.set_xlabel(self.pvNameSpectX)
-           self.axSpect.set_ylabel(self.pvNameSpectY)
-        else:
-           self.axSpect.set_xlabel(self.pvNameSpectX +' [' + self.pvSpectX.units + ']')
-           self.axSpect.set_ylabel(self.pvNameSpectY +' [' + self.pvSpectY.units + ']')
+        
+        self.axSpect.set_xlabel(self.pvNameSpectX + ' [Hz]')
+        self.axSpect.set_ylabel(self.pvNameSpectY + ' ' +self.unitSpectY)
 
         if autozoom:
            ymin = np.min(self.spectY)
@@ -602,10 +613,7 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.axRaw.grid(True)
 
         self.axRaw.set_xlabel('Time [s]')
-        if self.offline: # No units offline
-           self.axRaw.set_ylabel(self.pvNameRawDataY) 
-        else:
-           self.axRaw.set_ylabel(self.pvNameRawDataY +' [' + self.pvRawData.units + ']') 
+        self.axRaw.set_ylabel(self.pvNameRawDataY + ' ' + self.unitRawY)
 
         if autozoom:
            ymin = np.min(self.rawdataY)
