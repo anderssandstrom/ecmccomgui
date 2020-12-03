@@ -1,0 +1,4 @@
+#Install matplotlib
+sudo yum install python-matplotlib
+#install 
+sudo pip2 install numpy
