@@ -41,9 +41,8 @@ import threading
 # IOC_TEST:Plugin-FFT0-PreProc-Data-Act 
 # IOC_TEST:Plugin-FFT0-Spectrum-Amp-Act x
 # IOC_TEST:Plugin-FFT0-Spectrum-X-Axis-Act x
-# IOC_TEST:Plugin-FFT2-BuffIdAct
-
-
+# IOC_TEST:Plugin-FFT0-BuffIdAct
+# IOC_TEST:Plugin-FFT0-Title
 
 class comSignal(QObject):
     data_signal = pyqtSignal(object)
@@ -62,6 +61,7 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.unitSpectY = "[]"
         self.labelSpectY = "Amplitude"
         self.labelRawY = "Raw"
+        self.title = ""
         self.NFFT = 1024
         self.sampleRate = 1000
         if prefix is None or fftPluginId is None:
@@ -251,7 +251,8 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
            self.pvnNameSampleRate = self.buildPvName('SampleRate-Act') # IOC_TEST:Plugin-FFT0-SampleRate-Act
            self.pvnNameNFFT = self.buildPvName('NFFT') # IOC_TEST:Plugin-FFT0-NFFT
            self.pvnNameMode = self.buildPvName('Mode-RB') # IOC_TEST:Plugin-FFT0-Mode-RB
-           self.pvNameBuffIdAct= self.buildPvName('BuffIdAct')# IOC_TEST:Plugin-FFT2-BuffIdAct
+           self.pvNameBuffIdAct = self.buildPvName('BuffIdAct')# IOC_TEST:Plugin-FFT0-BuffIdAct
+           self.pvNameTitle = self.buildPvName('Title')# IOC_TEST:Plugin-FFT0-Title
 
     def buildPvName(self, suffixname):
         return self.pvPrefixStr + 'Plugin-FFT' + str(self.fftPluginId) + '-' + suffixname 
@@ -319,6 +320,11 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
             raise RuntimeError("pvname buffactid must not be 'None'")
         if len(self.pvNameBuffIdAct)==0:
             raise RuntimeError("pvname buffactid must not be ''")
+
+        if self.pvNameTitle is None:
+            raise RuntimeError("pvname title must not be 'None'")
+        if len(self.pvNameTitle)==0:
+            raise RuntimeError("pvname title must not be ''")
                 
         self.pvSpectX = epics.PV(self.pvNameSpectX)
         self.pvSpectY = epics.PV(self.pvNameSpectY)
@@ -332,12 +338,14 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.pvNFFT = epics.PV(self.pvnNameNFFT)
         self.pvMode = epics.PV(self.pvnNameMode)
         self.pvBuffIdAct = epics.PV(self.pvNameBuffIdAct)
+        self.pvTitle = epics.PV(self.pvNameTitle)
         self.pvSpectX.add_callback(self.onChangePvSpectX)
         self.pvSpectY.add_callback(self.onChangePvSpectY)
         self.pvRawData.add_callback(self.onChangePvrawData)
         self.pvEnable.add_callback(self.onChangePvEnable)
         self.pvMode.add_callback(self.onChangePvMode)
         self.pvBuffIdAct.add_callback(self.onChangePvBuffIdAct)
+        
         if not self.pvRawData is None:
           self.unitRawY = '[' + self.pvRawData.units + ']'
 
@@ -353,6 +361,11 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
           self.labelSpectY = self.pvSpectYDesc.char_value
         else:
           self.labelSpectY = pvNameSpectY
+
+        if not self.pvTitle is None:
+          self.title = self.pvTitle.char_value
+        else:
+          self.title = "FFT"
 
         QCoreApplication.processEvents()
     
@@ -537,7 +550,9 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         if 'labelRawY' in npzfile:
           self.labelRawY = str(npzfile['labelRawY'])
         if 'labelSpectY' in npzfile:
-          self.labelSpectY = str(npzfile['labelSpectY'])
+          self.labelSpectY = str(npzfile['labelSpectY'])                  
+        if 'title' in npzfile:
+          self.title = str(npzfile['title'])
 
         self.buildPvNames()
         
@@ -577,7 +592,8 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
                  unitRawY                 = self.unitRawY,
                  unitSpectY               = self.unitSpectY,
                  labelRawY                = self.labelRawY,
-                 labelSpectY              = self.labelSpectY
+                 labelSpectY              = self.labelSpectY,
+                 title                    = self.title
                  )
 
         self.path = os.path.dirname(os.path.abspath(fname[0]))
@@ -604,7 +620,7 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
 
         
         self.axSpect.set_xlabel("Frequency [Hz]")
-        self.axSpect.set_ylabel(self.labelSpectY + ' ' +self.unitSpectY)
+        self.axSpect.set_ylabel(self.labelSpectY + ' ' +self.unitSpectY)        
 
         if autozoom:
            ymin = np.min(self.spectY)
@@ -649,6 +665,7 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
 
         self.axRaw.set_xlabel('Time [s]')
         self.axRaw.set_ylabel(self.labelRawY + ' ' + self.unitRawY)
+        self.axRaw.set_title(self.title)
 
         if autozoom:
            ymin = np.min(self.rawdataY)
