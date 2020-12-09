@@ -116,6 +116,7 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.createWidgets()
         self.connectPvs()
         self.setStatusOfWidgets()
+        self.resize(1000,850)
 
         return
 
