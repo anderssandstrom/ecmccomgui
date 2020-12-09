@@ -64,6 +64,11 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.title = ""
         self.NFFT = 1024
         self.sampleRate = 1000
+        self.sampleRateValid = False
+        self.FFTYDataValid = False
+        self.FFTXDataValid = False
+        self.RawYDataValid = False
+        self.RawXDataValid = False
         if prefix is None or fftPluginId is None:
           self.offline = True
           self.pause = True
@@ -95,7 +100,7 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.comSignalMode.data_signal.connect(self.callbackFuncMode)
         self.comSignalBuffIdAct = comSignal()
         self.comSignalBuffIdAct.data_signal.connect(self.callbackFuncBuffIdAct)
-
+        self.startupDone=False
         
         self.pause = 0
 
@@ -209,9 +214,10 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
              return
 
            self.sampleRate = self.pvSampleRate.get()
-           if self.sampleRate is None:
+           if self.sampleRate is None:              
               print("pvSampleRate.get() failed")
               return
+           self.sampleRateValid = True
 
            self.NFFT = self.pvNFFT.get()        
            if self.NFFT is None:
@@ -431,22 +437,25 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
     def callbackFuncSpectX(self, value):
         if(np.size(value)) > 0:
             self.spectX = value
-            self.xDataValid = 1
+            self.FFTXDataValid = True
         return
 
     def callbackFuncSpectY(self, value):
         if(np.size(value)) > 0:
             self.spectY = value
-            self.plotSpect()            
+            self.FFTYDataValid = self.RawXDataValid
+            self.plotAll()            
         return
 
     def callbackFuncrawData(self, value):
         if(np.size(value)) > 0:
-            if self.rawdataX is None or np.size(value) != np.size(self.rawdataY):                
+            if (self.rawdataX is None or np.size(value) != np.size(self.rawdataY)) and self.sampleRateValid:
                 self.rawdataX = np.arange(-np.size(value)/self.sampleRate, 0, 1/self.sampleRate)
-
+                self.RawXDataValid = True
+                
             self.rawdataY = value
-            self.plotRaw()
+            self.RawYDataValid = True
+            self.plotAll()
         return
 
     def callbackFuncBuffIdAct(self, value):
@@ -454,6 +463,9 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
           return
         if(self.NFFT>0):
           self.progressBar.setValue(value/self.NFFT*100)
+          if value/self.NFFT*100 < 80 and value/self.NFFT*100 >1:
+            self.FFTYDataValid = False
+            self.RawYDataValid = False
         return
 
     ###### Widget callbacks
@@ -494,6 +506,8 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         if self.spectY is None:
             return
         if self.spectX is None:
+            return
+        if self.axSpect is None:
             return
 
         # Spect                
@@ -557,15 +571,21 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.buildPvNames()
         
         # trigg draw
+        self.FFTYDataValid = True
+        self.FFTXDataValid = True
+        self.RawYDataValid = True
+        self.RawXDataValid = True
+        self.sampleRateValid = True
+
         self.comSignalMode.data_signal.emit(self.mode)
         self.comSignalSpectX.data_signal.emit(self.spectX)
         self.comSignalSpectY.data_signal.emit(self.spectY)
         self.comSignalRawData.data_signal.emit(self.rawdataY)
         
         self.setStatusOfWidgets()
-        
-        self.zoomBtnAction()
 
+        self.startupDone=True
+        self.zoomBtnAction()
         return
 
     def saveBtnAction(self):
@@ -600,6 +620,18 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
 
         return
 
+    def plotAll(self):
+        print("self.FFTYDataValid = " + str(self.FFTYDataValid))
+        print("self.FFTXDataValid = " + str(self.FFTXDataValid))
+        print("self.RawYDataValid = " + str(self.RawYDataValid))
+        print("self.RawXDataValid   = " + str(self.RawXDataValid))
+        
+        if self.FFTYDataValid and self.FFTXDataValid and self.RawYDataValid and self.RawXDataValid:
+          self.plotSpect()
+          self.plotRaw()
+          self.FFTYDataValid = False 
+          self.RawYDataValid = False
+
     ###### Plotting
     def plotSpect(self, autozoom=False):
         if self.spectX is None:
@@ -618,7 +650,7 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
         self.plottedLineSpect, = self.axSpect.plot(self.spectX,self.spectY, 'b*-') 
         self.axSpect.grid(True)
 
-        
+
         self.axSpect.set_xlabel("Frequency [Hz]")
         self.axSpect.set_ylabel(self.labelSpectY + ' ' +self.unitSpectY)        
 
@@ -650,7 +682,10 @@ class ecmcFFTMainGui(QtWidgets.QDialog):
     def plotRaw(self, autozoom=False):
         if self.rawdataY is None:
             return
-        
+
+        if self.rawdataX is None:
+            return
+
         # create an axis for spectrum
         if self.axRaw is None:
            self.axRaw = self.figure.add_subplot(211)
