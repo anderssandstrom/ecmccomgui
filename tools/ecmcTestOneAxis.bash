@@ -6,15 +6,17 @@ testPV="IOC_TEST:TestNumber"
 
 echo "Starting ecmc automatic slit SAT script!"
 
+echo "0.0 Initilize tests..."
+# Toggle so zero will get new timestamp
+python ecmcTestInit.py ${testPV} -10
+python ecmcTestInit.py ${testPV}  0
+
 read -p "Ready to start the tests (Y/N) (if yes then please start data acquisition)? " -n 1 -r
 echo    # (optional) move to a new line
 if [[ ! $REPLY =~ ^[Yy]$ ]]
 then
     exit 1
 fi
-
-echo "0.0 Initilize tests..."
-python ecmcTestInit.py ${testPV}
 
 echo "0.1 Homing with sequence 1 (to low limit)..."
 python ecmcTestHome.py ${motorPV} ${testPV} 1 10

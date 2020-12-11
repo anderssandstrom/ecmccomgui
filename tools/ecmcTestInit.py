@@ -9,18 +9,19 @@ import math
 import unittest
 import ecmcSlitDemoLib
 
-if len(sys.argv)!=2:
-  print("python ecmcTestInit.py <testnumberpv>")
-  print("python ecmcTestInit.py IOC:TestNumber")
+if len(sys.argv)!=3:
+  print("python ecmcTestInit.py <testnumberpv> <numberToSet>")
+  print("python ecmcTestInit.py IOC:TestNumber 10")
   sys.exit()
 
 testPvname  = sys.argv[1]
 testPv = epics.PV(testPvname)
+testNumber  = float(sys.argv[2]) 
 
 if testPv is None:
    print ("Invalid testPv") 
    sys.exit()
 
-testPv.put(0)
+testPv.put(testNumber)
 
 print ('Init done')
