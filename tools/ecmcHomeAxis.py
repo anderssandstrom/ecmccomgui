@@ -40,9 +40,6 @@ error=ecmcSlitDemoLib.getAxisError(motor,1)
 ecmcSlitDemoLib.triggHomeAxis(motor,nCmdData)
 
 ecmcSlitDemoLib.setAxisEnable(motor, 0)
-epics.caput(motor+".CNEN",0)
-epics.caput(motor+".CNEN",0)
-epics.caput(motor+".STOP",1)
 
 print ('Homing done')
 
