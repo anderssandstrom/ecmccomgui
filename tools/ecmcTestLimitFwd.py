@@ -15,8 +15,8 @@ limitPvSuffix='-limitfwd'
 
 testLoops = 10
 
-if len(sys.argv)!=5:
-  print("python ecmcTestLimitFwd.py.py <motorPvNamepv> <testnumberpv> <stepsize> <velo>")
+if len(sys.argv)!=6:
+  print("python ecmcTestLimitFwd.py.py <motorPvNamepv> <testnumberpv> <stepsize> <velo> <testbasenum>")
   print("python ecmcTestLimitFwd.py.py IOC:Axis1 IOC:TestNumber 1 0.5")
   sys.exit()
 
@@ -26,6 +26,7 @@ testPvname  = sys.argv[2]
 motorHomedPvName = motorPvName + homedPvSuffix
 stepSize = float(sys.argv[3])
 velo  = float(sys.argv[4]) 
+testNumberBase  = float(sys.argv[5]) 
 homedPv = epics.PV(motorHomedPvName)
 testPv = epics.PV(testPvname)
 limitPv=epics.PV(motorPvName+limitPvSuffix)
@@ -44,7 +45,6 @@ homed = homedPv.get()
 
 testPv.put(testNumberBase)
 startPos = ecmcSlitDemoLib.getActPos(motorPvName)
-hepp = input('Start data acquisition now. Push enter when ready.\n')
     
 print ('Disable amplifier')
 ecmcSlitDemoLib.setAxisEnable(motorPvName, 0)

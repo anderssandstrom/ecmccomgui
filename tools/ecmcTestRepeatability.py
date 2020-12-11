@@ -72,7 +72,7 @@ time.sleep(1) #ensure that enabled goes down
 error=ecmcSlitDemoLib.getAxisError(motorPvName,1)
 counter = 0
 
-timeOut = (maxPos-minPos)/velo*1.5
+timeOut = 50
 
 while counter < testLoops:
   #run gap and center motorPvName to 0
@@ -82,7 +82,7 @@ while counter < testLoops:
   if not done:
     print (motorPvName + " failed to position.")
     sys.exit()
-
+  timeOut = 5
   print ('Move axis to position ' + str(toPos) + ' (cycles = ' + str(counter) + ').')
   done=ecmcSlitDemoLib.moveAxisPosition(motorPvName,toPos,velo,timeOut)
   if not done:

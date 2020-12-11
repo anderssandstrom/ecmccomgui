@@ -17,10 +17,10 @@ python ecmcHomeAxis.py ${motorPV} 1
 read -p "Please start data acquistion now!" -n 1 -r
 
 echo "1. Starting resolver standstill jitter test.."
-python ecmcTestResolver.py IOC_TEST:Axis1 IOC_TEST:TestNumber 0.125 8 0.5
+python ecmcTestResolver.py IOC_TEST:Axis1 IOC_TEST:TestNumber 0.125 8 0.5 1000
 
 echo "2. Starting low limit jitter test.."
-python ecmcTestLimitBwd.py IOC_TEST:Axis1 IOC_TEST:TestNumber 1 0.5
+python ecmcTestLimitBwd.py IOC_TEST:Axis1 IOC_TEST:TestNumber 1 0.5 2100
 
 echo "3.1 Starting repeatability test pos 15 (from below).."
 python ecmcTestRepeatability.py IOC_TEST:Axis1 IOC_TEST:TestNumber 14.5 15 0.5 3100
@@ -41,10 +41,10 @@ echo "3.6 Starting repeatability test pos 55 (from above).."
 python ecmcTestRepeatability.py IOC_TEST:Axis1 IOC_TEST:TestNumber 55.5 55 0.5 3700
 
 echo "4. Starting high limit jitter test.."
-python ecmcTestLimitFwd.py IOC_TEST:Axis1 IOC_TEST:TestNumber 1 0.5
+python ecmcTestLimitFwd.py IOC_TEST:Axis1 IOC_TEST:TestNumber 1 0.5 2200
 
 echo "5. Scan backward to low limit.."
-python ecmcTestJogBwd.py IOC:Axis1 IOC:TestNumber 0.5 5000
+python ecmcTestScanBwd.py IOC:Axis1 IOC:TestNumber 0.5 5000
 
 echo "6. Scan forward to hig limit.."
-python ecmcTestJogFwd.py IOC:Axis1 IOC:TestNumber 0.5 6000
+python ecmcTestScanFwd.py IOC:Axis1 IOC:TestNumber 0.5 6000

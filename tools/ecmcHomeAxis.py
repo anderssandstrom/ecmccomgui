@@ -13,9 +13,12 @@ if len(sys.argv)!=3:
   print( "python2 ecmcHomeAxis.py IOC:Axis1 3")
   sys.exit()
 
-
 motor = sys.argv[1]
 nCmdData = int(sys.argv[2])
+
+homedPvSuffix='-homed'
+motorHomedPvName = motor + homedPvSuffix
+homedPv = epics.PV(motorHomedPvName)
 
 print ('Disable amplifier')
 ecmcSlitDemoLib.setAxisEnable(motor, 0)
@@ -34,6 +37,12 @@ time.sleep(1) #ensure that enabled goes down
 error=ecmcSlitDemoLib.getAxisError(motor,1)
 
 #Start homing sequences
-ecmcSlitDemoLib.triggHomeAxis(motor,3)
+ecmcSlitDemoLib.triggHomeAxis(motor,nCmdData)
+
+ecmcSlitDemoLib.setAxisEnable(motor, 0)
+epics.caput(motor+".CNEN",0)
+epics.caput(motor+".CNEN",0)
+epics.caput(motor+".STOP",1)
 
 print ('Homing done')
+

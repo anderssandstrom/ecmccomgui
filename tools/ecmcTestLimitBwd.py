@@ -15,9 +15,9 @@ limitPvSuffix='-limitbwd'
 
 testLoops = 10
 
-if len(sys.argv)!=5:
-  print("python ecmcTestLimitBwd.py.py <motorPvNamepv> <testnumberpv> <stepsize> <velo>")
-  print("python ecmcTestLimitBwd.py.py IOC:Axis1 IOC:TestNumber 1 0.5")
+if len(sys.argv)!=6:
+  print("python ecmcTestLimitBwd.py.py <motorPvNamepv> <testnumberpv> <stepsize> <velo> <testbasenumber>")
+  print("python ecmcTestLimitBwd.py.py IOC:Axis1 IOC:TestNumber 1 0.5 2200")
   sys.exit()
 
 
@@ -26,6 +26,7 @@ testPvname  = sys.argv[2]
 motorHomedPvName = motorPvName + homedPvSuffix
 stepSize = float(sys.argv[3])
 velo  = float(sys.argv[4]) 
+testNumberBase  = float(sys.argv[5]) 
 homedPv = epics.PV(motorHomedPvName)
 testPv = epics.PV(testPvname)
 limitPv=epics.PV(motorPvName+limitPvSuffix)

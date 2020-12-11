@@ -12,9 +12,9 @@ testNumberBase=1000
 homedPvSuffix='-homed'
 
 
-if len(sys.argv)!=6:
-  print("python ecmcTestResolver.py <motorPvNamepv> <testnumberpv> <stepsize> <steps> <velo>")
-  print("python ecmcTestResolver.py IOC:Axis1 IOC:TestNumber 0.125 8 0.25")
+if len(sys.argv)!=7:
+  print("python ecmcTestResolver.py <motorPvNamepv> <testnumberpv> <stepsize> <steps> <velo> <testbasenumber>")
+  print("python ecmcTestResolver.py IOC:Axis1 IOC:TestNumber 0.125 8 0.25 1000")
   sys.exit()
 
 
@@ -23,7 +23,8 @@ testPvname  = sys.argv[2]
 motorHomedPvName = motorPvName + homedPvSuffix
 stepSize = float(sys.argv[3])
 steps = float(sys.argv[4])
-velo  = float(sys.argv[5]) 
+velo  = float(sys.argv[5])
+testNumberBase = float(sys.argv[6])
 homedPv = epics.PV(motorHomedPvName)
 testPv = epics.PV(testPvname)
 
@@ -41,7 +42,7 @@ homed = homedPv.get()
 #   sys.exit()
 
 testPv.put(testNumberBase)
-startPos = ecmcSlitDemoLib.getActPos(motorPvName)
+startPos = ecmcSlitDemoLib.getActPos(motorPvName)+1
     
 print ('Disable amplifier')
 ecmcSlitDemoLib.setAxisEnable(motorPvName, 0)

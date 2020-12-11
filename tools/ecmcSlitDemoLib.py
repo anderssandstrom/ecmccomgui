@@ -95,7 +95,7 @@ def setAxisEnable(motor, enable):
 def moveAxisPosition(motor,*restArgs):
   length=len(restArgs)
   if length<1  or length>3:
-    print ("moveAxisPosition: Wrong in arguments list (moveAxisPosition(motor,position,timout), timeout is optional)." )
+    print ("moveAxisPosition: Wrong in arguments list (moveAxisPosition(motor,position,velo,timout), timeout is optional)." )
     return False
   
   velo = 0
@@ -116,6 +116,8 @@ def moveAxisPosition(motor,*restArgs):
   epics.caput(motor + '.VAL', position)
 
   getAxisError(motor,1)
+  time.sleep(0.1)
+
   if timeout>0:
     done=waitForAxis(motor,timeout)
     if not done:
