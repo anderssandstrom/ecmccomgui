@@ -49,11 +49,7 @@ if toPos < minPos:
   minPos = toPos
 
 testPv.put(testNumberBase)
-    
-#Disable softLimits
-print( 'Set softlimits')
-ecmcSlitDemoLib.setSoftLowLimt(motorPvName, minPos -10)
-ecmcSlitDemoLib.setSoftHighLimt(motorPvName, maxPos +10)
+
 
 print ('Disable amplifier')
 ecmcSlitDemoLib.setAxisEnable(motorPvName, 0)

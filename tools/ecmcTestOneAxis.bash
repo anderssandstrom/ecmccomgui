@@ -14,7 +14,13 @@ fi
 echo "0. Homing with sequence 1 (to low limit)..."
 python ecmcHomeAxis.py ${motorPV} 1
 
-read -p "Please start data acquistion now!" -n 1 -r
+echo ""
+read -p "Please start data acquistion now! Continue (Y/N)?" -n 1 -r
+echo    # (optional) move to a new line
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+    exit 1
+fi
 
 echo "1. Starting resolver standstill jitter test.."
 python ecmcTestResolver.py IOC_TEST:Axis1 IOC_TEST:TestNumber 0.125 8 0.75 1000
