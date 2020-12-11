@@ -12,16 +12,15 @@ import ecmcSlitDemoLib
 testLoops = 10
 timeout = 50
 if len(sys.argv)!=6:
-  print("python ecmcTestHome.py. <motorPvNamepv> <testnumberpv> <sequence> <timout> <testnumber>")
-  print("python ecmcTestHome.py IOC:Axis1 IOC:TestNumber 1 50 10")
+  print("python ecmcTestHome.py. <motorPvNamepv> <testnumberpv> <sequence> <testnumber>")
+  print("python ecmcTestHome.py IOC:Axis1 IOC:TestNumber 1 10")
   sys.exit()
 
 
 motorPvName = sys.argv[1]
 testPvname  = sys.argv[2]
 nCmdData = float(sys.argv[3]) 
-timeout = float(sys.argv[4]) 
-testNumber = float(sys.argv[5]) 
+testNumber = float(sys.argv[4]) 
 testPv = epics.PV(testPvname)
 
 if testPv is None:

@@ -17,7 +17,7 @@ echo "0.0 Initilize tests..."
 python ecmcTestInit.py ${testPV}
 
 echo "0.1 Homing with sequence 1 (to low limit)..."
-python ecmcTestHome.py ${motorPV} ${testPV} 1 50 10
+python ecmcTestHome.py ${motorPV} ${testPV} 1 10
 
 echo "1. Starting resolver standstill jitter test.."
 python ecmcTestResolver.py ${motorPV} ${testPV} 0.125 8 0.75 1000
