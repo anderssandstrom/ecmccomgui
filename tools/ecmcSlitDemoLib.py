@@ -134,14 +134,20 @@ def setSoftLowLimt(motor,limt):
   return True
 
 ####################################################################################
-def moveAxisVelocity(motor,velocity):
-  epics.caput(motor + '.JVEL',velocity)
+def moveAxisVelocity(motor,velocity, timeout = 0):
+  epics.caput(motor + '.JVEL',abs(velocity))
   if velocity==0:
     print("moveAxisVelocity: Velocity must be !=0.")
   if velocity>0:
     epics.caput(motor + '.JOGF', 1)
   else:
     epics.caput(motor + '.JOGR', 1)
+
+  if timeout>0:
+    done=waitForAxis(motor,timeout)
+    if not done:
+      print ("%s failed to position.")
+      return False
 
   getAxisError(motor,1)
   return True
@@ -170,4 +176,6 @@ def stopAxis(*restArgs):
       return False
   return True
 
+def getActPos(motor):
 
+   return epics.caget(motor + ".RBV")
