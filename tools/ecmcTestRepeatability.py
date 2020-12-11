@@ -57,18 +57,18 @@ ecmcSlitDemoLib.setSoftHighLimt(motorPvName, maxPos +10)
 
 print ('Disable amplifier')
 ecmcSlitDemoLib.setAxisEnable(motorPvName, 0)
-time.sleep(1) #ensure that enabled goes down
+time.sleep(0.2) #ensure that enabled goes down
 error=ecmcSlitDemoLib.getAxisError(motorPvName,1)
 
 #Reset error on all axis
 print ('Reset error axes.')
 ecmcSlitDemoLib.setAxisReset(motorPvName, 1)
-time.sleep(0.5)
+time.sleep(0.2)
 ecmcSlitDemoLib.setAxisReset(motorPvName, 0)
 
 print ('Enable amplifier')
 ecmcSlitDemoLib.setAxisEnable(motorPvName, 1)
-time.sleep(1) #ensure that enabled goes down
+time.sleep(0.2) #ensure that enabled goes down
 error=ecmcSlitDemoLib.getAxisError(motorPvName,1)
 counter = 0
 

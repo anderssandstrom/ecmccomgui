@@ -13,10 +13,10 @@ homedPvSuffix='-homed'
 limitPvSuffix='-limitbwd'
 
 testLoops = 10
-
-if len(sys.argv)!=5:
-  print("python ecmcTestScanBwd.py. <motorPvNamepv> <testnumberpv> <velo> <testnumber>")
-  print("python ecmcTestScanBwd.py IOC:Axis1 IOC:TestNumber 0.5 5000")
+timeout =50
+if len(sys.argv)!=6:
+  print("python ecmcTestScanBwd.py. <motorPvNamepv> <testnumberpv> <velo> <timeout> <testnumber>")
+  print("python ecmcTestScanBwd.py IOC:Axis1 IOC:TestNumber 0.5 50 5000")
   sys.exit()
 
 
@@ -24,7 +24,8 @@ motorPvName = sys.argv[1]
 testPvname  = sys.argv[2]
 motorHomedPvName = motorPvName + homedPvSuffix
 velo  = float(sys.argv[3]) 
-testNumber = float(sys.argv[4]) 
+timeout = float(sys.argv[4]]) 
+testNumber = float(sys.argv[5]) 
 homedPv = epics.PV(motorHomedPvName)
 testPv = epics.PV(testPvname)
 limitPv=epics.PV(motorPvName+limitPvSuffix)
@@ -46,25 +47,24 @@ startPos = ecmcSlitDemoLib.getActPos(motorPvName)
     
 print ('Disable amplifier')
 ecmcSlitDemoLib.setAxisEnable(motorPvName, 0)
-time.sleep(1) #ensure that enabled goes down
+time.sleep(.2) #ensure that enabled goes down
 error=ecmcSlitDemoLib.getAxisError(motorPvName,1)
 
 #Reset error on all axis
 print ('Reset error axes.')
 ecmcSlitDemoLib.setAxisReset(motorPvName, 1)
-time.sleep(0.5)
+time.sleep(0.2)
 ecmcSlitDemoLib.setAxisReset(motorPvName, 0)
 
 print ('Enable amplifier')
 ecmcSlitDemoLib.setAxisEnable(motorPvName, 1)
-time.sleep(1) #ensure that enabled goes down
+time.sleep(.2) #ensure that enabled goes down
 error=ecmcSlitDemoLib.getAxisError(motorPvName,1)
 counter = 0
 
 print ('Move to switch')
 error=ecmcSlitDemoLib.moveAxisVelocity(motorPvName,-velo,0)
 
-timeout = 50
 polltime=1
 wait_for_done = timeout
 while wait_for_done > 0:

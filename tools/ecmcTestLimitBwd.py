@@ -66,9 +66,9 @@ counter = 0
 print ('Move to switch')
 error=ecmcSlitDemoLib.moveAxisVelocity(motorPvName,-velo,0)
 
-timeout = 50
+timeOut = 50
 polltime=1
-wait_for_done = timeout
+wait_for_done = timeOut
 while wait_for_done > 0:
   time.sleep(polltime)
   limitVal = limitPv.get()
@@ -78,22 +78,31 @@ while wait_for_done > 0:
   else: 
       wait_for_done-=polltime
       if wait_for_done==0:
-          print ('Timeout! Did not reach switch..')
+          print ('timeOut! Did not reach switch..')
           sys.exit()
 
 print ('Now at switch')
-timeOut = 10
+
 startPos = ecmcSlitDemoLib.getActPos(motorPvName)+stepSize  # Now in the limit
 print ('Move axis to position startposition just before switch: ' + str(startPos))
 done=ecmcSlitDemoLib.moveAxisPosition(motorPvName,startPos,velo,timeOut)
-
 while counter < testLoops:
-  print ('Engage switch' + str(startPos-stepSize) + ' (cycles = ' + str(counter) + ').')
-  done=ecmcSlitDemoLib.moveAxisPosition(motorPvName,startPos-stepSize,velo,timeOut)
-  if not done:
-    print (motorPvName + " failed to position.")
-    sys.exit()
-  counter = counter + 1
+  print ('Engage switch')
+  error=ecmcSlitDemoLib.moveAxisVelocity(motorPvName,-velo)
+  polltime=1
+  counter+=1
+  wait_for_done = timeOut
+  while wait_for_done > 0:
+    time.sleep(polltime)
+    limitVal = limitPv.get()
+    if not limitVal:
+      print ('Reached switch')
+      wait_for_done = 0
+    else: 
+      wait_for_done-=polltime
+      if wait_for_done==0:
+          print ('timeOut! Did not reach switch..')
+          sys.exit()
   time.sleep(1)
   testPv.put(testNumberBase+counter)
 
@@ -102,8 +111,8 @@ while counter < testLoops:
   if not done:
     print (motorPvName + " failed to position.")
     sys.exit()
-  time.sleep(1)
-  testPv.put(testNumberBase+testLoops)
+  time.sleep(0.1)
+  testPv.put(testNumberBase+testLoops+counter)
 
 time.sleep(1)
 testPv.put(testNumberBase)
