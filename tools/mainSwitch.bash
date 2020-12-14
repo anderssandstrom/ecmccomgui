@@ -169,7 +169,7 @@ OPENLOOPAVG=""
 RESOLVERAVG=""
 COUNTER=0
 DIFFS=""
-bash ecmcReport.bash $REPORT "## Low Limit Disengage Position "
+bash ecmcReport.bash $REPORT "## High Limit Disengage Position "
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "Test | Openloop [mm]| Resolver [mm]| Diff [mm]"
 bash ecmcReport.bash $REPORT "--- | --- | --- |--- |"
