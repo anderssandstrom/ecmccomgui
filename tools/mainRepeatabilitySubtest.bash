@@ -77,7 +77,7 @@ RESOLVER_VALS_NEG=""
 RESOLVER_VALS_POS=""
 OPTO_VALS_POS=""
 OPTO_VALS_NEG=""
-
+RANGES=""
 for COUNTER in {1..10}
 do
    # positive
@@ -115,8 +115,11 @@ RANGE_NEG=$(echo "$RESOLVER_VALS_NEG" | bash ecmcRangeDataRow.bash)
 DIFF_RANGE=$(echo "$DIFFS" | bash ecmcRangeDataRow.bash)
 printf "Range | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $RANGE_POS $RANGE_NEG $DIFF_RANGE >> $REPORT
 
+RANGES+="$RANGE_POS "
+RANGES+="$RANGE_NEG "
+# Write max diffs
 bash ecmcReport.bash $REPORT ""
-REPEATABILITY_RES_DIFF=$(echo "$DIFFS" | bash ecmcAbsMaxDataRow.bash)
+REPEATABILITY_RES_DIFF=$(echo "$RANGES" | bash ecmcMaxDataRow.bash)
 printf "Repeatability (Resolver): %.${DEC}f\n" $REPEATABILITY_RES_DIFF >> $REPORT
 
 # Opto
@@ -129,6 +132,7 @@ RESOLVER_VALS_NEG=""
 RESOLVER_VALS_POS=""
 OPTO_VALS_POS=""
 OPTO_VALS_NEG=""
+RANGES=""
 for COUNTER in {1..10}
 do
    # positive
@@ -164,7 +168,10 @@ RANGE_NEG=$(echo "$OPTO_VALS_NEG" | bash ecmcRangeDataRow.bash)
 DIFF_RANGE=$(echo "$DIFFS" | bash ecmcRangeDataRow.bash)
 printf "Range | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $RANGE_POS $RANGE_NEG $DIFF_RANGE >> $REPORT
 
+RANGES+="$RANGE_POS "
+RANGES+="$RANGE_NEG "
 # Write max diffs
 bash ecmcReport.bash $REPORT ""
-REPEATABILITY_OPTO_DIFF=$(echo "$DIFFS" | bash ecmcAbsMaxDataRow.bash)
+REPEATABILITY_OPTO_DIFF=$(echo "$RANGES" | bash ecmcMaxDataRow.bash)
+# Max of RANGEPOS and RANGE_NEG
 printf "Repeatability (ILD2300): %.${DEC}f\n" $REPEATABILITY_OPTO_DIFF >> $REPORT
