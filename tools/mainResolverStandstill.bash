@@ -29,12 +29,15 @@ TESTBASE=$6
 
 
 # Finds out what position by reading setpoint
-
+DATACOUNT_RESOLVER="75"
+TESTCOUNT=8
 
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "## Resolver Jitter at ${SETPOINT}mm setpoint"
+bash ecmcReport.bash $REPORT "## Resolver Value Distribution"
 
 # Resolver 
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "Measured at $TESTCOUNT positions offset by 45deg resolver shaft angle. The distrubution values are based on $DATACOUNT_RESOLVER values at each location."
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "Test | Setpoint [mm] | Resolver AVG[mm] | Resolver STD[mm]"
 bash ecmcReport.bash $REPORT "--- | --- | --- | --- |"
@@ -54,8 +57,8 @@ do
 
    # resolver
    DATAPV="IOC_TEST:ec0-s4-EL7211-Enc-PosAct"
-   DATACOUNT="50"
-   RESOLVER_VAL=$(bash ecmcGetLinesBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})
+   
+   RESOLVER_VAL=$(bash ecmcGetLinesBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT_RESOLVER})
    RESOLVER_VAL=$(echo "$RESOLVER_VAL" | bash ecmcScaleOffsetLines.bash 1 ${RESOLVER_OFFSET})
    RESOLVER_AVG=$(echo "$RESOLVER_VAL" | bash ecmcAvgLines.bash)
    RESOLVER_STD=$(echo "$RESOLVER_VAL" | bash ecmcStdLines.bash)
@@ -63,6 +66,6 @@ do
    echo "Resolver value AVG = $RESOLVER_AVG STD = $RESOLVER_STD"
    
    printf "%d | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $COUNTER $SETPOINT $RESOLVER_AVG $RESOLVER_STD >> $REPORT
-   echo "DATA=$RESOLVER_VAL"
-   echo "$RESOLVER_VAL" | python ../pyDataManip/histCaMonitor.py
+   #echo "DATA=$RESOLVER_VAL"
+   #echo "$RESOLVER_VAL" | python ../pyDataManip/histCaMonitor.py
 done
