@@ -46,6 +46,10 @@ OPENLOOPVALS=""
 RESOLVERVALS=""
 COUNTER=0
 DIFFS=""
+RES_MIN=10000;
+RES_MAX=-10000;
+OPEN_MIN=10000;
+OPEN_MAX=-10000;
 # Engage
 for TRIGGVAL in {2001..2010}
 do
@@ -61,6 +65,20 @@ do
    DIFF=$(awk "BEGIN {print ($RESOLVERVAL-($OPENLOOPVAL))}")
    DIFFS+="$DIFF "
    printf "%d | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $COUNTER $OPENLOOPVAL $RESOLVERVAL $DIFF >> $REPORT
+
+   if (( $(echo "$RESOLVERVAL > $RES_MAX" |bc -l) )); then
+     RES_MAX=$RESOLVERVAL
+   fi
+   if (( $(echo "$RESOLVERVAL < $RES_MIN" |bc -l) )); then
+     RES_MIN=$RESOLVERVAL
+   fi
+   if (( $(echo "$OPENLOOPVAL > $OPEN_MAX" |bc -l) )); then
+     OPEN_MAX=$OPENLOOPVAL
+   fi
+   if (( $(echo "$OPENLOOPVAL < $OPEN_MIN" |bc -l) )); then
+     OPEN_MIN=$OPENLOOPVAL
+   fi
+
 done
 # Calc avg and std
 OPENLOOPAVG=$(echo "$OPENLOOPVALS" | bash ecmcAvgDataRow.bash)
@@ -70,9 +88,15 @@ RESOLVERAVG=$(echo "$RESOLVERVALS" | bash ecmcAvgDataRow.bash)
 RESOLVERSTD=$(echo "$RESOLVERVALS" | bash ecmcStdDataRow.bash)
 DIFF_AVG=$(awk "BEGIN {print ($OPENLOOPAVG-($RESOLVERAVG))}")
 DIFF_STD=$(awk "BEGIN {print ($OPENLOOPSTD-($RESOLVERSTD))}")
+RES_RANGE=$(echo "$RES_MAX-($RES_MIN)" | bc -l)
+OPEN_RANGE=$(echo "$OPEN_MAX-($OPEN_MIN)" | bc -l)
 echo "Resolver AVG=$RESOLVERAVG, STD=$RESOLVERSTD"
 printf "AVG | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $OPENLOOPAVG $RESOLVERAVG $DIFF_AVG >> $REPORT
 printf "STD | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $OPENLOOPSTD $RESOLVERSTD $DIFF_STD>> $REPORT
+printf "Range | %.${DEC}f | %.${DEC}f\n" $OPEN_RANGE $RES_RANGE >> $REPORT
+
+echo "RES_MIN=$RES_MIN, RES_MAX=$RES_MAX, RES_RANGE=$RES_RANGE"
+
 bash ecmcReport.bash $REPORT ""
 
 # Disengage
@@ -88,6 +112,11 @@ OPENLOOPAVG=""
 RESOLVERAVG=""
 COUNTER=0
 DIFFS=""
+RES_MIN=10000;
+RES_MAX=-10000;
+OPEN_MIN=10000;
+OPEN_MAX=-10000;
+
 for TRIGGVAL in {2011..2020}
 do
    let "COUNTER=$COUNTER+1"
@@ -102,6 +131,19 @@ do
    DIFF=$(awk "BEGIN {print ($RESOLVERVAL-($OPENLOOPVAL))}")
    DIFFS+="$DIFF "
    printf "%d | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $COUNTER $OPENLOOPVAL $RESOLVERVAL $DIFF >> $REPORT
+   if (( $(echo "$RESOLVERVAL > $RES_MAX" |bc -l) )); then
+     RES_MAX=$RESOLVERVAL
+   fi
+   if (( $(echo "$RESOLVERVAL < $RES_MIN" |bc -l) )); then
+     RES_MIN=$RESOLVERVAL
+   fi
+   if (( $(echo "$OPENLOOPVAL > $OPEN_MAX" |bc -l) )); then
+     OPEN_MAX=$OPENLOOPVAL
+   fi
+   if (( $(echo "$OPENLOOPVAL < $OPEN_MIN" |bc -l) )); then
+     OPEN_MIN=$OPENLOOPVAL
+   fi
+
 done
 
 # Calc avg and std
@@ -112,9 +154,12 @@ RESOLVERAVG=$(echo "$RESOLVERVALS" | bash ecmcAvgDataRow.bash)
 RESOLVERSTD=$(echo "$RESOLVERVALS" | bash ecmcStdDataRow.bash)
 DIFF_AVG=$(awk "BEGIN {print ($OPENLOOPAVG-($RESOLVERAVG))}")
 DIFF_STD=$(awk "BEGIN {print ($OPENLOOPSTD-($RESOLVERSTD))}")
+RES_RANGE=$(echo "$RES_MAX-($RES_MIN)" |bc -l)
+OPEN_RANGE=$(echo "$OPEN_MAX-($OPEN_MIN)" |bc -l)
 echo "Resolver AVG=$RESOLVERAVG, STD=$RESOLVERSTD"
 printf "AVG | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $OPENLOOPAVG $RESOLVERAVG $DIFF_AVG >> $REPORT
 printf "STD | %.${DEC}f | %.${DEC}f| %.${DEC}f\n" $OPENLOOPSTD $RESOLVERSTD $DIFF_STD >> $REPORT
+printf "Range | %.${DEC}f | %.${DEC}f\n" $OPEN_RANGE $RES_RANGE >> $REPORT
 bash ecmcReport.bash $REPORT ""
 
 ############ HIGH LIMIT SWITCH
@@ -127,6 +172,11 @@ OPENLOOPAVG=""
 RESOLVERAVG=""
 COUNTER=0
 DIFFS=""
+RES_MIN=10000;
+RES_MAX=-10000;
+OPEN_MIN=10000;
+OPEN_MAX=-10000;
+
 bash ecmcReport.bash $REPORT "## High Limit Engage Position "
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "Test | Openloop [mm]| Resolver [mm]| Diff [mm]"
@@ -146,6 +196,18 @@ do
    DIFF=$(awk "BEGIN {print ($RESOLVERVAL-($OPENLOOPVAL))}")
    DIFFS+="$DIFF "
    printf "%d | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $COUNTER $OPENLOOPVAL $RESOLVERVAL $DIFF >> $REPORT
+   if (( $(echo "$RESOLVERVAL > $RES_MAX" |bc -l) )); then
+     RES_MAX=$RESOLVERVAL
+   fi
+   if (( $(echo "$RESOLVERVAL < $RES_MIN" |bc -l) )); then
+     RES_MIN=$RESOLVERVAL
+   fi
+   if (( $(echo "$OPENLOOPVAL > $OPEN_MAX" |bc -l) )); then
+     OPEN_MAX=$OPENLOOPVAL
+   fi
+   if (( $(echo "$OPENLOOPVAL < $OPEN_MIN" |bc -l) )); then
+     OPEN_MIN=$OPENLOOPVAL
+   fi
 done
 
 # Calc avg and std
@@ -156,9 +218,12 @@ RESOLVERAVG=$(echo "$RESOLVERVALS" | bash ecmcAvgDataRow.bash)
 RESOLVERSTD=$(echo "$RESOLVERVALS" | bash ecmcStdDataRow.bash)
 DIFF_AVG=$(awk "BEGIN {print ($OPENLOOPAVG-($RESOLVERAVG))}")
 DIFF_STD=$(awk "BEGIN {print ($OPENLOOPSTD-($RESOLVERSTD))}")
+RES_RANGE=$(echo "$RES_MAX-($RES_MIN)" |bc -l)
+OPEN_RANGE=$(echo "$OPEN_MAX-($OPEN_MIN)" |bc -l)
 echo "Resolver AVG=$RESOLVERAVG, STD=$RESOLVERSTD"
 printf "AVG | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $OPENLOOPAVG $RESOLVERAVG $DIFF_AVG >> $REPORT
 printf "STD | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $OPENLOOPSTD $RESOLVERSTD $DIFF_STD >> $REPORT
+printf "Range | %.${DEC}f | %.${DEC}f\n" $OPEN_RANGE $RES_RANGE >> $REPORT
 bash ecmcReport.bash $REPORT ""
 
 # Disengage
@@ -169,6 +234,11 @@ OPENLOOPAVG=""
 RESOLVERAVG=""
 COUNTER=0
 DIFFS=""
+RES_MIN=10000;
+RES_MAX=-10000;
+OPEN_MIN=10000;
+OPEN_MAX=-10000;
+
 bash ecmcReport.bash $REPORT "## High Limit Disengage Position "
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "Test | Openloop [mm]| Resolver [mm]| Diff [mm]"
@@ -188,6 +258,18 @@ do
    DIFF=$(awk "BEGIN {print ($RESOLVERVAL-($OPENLOOPVAL))}")
    DIFFS+="$DIFF "
    printf "%d | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $COUNTER $OPENLOOPVAL $RESOLVERVAL $DIFF >> $REPORT
+   if (( $(echo "$RESOLVERVAL > $RES_MAX" |bc -l) )); then
+     RES_MAX=$RESOLVERVAL
+   fi
+   if (( $(echo "$RESOLVERVAL < $RES_MIN" |bc -l) )); then
+     RES_MIN=$RESOLVERVAL
+   fi
+   if (( $(echo "$OPENLOOPVAL > $OPEN_MAX" |bc -l) )); then
+     OPEN_MAX=$OPENLOOPVAL
+   fi
+   if (( $(echo "$OPENLOOPVAL < $OPEN_MIN" |bc -l) )); then
+     OPEN_MIN=$OPENLOOPVAL
+   fi
 done
 
 # Calc avg and std
@@ -198,7 +280,10 @@ RESOLVERAVG=$(echo "$RESOLVERVALS" | bash ecmcAvgDataRow.bash)
 RESOLVERSTD=$(echo "$RESOLVERVALS" | bash ecmcStdDataRow.bash)
 DIFF_AVG=$(awk "BEGIN {print ($OPENLOOPAVG-($RESOLVERAVG))}")
 DIFF_STD=$(awk "BEGIN {print ($OPENLOOPSTD-($RESOLVERSTD))}")
+RES_RANGE=$(echo "$RES_MAX-($RES_MIN)" |bc -l)
+OPEN_RANGE=$(echo "$OPEN_MAX-($OPEN_MIN)" |bc -l)
 echo "Resolver AVG=$RESOLVERAVG, STD=$RESOLVERSTD"
 printf "AVG | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $OPENLOOPAVG $RESOLVERAVG $DIFF_AVG >> $REPORT
 printf "STD | %.${DEC}f | %.${DEC}f| %.${DEC}f\n" $OPENLOOPSTD $RESOLVERSTD $DIFF_STD >> $REPORT
+printf "Range | %.${DEC}f | %.${DEC}f\n" $OPEN_RANGE $RES_RANGE >> $REPORT
 bash ecmcReport.bash $REPORT ""

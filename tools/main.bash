@@ -152,9 +152,9 @@ bash mainResolverStandstill.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET 5 1
 
 ##### Accuracy FWD ######################################################
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "## Accuracy based on Resolver and ILD2300 sensor Positive Direction"
+bash ecmcReport.bash $REPORT "## Accuracy based on Resolver and ILD2300 Sensor Positive Direction"
 bash mainAccuracy.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET $DEC 8000 0
 
 ##### Accuracy BWD ######################################################
-bash ecmcReport.bash $REPORT "## Accuracy based on Resolver and ILD2300 sensor Negative Direction"
+bash ecmcReport.bash $REPORT "## Accuracy based on Resolver and ILD2300 Sensor Negative Direction"
 bash mainAccuracy.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET $DEC 7000 1

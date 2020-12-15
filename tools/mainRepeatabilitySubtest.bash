@@ -110,6 +110,14 @@ echo "Resolver Pos AVG=$RESOLVER_AVG_POS, STD=$RESOLVER_STD_POS"
 echo "Resolver Neg AVG=$RESOLVER_AVG_NEG, STD=$RESOLVER_STD_NEG"
 printf "AVG | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $RESOLVER_AVG_POS $RESOLVER_AVG_NEG $DIFF_AVG >> $REPORT
 printf "STD | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $RESOLVER_STD_POS $RESOLVER_STD_NEG $DIFF_STD >> $REPORT
+RANGE_POS=$(echo "$RESOLVER_VALS_POS" | bash ecmcRangeDataRow.bash)
+RANGE_NEG=$(echo "$RESOLVER_VALS_NEG" | bash ecmcRangeDataRow.bash)
+DIFF_RANGE=$(echo "$DIFFS" | bash ecmcRangeDataRow.bash)
+printf "Range | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $RANGE_POS $RANGE_NEG $DIFF_RANGE >> $REPORT
+
+bash ecmcReport.bash $REPORT ""
+REPEATABILITY_RES_DIFF=$(echo "$DIFFS" | bash ecmcAbsMaxDataRow.bash)
+printf "Repeatability (Resolver) %.${DEC}f\n" $REPEATABILITY_RES_DIFF >> $REPORT
 
 # Opto
 bash ecmcReport.bash $REPORT ""
@@ -151,3 +159,12 @@ echo "OPTO POS AVG=$OPTO_AVG_POS, STD=$OPTO_STD_POS"
 echo "OPTO NEG AVG=$OPTO_AVG_NEG, STD=$OPTO_STD_NEG"
 printf "AVG | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $OPTO_AVG_POS $OPTO_AVG_NEG $DIFF_AVG>> $REPORT
 printf "STD | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $OPTO_STD_POS $OPTO_STD_NEG $DIFF_STD>> $REPORT
+RANGE_POS=$(echo "$OPTO_VALS_POS" | bash ecmcRangeDataRow.bash)
+RANGE_NEG=$(echo "$OPTO_VALS_NEG" | bash ecmcRangeDataRow.bash)
+DIFF_RANGE=$(echo "$DIFFS" | bash ecmcRangeDataRow.bash)
+printf "Range | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $RANGE_POS $RANGE_NEG $DIFF_RANGE >> $REPORT
+
+# Write max diffs
+bash ecmcReport.bash $REPORT ""
+REPEATABILITY_OPTO_DIFF=$(echo "$DIFFS" | bash ecmcAbsMaxDataRow.bash)
+printf "Repeatability (ILD2300) %.${DEC}f\n" $REPEATABILITY_OPTO_DIFF >> $REPORT

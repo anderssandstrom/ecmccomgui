@@ -62,6 +62,7 @@ do
    RESOLVER_VAL=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})
    RESOLVER_VAL=$(echo "$RESOLVER_VAL" | bash ecmcScaleOffsetLines.bash 1 ${RESOLVER_OFFSET})
    DIFF_RESOLVER=$(echo "$RESOLVER_VAL-$SETPOINT" | bc -l)
+   DIFFS_RESOLVER+="$DIFF_RESOLVER "
    echo "Resolver value = $RESOLVER_VAL"
    
    # opto
@@ -73,13 +74,19 @@ do
       OPTO_VAL="Out of range"
       DIFF_OPTO="NaN"
       printf "%d | %.${DEC}f | %.${DEC}f | %.${DEC}f | %s | %s\n" $COUNTER $SETPOINT $RESOLVER_VAL $DIFF_RESOLVER "$OPTO_VAL" "$DIFF_OPTO" >> $REPORT
-   else
+   else   
       DIFF_OPTO=$(echo "$OPTO_VAL-$SETPOINT" | bc -l)
+      DIFFS_OPTO+="$DIFF_OPTO "
       printf "%d | %.${DEC}f | %.${DEC}f | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $COUNTER $SETPOINT $RESOLVER_VAL $DIFF_RESOLVER $OPTO_VAL $DIFF_OPTO >> $REPORT
    fi
-
+   
    echo "Opto value =$OPTO_VAL"
    
 done
+# Write max diffs
+ACCURACY_RES_DIFF=$(echo "$DIFFS_RESOLVER" | bash ecmcAbsMaxDataRow.bash)
+ACCURACY_OPTO_DIFF=$(echo "$DIFFS_OPTO" | bash ecmcAbsMaxDataRow.bash)
+
+printf "Accuracy |-|-| %.${DEC}f | - | %.${DEC}f\n" $ACCURACY_RES_DIFF $ACCURACY_OPTO_DIFF  >> $REPORT
 
 bash ecmcReport.bash $REPORT ""
