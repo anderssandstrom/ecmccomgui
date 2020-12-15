@@ -64,8 +64,8 @@ do
    RESOLVER_STD=$(echo "$RESOLVER_VAL" | bash ecmcStdLines.bash)
 
    echo "Resolver value AVG = $RESOLVER_AVG STD = $RESOLVER_STD"
-   
-   printf "%d | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $COUNTER $SETPOINT $RESOLVER_AVG $RESOLVER_STD >> $REPORT
+   let "DEC_STD_AVG=$DEC+2"
+   printf "%d | %.${DEC}f | %.${DEC_STD_AVG}f | %.${DEC_STD_AVG}f\n" $COUNTER $SETPOINT $RESOLVER_AVG $RESOLVER_STD >> $REPORT
    #echo "DATA=$RESOLVER_VAL"
    #echo "$RESOLVER_VAL" | python ../pyDataManip/histCaMonitor.py
 done

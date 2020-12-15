@@ -117,7 +117,7 @@ echo "Resolver offset = ${RESOLVER_OFFSET}"
 bash ecmcReportInit.bash $REPORT $FILE
 
 ## Write sensor information
-bash ecmcReport.bash $REPORT "# Sensor calibration"
+bash ecmcReport.bash $REPORT "# Sensors"
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "## Open loop step counter of stepper"
 bash ecmcReport.bash $REPORT ""
@@ -129,29 +129,32 @@ bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "Conversion data (to open loop coord syst):"
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "1. Scale factor  : 1"
-bash ecmcReport.bash $REPORT "2. Offset factor : ${RESOLVER_OFFSET}mm"
+bash ecmcReport.bash $REPORT "2. Offset : ${RESOLVER_OFFSET}mm"
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "## External verification system, Micro-Epsilon ILD2300 sensor"
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "Conversion data (to open loop coord syst):"
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "1. Scale factor  : -1 (measure from top)"
-bash ecmcReport.bash $REPORT "2. Offset factor : ${OPTO_OFFSET}mm"
+bash ecmcReport.bash $REPORT "2. Offset : ${OPTO_OFFSET}mm"
 bash ecmcReport.bash $REPORT ""
 
 echo "####################################################################"
 
-# Switches ##########################################################
-#bash mainSwitch.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET $DEC
+##### Switches ##########################################################
+bash mainSwitch.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET $DEC
 
-# Repeatability #####################################################
-#bash mainRepeatability.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET $DEC
+##### Repeatability #####################################################
+bash mainRepeatability.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET $DEC
 
-# Resolver jitter ###################################################
-#bash mainResolverStandstill.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET 5 1000
+##### Resolver jitter ###################################################
+bash mainResolverStandstill.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET 5 1000
 
-# Accuracy FWD ######################################################
-bash mainAccuracy.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET $DEC 8000
+##### Accuracy FWD ######################################################
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "## Accuracy based on Resolver and ILD2300 sensor Positive Direction"
+bash mainAccuracy.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET $DEC 8000 0
 
-# Accuracy BWD ######################################################
-bash mainAccuracy.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET $DEC 7000
+##### Accuracy BWD ######################################################
+bash ecmcReport.bash $REPORT "## Accuracy based on Resolver and ILD2300 sensor Negative Direction"
+bash mainAccuracy.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET $DEC 7000 1

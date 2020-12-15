@@ -113,7 +113,7 @@ printf "STD | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $RESOLVER_STD_POS $RESOLVER_S
 
 # Opto
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "Test | Opto Pos [mm] | Opto Neg [mm] | Diff [mm]"
+bash ecmcReport.bash $REPORT "Test | ILD2300 Pos [mm] | ILD2300 Neg [mm] | Diff [mm]"
 bash ecmcReport.bash $REPORT "--- | --- | --- | --- |"
 DATAPV="IOC_TEST:ec0-s5-OptoILD2300_50mm-AI1"
 DIFFS=""
