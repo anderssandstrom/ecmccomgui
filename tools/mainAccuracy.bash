@@ -90,3 +90,8 @@ ACCURACY_OPTO_DIFF=$(echo "$DIFFS_OPTO" | bash ecmcAbsMaxDataRow.bash)
 printf "Accuracy |-|-| %.${DEC}f | - | %.${DEC}f\n" $ACCURACY_RES_DIFF $ACCURACY_OPTO_DIFF  >> $REPORT
 
 bash ecmcReport.bash $REPORT ""
+
+
+printf "Accuracy (Resolver): %.${DEC}f\n" $ACCURACY_RES_DIFF >> $REPORT
+printf "Accuracy (ILD2300): %.${DEC}f\n" $ACCURACY_OPTO_DIFF >> $REPORT
+bash ecmcReport.bash $REPORT ""

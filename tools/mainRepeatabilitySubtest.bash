@@ -117,7 +117,7 @@ printf "Range | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $RANGE_POS $RANGE_NEG $DIFF
 
 bash ecmcReport.bash $REPORT ""
 REPEATABILITY_RES_DIFF=$(echo "$DIFFS" | bash ecmcAbsMaxDataRow.bash)
-printf "Repeatability (Resolver) %.${DEC}f\n" $REPEATABILITY_RES_DIFF >> $REPORT
+printf "Repeatability (Resolver): %.${DEC}f\n" $REPEATABILITY_RES_DIFF >> $REPORT
 
 # Opto
 bash ecmcReport.bash $REPORT ""
@@ -167,4 +167,4 @@ printf "Range | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $RANGE_POS $RANGE_NEG $DIFF
 # Write max diffs
 bash ecmcReport.bash $REPORT ""
 REPEATABILITY_OPTO_DIFF=$(echo "$DIFFS" | bash ecmcAbsMaxDataRow.bash)
-printf "Repeatability (ILD2300) %.${DEC}f\n" $REPEATABILITY_OPTO_DIFF >> $REPORT
+printf "Repeatability (ILD2300): %.${DEC}f\n" $REPEATABILITY_OPTO_DIFF >> $REPORT
