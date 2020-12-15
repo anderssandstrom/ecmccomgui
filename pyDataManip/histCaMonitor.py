@@ -84,7 +84,7 @@ def main():
     
     print(legStr)
     plt.figure(figsize=(8, 8))
-    n, bins, patches = plt.hist(dataSet, 50, density=1)
+    n, bins, patches = plt.hist(dataSet, int(pvLength/5), density=1)
     y = mlab.normpdf( bins, pvAvg, pvStd)
     l = plt.plot(bins, y, linewidth=1) 
 
