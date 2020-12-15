@@ -37,6 +37,7 @@ DATACOUNT="1"
 DATAPV="IOC_TEST:Axis1-PosSet"
 SETPOINT=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})
 echo "Setpoint=$SETPOINT"
+
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "## Target Position $SETPOINT Positive and Negative Direction"
 

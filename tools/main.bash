@@ -142,7 +142,10 @@ bash ecmcReport.bash $REPORT ""
 echo "####################################################################"
 
 # Switches ##########################################################
-bash mainSwitch.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET $DEC
+#bash mainSwitch.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET $DEC
 
-# Reepatability #####################################################
-bash mainRepeatability.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET $DEC
+# Repeatability #####################################################
+#bash mainRepeatability.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET $DEC
+
+# Resolver jitter ###################################################
+bash mainResolverStandstill.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET 5 1000
