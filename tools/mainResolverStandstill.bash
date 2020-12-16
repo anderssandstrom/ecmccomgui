@@ -62,10 +62,17 @@ do
    RESOLVER_VAL=$(echo "$RESOLVER_VAL" | bash ecmcScaleOffsetLines.bash 1 ${RESOLVER_OFFSET})
    RESOLVER_AVG=$(echo "$RESOLVER_VAL" | bash ecmcAvgLines.bash)
    RESOLVER_STD=$(echo "$RESOLVER_VAL" | bash ecmcStdLines.bash)
-
+   DIFF_RESOLVER=$(echo "$RESOLVER_VAL-$SETPOINT" | bc -l)
+   DIFFS_RESOLVER+="$DIFF_RESOLVER "
+   DIFF_MAX
    echo "Resolver value AVG = $RESOLVER_AVG STD = $RESOLVER_STD"
    let "DEC_STD_AVG=$DEC+2"
-   printf "%d | %.${DEC}f | %.${DEC_STD_AVG}f | %.${DEC_STD_AVG}f\n" $COUNTER $SETPOINT $RESOLVER_AVG $RESOLVER_STD >> $REPORT
+   printf "%d | %.${DEC}f | %.${DEC_STD_AVG}f | %.${DEC_STD_AVG}f | %.${DEC_STD_AVG}f\n" $COUNTER $SETPOINT $RESOLVER_AVG $DIFF_RESOLVER $RESOLVER_STD >> $REPORT
    #echo "DATA=$RESOLVER_VAL"
    #echo "$RESOLVER_VAL" | python ../pyDataManip/histCaMonitor.py
 done
+
+MAX_RES_DIFF=$(echo "$DIFFS_RESOLVER" | bash ecmcAbsMaxDataRow.bash)
+bash ecmcReport.bash $REPORT ""
+printf "Accuracy standstill (Resolver): %.${DEC}f\n" $MAX_RES_DIFF >> $REPORT
+bash ecmcReport.bash $REPORT ""
