@@ -20,7 +20,7 @@ then
 fi
 
 echo "0.1 Homing with sequence 1 (to low limit)..."
-python ecmcTestHome.py ${motorPV} ${testPV} 1 10
+#python ecmcTestHome.py ${motorPV} ${testPV} 1 10
 
 echo "2. Starting low limit jitter test.."
 python ecmcTestLimitBwd.py ${motorPV} ${testPV} 2 $velo 2000
