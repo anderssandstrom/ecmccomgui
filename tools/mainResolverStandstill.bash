@@ -39,8 +39,8 @@ bash ecmcReport.bash $REPORT "## Resolver Value Distribution"
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "Measured at $TESTCOUNT positions offset by 45deg resolver shaft angle. The distrubution values are based on $DATACOUNT_RESOLVER values at each location."
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "Test | Setpoint [mm] | Resolver AVG[mm] | Resolver STD[mm]"
-bash ecmcReport.bash $REPORT "--- | --- | --- | --- |"
+bash ecmcReport.bash $REPORT "Test | Setpoint [mm] | Resolver AVG[mm] | Diff [mm} | Resolver STD[mm]"
+bash ecmcReport.bash $REPORT "--- | --- | --- | --- | --- |"
 
 TRIGGPV="IOC_TEST:TestNumber"
 DIFFS=""
@@ -62,9 +62,8 @@ do
    RESOLVER_VAL=$(echo "$RESOLVER_VAL" | bash ecmcScaleOffsetLines.bash 1 ${RESOLVER_OFFSET})
    RESOLVER_AVG=$(echo "$RESOLVER_VAL" | bash ecmcAvgLines.bash)
    RESOLVER_STD=$(echo "$RESOLVER_VAL" | bash ecmcStdLines.bash)
-   DIFF_RESOLVER=$(echo "$RESOLVER_VAL-$SETPOINT" | bc -l)
-   DIFFS_RESOLVER+="$DIFF_RESOLVER "
-   DIFF_MAX
+   DIFF_RESOLVER=$(echo "$RESOLVER_AVG-($SETPOINT)" | bc -l)
+   DIFFS_RESOLVER+="$DIFF_RESOLVER "   
    echo "Resolver value AVG = $RESOLVER_AVG STD = $RESOLVER_STD"
    let "DEC_STD_AVG=$DEC+2"
    printf "%d | %.${DEC}f | %.${DEC_STD_AVG}f | %.${DEC_STD_AVG}f | %.${DEC_STD_AVG}f\n" $COUNTER $SETPOINT $RESOLVER_AVG $DIFF_RESOLVER $RESOLVER_STD >> $REPORT
@@ -74,5 +73,5 @@ done
 
 MAX_RES_DIFF=$(echo "$DIFFS_RESOLVER" | bash ecmcAbsMaxDataRow.bash)
 bash ecmcReport.bash $REPORT ""
-printf "Accuracy standstill (Resolver): %.${DEC}f\n" $MAX_RES_DIFF >> $REPORT
+printf "Accuracy standstill (Resolver): %.${DEC_STD_AVG}f\n" $MAX_RES_DIFF >> $REPORT
 bash ecmcReport.bash $REPORT ""
