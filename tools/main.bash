@@ -88,7 +88,7 @@ echo "Resolver val at 35mm                = ${RESOLVER_VAL_AT_35}"
 TRIGGPV="IOC_TEST:TestNumber"
 TRIGGVAL="3305"
 DATAPV="IOC_TEST:ec0-s5-OptoILD2300_50mm-AI1"
-DATACOUNT="30"  # Not updating every cycle
+DATACOUNT="1"  # Not updating every cycle
 DATA=$(bash ecmcGetLinesBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})
 # Need to reverse sign since positive in negative ditrection
 OPTO_VAL_AT_35=$(echo "${DATA}" | bash ecmcScaleLines.bash -1 | bash ecmcAvgLines.bash)
