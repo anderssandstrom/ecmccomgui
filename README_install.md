@@ -1,14 +1,19 @@
 # ecmc PYQT GUI installation
 
 ## Centos
-Seems conda is not possible to use since could not find a working conda mix between pyepics, pyqt and the other libs. Therefore use pip..
+Need a mix of conda and pip since cannot find all needed packages in conda:
 
 ```
-#conda create --name ecmccomgui_py35 python=3.5
-#conda activate ecmccomgui_py35
+sudo yum install conda
+# Choose python 3.5 or 3.6 (for 3.6 the below line needs editing)
+conda create --name ecmccomgui_py35 python=3.5
+conda activate ecmccomgui_py35
 pip install pyqt5
 pip install matplotlib
 pip install numpy
+pip install pyepics
+
+sudo yum install qt5-qtbase-devel
 ```
 probbaly pyepics is also needed (but could not find in my notes, maybe alreday installed on the ess centos machines..)..
 
