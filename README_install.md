@@ -15,8 +15,6 @@ pip install pyepics
 
 sudo yum install qt5-qtbase-devel
 ```
-probbaly pyepics is also needed (but could not find in my notes, maybe alreday installed on the ess centos machines..)..
-
 ## Raspian (Raspi 4b)
 Setup partly virtuel environment using berryconda (https://github.com/jjhelmus/berryconda).
 
