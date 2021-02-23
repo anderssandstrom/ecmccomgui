@@ -48,9 +48,9 @@ def main():
   plt.plot(y)
   plt.legend("Data")
   plt.grid()
-  plt.title("Raw data, sinus wave in 5Hz, (NFFT=1024)")
-  plt.xlabel("time [samples in 100Hz]")
-  plt.ylabel("[]")
+  plt.title("Wavform data")
+  plt.xlabel("time [samples in 20kHz]")
+  plt.ylabel("Voltage [raw]")
   plt.show()
   
 if __name__ == "__main__":
