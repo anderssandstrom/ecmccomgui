@@ -41,12 +41,13 @@ def main():
     x.append(counter)
     counter=counter+1
     y.append(float(line))
-    
+  
+  print('Samples []' + str(counter))
   plt.plot(x,y,'o-')
   #plt.legend(legend)
   plt.grid()
   #plt.title(fname)
-  plt.xlabel("time")
+  plt.xlabel("samples")
   plt.show()
   
 if __name__ == "__main__":
