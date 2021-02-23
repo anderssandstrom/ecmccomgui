@@ -11,7 +11,7 @@ def printOutHelp():
   print ("python plotCaMonitor.py [<filename>]")
   print ("example: python plotData.py xx.txt")
   print ("example stdin: cat data.log | grep -E 'thread|CPU' | python plotData.py" )
-  print ("cat log.log | grep 'DIFF(ref-send)' | awk '{print $3}' | grep "-" | python ~/sources/ecmccomgui/pyDataManip/plotData.py")
+  print ("cat log.log | grep 'DIFF(ref-send)' | awk '{print $3}' | python ~/sources/ecmccomgui/pyDataManip/plotData.py")
 def main():
   # Check args
   if len(sys.argv)>1:
@@ -38,9 +38,10 @@ def main():
   counter=0
   for line in dataFile:     
     print("LINE:" + line)
-    x.append(counter)
-    counter=counter+1
-    y.append(float(line))
+    if(len(line.strip())>0 and line.find(":") < 0):        
+      y.append(float(line))
+      x.append(counter)
+      counter=counter+1
   
   print('Samples []' + str(counter))
   plt.plot(x,y,'o-')
