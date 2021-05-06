@@ -38,14 +38,20 @@ def main():
   counter=0
   for line in dataFile:     
     print("LINE:" + line)
-    if(len(line.strip())>0 and line.find(":") < 0):        
+    if(len(line.strip())>0 and line.find(":") < 0 and line.find("/") < 0):        
       y.append(float(line))
       x.append(counter)
       counter=counter+1
   
-  print('Samples []' + str(counter))
+  pvMax = np.max(y)
+  pvMin = np.min(y)
+  pvAvg = np.mean(y)
+  pvStd = np.std(y)
+  legStr = "[" + str(counter) + "] " + str(pvMin) + ".." + str(pvMax) + ", mean: " + str(pvAvg) + ", std: " + str(pvStd)
+
+  print('Samples' + legStr)
   plt.plot(x,y,'o-')
-  #plt.legend(legend)
+  plt.legend(legStr)
   plt.grid()
   #plt.title(fname)
   plt.xlabel("samples")
