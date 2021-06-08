@@ -8,13 +8,13 @@ from caPVArrayLib import caPVArray
 from caMonitorArrayParserLib import caMonitorArrayParser 
  
 def printOutHelp():
-  print "python plotCaMonitor.py [<filename X>] [<filename Y>]"
-  print "example: python plotCaMonitor.py xx.txt yy.txt"
+  print ("python plotCaMonitor.py [<filename X>] [<filename Y>]")
+  print ("example: python plotCaMonitor.py xx.txt yy.txt")
 
 def main():
   # Check args
   if len(sys.argv)>1:
-    print sys.argv[1] 
+    print (sys.argv[1] )
     pos1=sys.argv[1].find('-h')
     if(pos1>=0):
       printOutHelp()
@@ -58,10 +58,10 @@ def main():
   y=dataBufferY
 
   plt.plot(x,y)
-  plt.legend("Amplitude []")
+  #plt.legend("Amplitude []")
   plt.grid()
-  plt.title("FFT of 5Hz sin wave sampled at 100Hz (generated in ecmc PLC)")
-  plt.xlabel("Freq [Hz]")
+  #plt.title("FFT of 5Hz sin wave sampled at 100Hz (generated in ecmc PLC)")
+  #plt.xlabel("Freq [Hz]")
   plt.show()
   
 if __name__ == "__main__":
