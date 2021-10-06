@@ -120,16 +120,21 @@ rstCmdPv.put(0)
 
 print ('Enable amplifier:')
 enaCmdPv.put(1)
-waiting = 10
+time.sleep(1)
 
+waiting = 10
 print('Waiting for enabled..')
 while waiting > 0:
   if enaActPv.get():
       break
   print('...')
-  time.sleep(0.1) #ensure that enabled goes down
+  time.sleep(0.1)
   waiting = waiting-1
-  
+
+if not enaActPv.get():
+  printf('Failed to enable amplifier..')
+  sys.exit(1)
+
 counter = 1
 
 stpCmdPv.put(0)
