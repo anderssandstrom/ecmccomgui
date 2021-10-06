@@ -120,11 +120,22 @@ rstCmdPv.put(0)
 
 print ('Enable amplifier:')
 enaCmdPv.put(1)
-time.sleep(1) #ensure that enabled goes down
+waiting = 10
+
+print('Waiting for enabled..')
+while waiting > 0:
+  if enaActPv.get():
+      break
+  print('...')
+  time.sleep(0.1) #ensure that enabled goes down
+  waiting = waiting-1
+  
 counter = 1
 
 stpCmdPv.put(0)
 
+maxTime = (maxPos-minPos) / maxVelo
+print('Max time: ' + str(maxTime))
 while 1:
   
   exeCmdPv.put(0)
@@ -146,7 +157,7 @@ while 1:
   print ('Executing new motion cmd no. ' + str(counter) + ':')
   print ('  Target pos:   ' + str(newTgtPos))
   print ('  Target velo:  ' + str(newTgtVel))
-  timeToWait=uniform(0.001, 5)
+  timeToWait=uniform(0, maxTime)
   print ('  Time to wait: ' + str(timeToWait))
   time.sleep(timeToWait)
   
