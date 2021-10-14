@@ -11,6 +11,7 @@ def printOutHelp():
   print ("example: python ecmcGearRatio.py Axis1 5002 data.log")
   print ("example stdin: cat data.log | grep -E 'Axis1-ActPos | EL5002' | python ecmcGearRatio.py Axis1 5002" )
   print ("NOTE: data input must be sorted in increasing time since only data pairs with exactly the same timestamp will be used." )
+  print ("Only use data for motion in a single direction, otherwise backlash can affect the gearratio." )
 
 def main():
    
@@ -61,7 +62,7 @@ def main():
     if lineOK==0:
       continue
 
-    # check if timesatps are equal
+    # Ensure timestamps are equal
     if toTimeVal!=fromTimeVal:
       continue
     
