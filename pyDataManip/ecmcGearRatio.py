@@ -75,9 +75,13 @@ def main():
   else:
     print ("Array size missmatch")
     sys.exit(1)
-
-  print("[gear ratio, offset]: ")
-  print(z)
   
+  print("from to [gear ratio, offset]: ")
+  print(z)
+
+  print("to from (inverted) [gear ratio, offset]: ")
+  z = np.polyfit(fromArray, toArray, 1)
+  print(z)
+
 if __name__ == "__main__":
   main()
