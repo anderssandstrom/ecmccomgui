@@ -76,10 +76,10 @@ def main():
     print ("Array size missmatch")
     sys.exit(1)
   
-  print("from to [gear ratio, offset]: ")
+  print("from *" + fromPvNameFilter + "* to *" + toPvNameFilter + "* [gear ratio, offset]: ")
   print(z)
 
-  print("to from (inverted) [gear ratio, offset]: ")
+  print("INVERTED!!! from *" + toPvNameFilter + "* to *" + fromPvNameFilter + "* [gear ratio, offset]: ")
   z = np.polyfit(fromArray, toArray, 1)
   print(z)
 
