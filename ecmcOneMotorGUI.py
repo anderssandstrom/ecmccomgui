@@ -185,7 +185,6 @@ STYLES = {      ### http://doc.qt.digia.com/qt/stylesheet-reference.html
     'ArrayStat': '''
             QTableView { 
                    background-color: white;
-                   foreground-color: black;
                    font: bold;
                    width: 350px;
                    min-width: 350px;

@@ -33,31 +33,37 @@ def main():
     dataFileY=open(fnamey,'r')
 
   parserY=caMonitorArrayParser()
-  pvs=[]
-  dataBufferY=np.array([])
+
+  firstY = 1
   for line in dataFileY:
     if not parserY.lineValid(line):
       continue
-
+    
     pvName, timeVal, data=parserY.getValues(line)
-    dataBufferY=np.append(dataBufferY,data[:].astype(np.float))
+    if firstY:    
+      pvY=caPVArray(pvName)
+      firstY = 0
+
+    pvY.setValues(timeVal,data)    
+
   
-  y=dataBufferY
-
   parserX=caMonitorArrayParser()
-
-  dataBufferX=np.array([])
+  firstX = 1  
   for line in dataFileX:
     if not parserX.lineValid(line):
       continue
 
     pvName, timeVal, data=parserX.getValues(line)
-    dataBufferX=np.append(dataBufferX,data[:].astype(np.float))
-  
-  x=dataBufferX
-  y=dataBufferY
+    if firstX:    
+      pvX=caPVArray(pvName)
+      firstX = 0
 
-  plt.plot(x,y)
+    pvX.setValues(timeVal,data)    
+  
+  timeSetX, dataSetX=pvX.getData()
+  timeSetY, dataSetY=pvY.getData()
+
+  plt.plot(dataSetX,dataSetY)
   #plt.legend("Amplitude []")
   plt.grid()
   #plt.title("FFT of 5Hz sin wave sampled at 100Hz (generated in ecmc PLC)")

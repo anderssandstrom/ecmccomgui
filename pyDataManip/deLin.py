@@ -7,15 +7,15 @@ from caPVArrayLib import caPVArray
 from caMonitorArrayParserLib import caMonitorArrayParser
 
 def printOutHelp():    
-  print "python deLin.py [<filename>] <modFactor>"
-  print "Make contious increaseing data flat (make best fit and substract)"
-  print "example: python deLin.py xx.txt"
-  print "example stdin: cat data.log | grep -E 'ActPos' | python deLin.py" 
+  print ("python deLin.py [<filename>] <modFactor>")
+  print ("Make contious increaseing data flat (make best fit and substract)")
+  print ("example: python deLin.py xx.txt")
+  print ("example stdin: cat data.log | grep -E 'ActPos' | python deLin.py" )
 
 def main():
   # Check args
   if len(sys.argv)>1:
-    print sys.argv[1] 
+    print (sys.argv[1] )
     pos1=sys.argv[1].find('-h')
     if(pos1>=0):
       printOutHelp()
@@ -53,7 +53,7 @@ def main():
     pvToAddDataTo.setValues(timeVal,data)
     if newPv:       
       pvs.append(pvToAddDataTo)
-      print "Added PV: " + pvName
+      print ("Added PV: " + pvName)
   
   
   legend=[]

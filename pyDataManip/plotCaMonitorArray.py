@@ -8,14 +8,14 @@ from caPVArrayLib import caPVArray
 from caMonitorArrayParserLib import caMonitorArrayParser 
  
 def printOutHelp():
-  print "python plotCaMonitor.py [<filename>]"
-  print "example: python plotCaMonitor.py xx.txt"
-  print "example stdin: cat data.log | grep -E 'thread|CPU' | python plotCaMonitor.py" 
+  print("python plotCaMonitor.py [<filename>]")
+  print("example: python plotCaMonitor.py xx.txt")
+  print("example stdin: cat data.log | grep -E 'thread|CPU' | python plotCaMonitor.py")
 
 def main():
   # Check args
   if len(sys.argv)>1:
-    print sys.argv[1] 
+    print(sys.argv[1])
     pos1=sys.argv[1].find('-h')
     if(pos1>=0):
       printOutHelp()
@@ -42,15 +42,15 @@ def main():
 
     pvName, timeVal, data=parser.getValues(line)
     dataBuffer=np.append(dataBuffer,data[:].astype(np.float))
-  print dataBuffer  
+  print(dataBuffer)
   
   y=dataBuffer
   plt.plot(y)
   plt.legend("Data")
   plt.grid()
-  plt.title("Raw data, sinus wave in 5Hz, (NFFT=1024)")
-  plt.xlabel("time [samples in 100Hz]")
-  plt.ylabel("[]")
+  plt.title("Wavform data")
+  plt.xlabel("time [samples in 20kHz]")
+  plt.ylabel("Voltage [raw]")
   plt.show()
   
 if __name__ == "__main__":

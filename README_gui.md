@@ -6,9 +6,23 @@ All data is accessiblie in the iocsh but sometimes it's simpler with a graphical
 1. Start a new terminal/shell by pressing the blach button ">_" in upper left corner of screen 
 2. Activate conda environment in order to use the correct python module versions
 
+Different controllers might be installed with different conda environments (normally "ecmccomgui_py35" or "ecmccomgui_py36").
+List available conda environments in order to find a "ecmccomgui_py*":
 ```
-source activate ecmccomgui_py35
+$ conda info --envs
+# conda environments:
+#
+ecmccomgui_py36          /home/dev/.conda/envs/ecmccomgui_py36
+base                  *  /opt/conda
 ```
+In the above list, the conda environment to choose on this controller is "ecmccomgui_py36":
+```
+# On "normal" controller use "conda" to activate:
+conda activate ecmccomgui_py36
+# On raspberry pi, use "source" instead of "conda":
+source activate ecmccomgui_py36
+```
+
 ![Activate conda](doc/gui/condaenv_small.png)
 
 3. Go to GUI repo:
@@ -44,11 +58,11 @@ pv name: "Axis1"
 
 ![Start GUI](doc/pics/ecmcGuiMain_small.png)
 
-6. Start GUI for the choosen:
+6. Start GUI for the choosen process variable (pv):
 
-press the "open gui" button
+press the "Start GUI for: <pv name>" button
 
-note: The GUI supports multiple open windows for different PV:s (a new window will be created each time the "open gui"- button is pressed with a valid PV). 
+note: The GUI supports multiple open windows for different PV:s (a new window will be created each time the button is pressed with a valid PV). 
 
 Depending on the PV-type, different GUI windows will appear:
 
@@ -66,7 +80,7 @@ Depending on the PV-type, different GUI windows will appear:
 
 ## Generic GUI window
 
-The genric window can be used to both read and write to the PV choosen.
+The generic window can be used to both read and write to the PV choosen.
 
 The actual value can be seen in the plot window and writes to the PV can be done using the controls in the lower left corner of the window.
 

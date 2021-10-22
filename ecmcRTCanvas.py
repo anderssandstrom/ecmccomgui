@@ -58,7 +58,7 @@ class ecmcRTCanvas(FigureCanvas, TimedAnimation):
         self.ax1.add_line(self.line1_head)
         self.ax1.set_xlim(-(self.xlim - 1),0)
         self.ax1.set_ylim(-100, 100)
-        self.ax1.grid()        
+        self.ax1.grid()
         self.firstUpdatedData = True
         FigureCanvas.__init__(self, self.fig)
         TimedAnimation.__init__(self, self.fig, interval = 50, blit = True)
@@ -111,13 +111,14 @@ class ecmcRTCanvas(FigureCanvas, TimedAnimation):
         # ensure different values
         if bottom == top:
             top = bottom +1
-
+        self.ax1.clear()
+        self.ax1.grid(b=True)
         range = top - bottom
         top += range * 0.1
         bottom -= range *0.1
         self.ax1.set_ylim(bottom,top)
-        self.ax1.set_xlim(-(self.xlim-1), 1)
-        self.draw()
+        self.ax1.set_xlim(-(self.xlim-1), 1)        
+        self.draw()        
         return
     
     def zoomLow(self, value):
@@ -164,8 +165,7 @@ class ecmcRTCanvas(FigureCanvas, TimedAnimation):
         self.line1.set_data(self.n[ 0 : self.n.size - margin ], self.y[ 0 : self.n.size - margin ])
         self.line1_tail.set_data(np.append(self.n[-10:-1 - margin], self.n[-1 - margin]), np.append(self.y[-10:-1 - margin], self.y[-1 - margin]))
         self.line1_head.set_data(self.n[-1 - margin], self.y[-1 - margin])
-        self._drawn_artists = [self.line1, self.line1_tail, self.line1_head]
-
+        self._drawn_artists = [self.line1, self.line1_tail, self.line1_head]        
         return
 
     def setYLabel(self,label):
