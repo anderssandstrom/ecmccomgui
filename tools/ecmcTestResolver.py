@@ -9,7 +9,7 @@ import unittest
 import ecmcSlitDemoLib
 
 testNumberBase=1000
-homedPvSuffix='-homed'
+homedPvSuffix='-Homed'
 
 
 if len(sys.argv)!=7:

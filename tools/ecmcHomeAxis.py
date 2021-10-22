@@ -16,7 +16,7 @@ if len(sys.argv)!=3:
 motor = sys.argv[1]
 nCmdData = int(sys.argv[2])
 
-homedPvSuffix='-homed'
+homedPvSuffix='-Homed'
 motorHomedPvName = motor + homedPvSuffix
 homedPv = epics.PV(motorHomedPvName)
 

@@ -9,8 +9,8 @@ import math
 import unittest
 import ecmcSlitDemoLib
 
-homedPvSuffix='-homed'
-limitPvSuffix='-limitbwd'
+homedPvSuffix='-Homed'
+limitPvSuffix='-LimBwd'
 
 testLoops = 10
 timeout =50

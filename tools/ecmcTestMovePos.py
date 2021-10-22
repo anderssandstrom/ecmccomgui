@@ -10,8 +10,6 @@ import unittest
 import ecmcSlitDemoLib
 
 testNumberBase=2100
-homedPvSuffix='-homed'
-limitPvSuffix='-limitfwd'
 
 testLoops = 10
 

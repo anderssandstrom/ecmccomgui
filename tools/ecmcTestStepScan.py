@@ -8,7 +8,7 @@ import math
 import unittest
 import ecmcSlitDemoLib
 
-homedPvSuffix='-homed'
+homedPvSuffix='-Homed'
 testLoops = 10
 
 if len(sys.argv)!=8:
