@@ -22,6 +22,8 @@ def main():
   fromPvNameFilter = sys.argv[1]
   toPvNameFilter = sys.argv[2]
 
+#  print("Initiating calculation of gear ration between "+ fromPvNameFilter + " and " +toPvNameFilter)
+
   if len(sys.argv)==4:
     fname=sys.argv[3]
     dataFile=open(fname,'r')
@@ -73,15 +75,18 @@ def main():
   if len(toArray) == len(fromArray) and len(fromArray)>0:
     z = np.polyfit(toArray, fromArray, 1)
   else:
+
     print ("Array size missmatch")
+    print ("L1: "+ str(len(toArray)) + " L2: " + str(len(fromArray)) )
     sys.exit(1)
   
-  print("from *" + fromPvNameFilter + "* to *" + toPvNameFilter + "* [gear ratio, offset]: ")
-  print(z)
+ # print("from *" + fromPvNameFilter + "* to *" + toPvNameFilter + "* [gear ratio, offset]: ")
+  print(str(z[0])+ " " + str(z[1]))
 
-  print("INVERTED!!! from *" + toPvNameFilter + "* to *" + fromPvNameFilter + "* [gear ratio, offset]: ")
-  z = np.polyfit(fromArray, toArray, 1)
-  print(z)
+#  print("INVERTED!!! from *" + toPvNameFilter + "* to *" + fromPvNameFilter + "* [gear ratio, offset]: ")
+#  z = np.polyfit(fromArray, toArray, 1)
+#  print("INVERTED GR="+str(z))
+  
 
 if __name__ == "__main__":
   main()
