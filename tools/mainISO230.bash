@@ -58,9 +58,9 @@ TESTNUMPV="IOC_TEST:TestNumber"
 
 
 # Calculate gearratios based on this test
-TESTNUM_GEARRATIO=1503
+TESTNUM_GEARRATIO=1505
 # this many sample before this test
-SAMPLES_GEARRATIO=20000
+SAMPLES_GEARRATIO=30000
 
 
 # Defs for ISO230 analysis
@@ -134,6 +134,7 @@ do
    TRIGGVAL=$TESTNUMBER
    DATACOUNT=1
    DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
+   echo "OL_DATA=$DATA" 
    eval "OL_FWD_$CYCLE$TEST=$DATA"
 
    # Resolver
