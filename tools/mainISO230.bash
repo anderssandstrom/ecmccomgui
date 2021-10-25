@@ -56,24 +56,20 @@ RESOLVERPV="IOC_TEST:m0s004-Enc01-PosAct"
 REFERENCEPV="IOC_TEST:m0s005-Enc01-PosAct"
 TESTNUMPV="IOC_TEST:TestNumber"
 
+
 # Calculate gearratios based on this test
 TESTNUM_GEARRATIO=1503
 # this many sample before this test
 SAMPLES_GEARRATIO=20000
 
 
+# Defs for ISO230 analysis
+ISO230_POS_COUNT=5
 
 
 
 FILE=$1
 REPORT=$2
-
-TRIGGPV=$TESTNUMPV
-TRIGGVAL="1001"
-DATAPV=$RESOLVERPV
-
-DATACOUNT="10"
-DEC=4
 
 echo "FILE      = ${FILE}"
 echo "TRIGGPV   = ${TRIGGPV}"
@@ -99,19 +95,75 @@ echo "DATACOUNT = ${DATACOUNT}"
 
 # Use gear ratio python script to find gear ratios
 
+echo "1. Calculate gear ratios..."
 # Resolver to open loop use test 1503
+TEMP=$(cat $FILE | grep -B $SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO" |  python ../pyDataManip/ecmcGearRatio.py "$MOTORACTPV" "$RESOLVERPV")
+
+# Gear ratio resolver
+RES_GR=$(echo $TEMP | awk '{print $1}')
+RES_OFF=$(echo $TEMP | awk '{print $2}')
+echo "RES GR=$RES_GR, OFF=$RES_OFF"
+# Reference to open loop use test 1503
+TEMP=$(cat $FILE | grep -B $SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO" |  python ../pyDataManip/ecmcGearRatio.py "$MOTORACTPV" "$REFERENCEPV")
+
+# Gear ratio reference
+REF_GR=$(echo $TEMP | awk '{print $1}')
+REF_OFF=$(echo $TEMP | awk '{print $2}')
+echo "REF GR=$REF_GR, OFF=$REF_OFF"
+echo "2. ISO230-2 test..."
+
+# Always 5 cycles in standard
+# Get forward direction data points (test numbers 1xx1..1xx)
 
 
- TEST=$(cat $FILE | grep -B $SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO" |  python ../pyDataManip/ecmcGearRatio.py "$RESOLVERPV" "$MOTORACTPV")
- 
- echo "TEST=$TEST"
+TESTS=$(seq -w 1 1 $ISO230_POS_COUNT)
+TESTNUMBER_BASE=1
 
- exit
+for CYCLE in {1..5};
+do
+  echo "CYCLE=$CYCLE"
 
- TRIGGVAL="1001"
- DATA=$(bash ecmcGetLinesBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})
+  for TEST in $TESTS
+  do   
+   TESTNUMBER=$TESTNUMBER_BASE$CYCLE"0"$TEST
+   echo "TESTNUMBER=$TESTNUMBER"
+   
+   # Open loop counter
+   DATAPV=$MOTORACTPV
+   TRIGGPV=$TESTNUMPV
+   TRIGGVAL=$TESTNUMBER
+   DATACOUNT=1
+   DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
+   eval "OL_FWD_$CYCLE$TEST=$DATA"
 
- cat 230_2.log |  head -n 10000 | python ~/projects/ecmccomgui/pyDataManip/ecmcGearRatio.py "Axis1-PosAct" "s004-Enc01" | tee log.log
+   # Resolver
+   DATAPV=$RESOLVERPV
+   TRIGGPV=$TESTNUMPV
+   TRIGGVAL=$TESTNUMBER
+   DATACOUNT=1
+   DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
+   DATA=$(bc -l <<< "($DATA*($RES_GR))+($RES_OFF)")
+   echo "RES_DATA=$DATA" 
+   eval "RES_FWD_$CYCLE$TEST=$DATA"
+
+   # Reference
+   DATAPV=$REFERENCEPV
+   TRIGGPV=$TESTNUMPV
+   TRIGGVAL=$TESTNUMBER
+   DATACOUNT=1
+   DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
+   DATA=$(bc -l <<< "($DATA*($REF_GR))+($REF_OFF)")
+   echo "REF_DATA=$DATA"   
+   eval "REF_FWD_$CYCLE$TEST=$DATA"
+
+  done
+done
+
+echo "OL_FWD_43=$OL_FWD_43"
+echo "REF_FWD_13=$REF_FWD_13"
+echo "RES_FWD_13=$RES_FWD_13"
+
+exit
 
 
 # Find resolver value at 35mm (on open loop counter).
