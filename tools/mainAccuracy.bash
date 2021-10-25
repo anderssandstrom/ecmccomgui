@@ -17,7 +17,7 @@
 nl='
 '
 if [ "$#" -ne 7 ]; then
-   echo "mainResolverStandstill: Wrong arg count... Please specify input and output file."
+   echo "mainAccuracy: Wrong arg count... Please specify input and output file."
    exit 1 
 fi
 
