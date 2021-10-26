@@ -55,7 +55,7 @@ REFERENCEPV="IOC_TEST:m0s005-Enc01-PosAct"
 TESTNUMPV="IOC_TEST:TestNumber"
 
 # Number decimals
-DEC=4
+DEC=5
 
 # Calculate gearratios based on this test
 TESTNUM_GEARRATIO_FROM=1501
@@ -372,7 +372,7 @@ bash ecmcReport.bash $REPORT "Ri_fwd = Forward unidirectional positioning repeat
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "Ri_bwd = Backward unidirectional positioning repeatability at a position."
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "Ri= Bi-directional position repeatability at a position"
+bash ecmcReport.bash $REPORT "Ri = Bi-directional position repeatability at a position."
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "Pos (i) | Tgt pos. [mm] | Si_fwd[mm] | Si_bwd [mm] | Ri_fwd | Ri_bwd | Ri"
 bash ecmcReport.bash $REPORT "--- | --- | --- |--- |--- |--- |--- |"
