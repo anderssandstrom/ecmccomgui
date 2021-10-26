@@ -134,6 +134,7 @@ REF_OFF_DISP=$(echo "scale=$DEC;$REF_OFF/1" | bc -l)
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "# Gear Ratios"
 bash ecmcReport.bash $REPORT "From | To | Ratio [] | Offset [mm] | Data count [] | Residual error [mm²]"
+bash ecmcReport.bash $REPORT "--- | --- | --- | --- | --- | --- |"
 bash ecmcReport.bash $REPORT "Openloop | Resolver | $RES_GR_DISP | $RES_OFF_DISP | $RES_LEN_DISP | $RES_ERR_DISP "
 bash ecmcReport.bash $REPORT "Openloop | Reference (ILD2300) | $REF_GR_DISP | $REF_OFF_DISP | $REF_LEN_DISP | $REF_ERR_DISP "
 bash ecmcReport.bash $REPORT ""
