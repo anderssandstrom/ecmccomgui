@@ -302,10 +302,11 @@ done
 bash ecmcReport.bash $REPORT ""
 
 # Calc x_dash_i (Mean unidirectional pos deviation at position i)
+B_MAX=0
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "# Mean position deviation"
+bash ecmcReport.bash $REPORT "# Mean Position Deviation and Reversal Error"
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "Pos (i) | Tgt pos. [mm] | Fwd unidir. pos dev [mm] | Bwd unidir. pos dev [mm] | Bi-dir pos. dev [mm] | Reversal Error"
+bash ecmcReport.bash $REPORT "Pos (i) | Tgt pos. [mm] | Fwd unidir. pos dev [mm] | Bwd unidir. pos dev [mm] | Bi-dir pos. dev [mm] | Reversal Error [mm]"
 bash ecmcReport.bash $REPORT "--- | --- | --- |--- |--- |"
 for TEST in $TESTS
 do
@@ -326,10 +327,19 @@ do
   TEMP_AVG=$(echo "scale=$DEC;($TEMP_BWD+$TEMP_FWD)/2" | bc -l)
   eval "X_AVG_$TEST=$TEMP_AVG"
 
-  TEMP_REV_ERR=$(echo "scale=$DEC;($TEMP_FWD)-($TEMP_BWD)" | bc -l)
-  bash ecmcReport.bash $REPORT " $TEST | $TGT | $TEMP_FWD | $TEMP_BWD | $TEMP_AVG | $TEMP_REV_ERR"
-
+  B_i=$(echo "scale=$DEC;($TEMP_FWD)-($TEMP_BWD)" | bc -l)
+  bash ecmcReport.bash $REPORT " $TEST | $TGT | $TEMP_FWD | $TEMP_BWD | $TEMP_AVG | $B_i"
+  # abs value ${var#-} (remove -)
+  if (( $(echo "${B_i#-} > $B_MAX" |bc -l) )); then
+    B_MAX=${B_i#-}
+  fi  
 done
+
+
+
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "Axis Reversal Error [mm]: $B_MAX"
+bash ecmcReport.bash $REPORT ""
 
 # Mean unidirectional pos dev at a position
 DIFF_AVG_BWD=$(echo "$DIFF_SUM/$TEST_COUNTER" | bc) 

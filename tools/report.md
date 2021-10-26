@@ -1,7 +1,7 @@
 # ecmc motion system test report
 
 * Data file   : /home/dev/sources/ecmc_bifrost_slits_sat/tests_2/11360/230_2.log
-* Date        : Tue Oct 26 13:10:16 CEST 2021
+* Date        : Tue Oct 26 13:53:57 CEST 2021
 * Author      : dev
 
 
@@ -71,12 +71,15 @@ Cycle (j)| Pos (i)| Tgt Pos [mm] | Openloop Act [mm] | Resolver Act [mm] | ILD23
 5 | 5 | 55.0000 | 54.9992 | 55.0157 | 55.0361 | .0361 |
 
 
-# Mean position deviation
+# Mean Position Deviation and Reversal Error
 
-Pos (i) | Tgt pos. [mm] | Fwd unidir. pos dev [mm] | Bwd unidir. pos dev [mm] | Bi-dir pos. dev [mm] | Reversal Error
+Pos (i) | Tgt pos. [mm] | Fwd unidir. pos dev [mm] | Bwd unidir. pos dev [mm] | Bi-dir pos. dev [mm] | Reversal Error [mm]
 --- | --- | --- |--- |--- |
 1 | 15.0000 | -.0219 | -.0242 | -.0230 | .0023
 2 | 25.0000 | -.0201 | -.0203 | -.0202 | .0002
 3 | 35.0000 | -.0048 | -.0020 | -.0034 | -.0028
 4 | 45.0000 | .0184 | .0194 | .0189 | -.0010
 5 | 55.0000 | .0364 | .0385 | .0374 | -.0021
+
+Axis Reversal Error [mm]: .0028
+
