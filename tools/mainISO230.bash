@@ -329,6 +329,7 @@ do
   eval "X_AVG_$TEST=$TEMP_AVG"
 
   B_i=$(echo "scale=$DEC;($TEMP_FWD)-($TEMP_BWD)" | bc -l)
+  eval "B_$TEST=$B_i"
   bash ecmcReport.bash $REPORT " $TEST | $TGT | $TEMP_FWD | $TEMP_BWD | $TEMP_AVG | $B_i"
   # abs value ${var#-} (remove -)
   if (( $(echo "${B_i#-} > $B_MAX" |bc -l) )); then
@@ -344,9 +345,8 @@ bash ecmcReport.bash $REPORT "Axis Avg. Reversal Error [mm]: $B_AVG"
 
 # Calculate Estimators for unidirectional axis repeatability at a position
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "# Fwd Estimators for unidirectional axis positiong repeatability at a position (Si_fwd)"
+bash ecmcReport.bash $REPORT "# Repeatability "
 bash ecmcReport.bash $REPORT ""
-
 
 # j=cycle 1..n  sqrt(1/(n-1)* E (xij-xi_avg)²)
 # calc sum of (xij-xi_avg)²
@@ -354,8 +354,11 @@ bash ecmcReport.bash $REPORT ""
 #xi=X_FWD_$TEST_$CYCLE
 #xi_avg=X_FWD_AVG_$TEST
 
-bash ecmcReport.bash $REPORT "Pos (i) | Tgt pos. [mm] | Fwd Si [mm] | Bwd Si [mm]"
-bash ecmcReport.bash $REPORT "--- | --- | --- |--- "
+bash ecmcReport.bash $REPORT "Si = Estimators for unidirectional axis positiong repeatability at a position"
+bash ecmcReport.bash $REPORT "Ri = Unidirectional positioning repeatability at a position"
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "Pos (i) | Tgt pos. [mm] | Si Fwd[mm] | Si Bwd [mm] | Ri Fwd | Ri Bwd"
+bash ecmcReport.bash $REPORT "--- | --- | --- |--- |--- |--- |"
 
 for TEST in $TESTS
 do
@@ -385,13 +388,26 @@ do
     STEMPSUM_BWD=$(echo "($STEMPSUM_BWD)+($STEMP2)" | bc -l)
   done
   # * 1/(1-n)
-  STEMP_FWD=$(echo "sqrt(($STEMPSUM_FWD)/4)" | bc -l)
+  STEMP_FWD=$(echo "scale=$DEC;sqrt(($STEMPSUM_FWD)/4)" | bc -l)
   eval "S_FWD_$TEST=$STEMP_FWD"
-  STEMP_BWD=$(echo "sqrt(($STEMPSUM_BWD)/4)" | bc -l)
+  STEMP_BWD=$(echo "scale=$DEC;sqrt(($STEMPSUM_BWD)/4)" | bc -l)
   eval "S_FWD_$TEST=$STEMP_BWD"
+  #Ri=4*Si
+  RTEMP_FWD=$(echo "scale=$DEC;4*$STEMP_FWD" | bc -l)  
+  eval "R_FWD_$TEST=$RTEMP_FWD"
+  RTEMP_BWD=$(echo "scale=$DEC;4*$STEMP_BWD" | bc -l)
+  eval "R_BWD_$TEST=$RTEMP_BWD"
+  bash ecmcReport.bash $REPORT " $TEST| $TGT | $STEMP_FWD |$STEMP_BWD | $RTEMP_FWD | $RTEMP_BWD"
+  
+  # Calc bi-directional positioning repeatability at a position Ri
+  BIVAR="B_$TEST"
+  BI=${!BIVAR}
 
-  bash ecmcReport.bash $REPORT " $TEST| $TGT | $STEMP_FWD |$STEMP_BWD "
-
+  RTEMP_1=$(echo "2*($STEMP_FWD)+2*($STEMP_BWD)+sqrt(($BI)*($BI))" | bc -l)
+  RTEMP_2=$STEMP_FWD;
+  RTEMP_3=$STEMP_BWD;
+  # R_i is max of RTEMP_1..3
+  
 done
 bash ecmcReport.bash $REPORT ""
 
