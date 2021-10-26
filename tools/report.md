@@ -1,7 +1,7 @@
 # ecmc motion system test report
 
 * Data file   : /home/pi/sources/ecmc_bifrost_slits_sat/tests_2/11360/230_2.log
-* Date        : Tue 26 Oct 2021 07:07:40 PM CEST
+* Date        : Tue 26 Oct 2021 07:17:21 PM CEST
 * Author      : pi
 
 
@@ -106,7 +106,7 @@ Ri_bwd = Backward unidirectional positioning repeatability at a position.
 Ri= Bi-directional position repeatability at a position
 
 Pos (i) | Tgt pos. [mm] | Si_fwd[mm] | Si_bwd [mm] | Ri_fwd | Ri_bwd | Ri
---- | --- | --- |--- |--- |--- |
+--- | --- | --- |--- |--- |--- |--- |
 1| 15.0000 | .0648 |.0700 | .2592 | .2800 | .2719
 2| 25.0000 | .0632 |.0655 | .2528 | .2620 | .2576
 3| 35.0000 | .0458 |.0447 | .1832 | .1788 | .1838

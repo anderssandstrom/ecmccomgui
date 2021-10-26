@@ -375,7 +375,7 @@ bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "Ri= Bi-directional position repeatability at a position"
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "Pos (i) | Tgt pos. [mm] | Si_fwd[mm] | Si_bwd [mm] | Ri_fwd | Ri_bwd | Ri"
-bash ecmcReport.bash $REPORT "--- | --- | --- |--- |--- |--- |"
+bash ecmcReport.bash $REPORT "--- | --- | --- |--- |--- |--- |--- |"
 R_FWD_MAX=0
 R_BWD_MAX=0
 
@@ -408,8 +408,10 @@ do
   # * 1/(1-n)
   STEMP_FWD=$(echo "scale=$DEC;sqrt(($STEMPSUM_FWD)/4)" | bc -l)
   eval "S_FWD_$TEST=$STEMP_FWD"
+  echo "S_FWD_$TEST=$STEMP_FWD, $STEMPSUM_FWD"
   STEMP_BWD=$(echo "scale=$DEC;sqrt(($STEMPSUM_BWD)/4)" | bc -l)
-  eval "S_FWD_$TEST=$STEMP_BWD"
+  eval "S_BWD_$TEST=$STEMP_BWD"
+  echo "S_BWD_$TEST=$STEMP_BWD, $STEMPSUM_BWD"
   #Ri=4*Si
   RTEMP_FWD=$(echo "scale=$DEC;4*$STEMP_FWD" | bc -l)  
   eval "R_FWD_$TEST=$RTEMP_FWD"
