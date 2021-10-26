@@ -46,8 +46,6 @@ if [ "$#" -ne 2 ]; then
    exit 1 
 fi
 
-
-
 ### Need to update these fileds for every FAT sat so everything is correct
 ##PV names:
 MOTORACTPV="IOC_TEST:Axis1-PosAct"
@@ -56,10 +54,18 @@ RESOLVERPV="IOC_TEST:m0s004-Enc01-PosAct"
 REFERENCEPV="IOC_TEST:m0s005-Enc01-PosAct"
 TESTNUMPV="IOC_TEST:TestNumber"
 
+# Number decimals
+DEC=4
+
 # Calculate gearratios based on this test
-TESTNUM_GEARRATIO=2501
-# this many sample before this test
-SAMPLES_GEARRATIO=10000
+TESTNUM_GEARRATIO_FROM=1501
+TESTNUM_GEARRATIO_TO=1502
+
+#TESTNUM_GEARRATIO_FROM=1501
+#TESTNUM_GEARRATIO_TO=2501
+
+# this many sample before this test (needs to be bigger than samples between TESTNUM_GEARRATIO_FROM to TESTNUM_GEARRATIO_TO)
+SAMPLES_GEARRATIO=1000000
 
 # Defs for ISO230 analysis
 ISO230_POS_COUNT=5
@@ -73,11 +79,20 @@ echo "TRIGGVAL  = ${TRIGGVAL}"
 echo "DATAPV    = ${DATAPV}"
 echo "DATACOUNT = ${DATACOUNT}"
 
-# Use gear ratio python script to find gear ratios
+## Init report file
+bash ecmcReportInit.bash $REPORT $FILE
 
+# Use gear ratio python script to find gear ratios
 echo "1. Calculate gear ratios..."
+
+# Filter data for gear ratio calculations
+GEAR_RATIO_DATA=$(cat $FILE | grep -A$SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO_FROM" | grep -B$SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO_TO" )
+
+# Filter outlieres of Micro epsilon sensor (values above 2000 is excluded)
+GEAR_RATIO_DATA=$(echo "$GEAR_RATIO_DATA " |  awk ' {if ($4<2000) print;}')
+
 # Resolver to open loop use test 1503
-TEMP=$(cat $FILE | grep -E "$MOTORACTPV|$RESOLVERPV|$TESTNUMPV" | grep -B $SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO" |  python ../pyDataManip/ecmcGearRatio.py "$MOTORACTPV" "$RESOLVERPV")
+TEMP=$(echo "$GEAR_RATIO_DATA " | grep -E "$MOTORACTPV|$RESOLVERPV|$TESTNUMPV" | grep -B $SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO" |  python ../pyDataManip/ecmcGearRatio.py "$MOTORACTPV" "$RESOLVERPV")
 
 echo "$TEMP"
 # Gear ratio resolver
@@ -88,7 +103,7 @@ RES_ERR=$(echo $TEMP | awk '{print $4}')
 echo "RES GR=$RES_GR, OFF=$RES_OFF, LEN=$RES_LEN, RESIDUAL=$RES_ERR"
 
 # Reference to open loop use test 1503 filter values above  2000 #awk '{if($4<2000){ print}}'| 
-TEMP=$(cat $FILE | grep -E "$MOTORACTPV|$REFERENCEPV|$TESTNUMPV" | grep -B $SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO" |  python ../pyDataManip/ecmcGearRatio.py "$MOTORACTPV" "$REFERENCEPV")
+TEMP=$(echo "$GEAR_RATIO_DATA " | grep -E "$MOTORACTPV|$REFERENCEPV|$TESTNUMPV" | grep -B $SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO" |  python ../pyDataManip/ecmcGearRatio.py "$MOTORACTPV" "$REFERENCEPV")
 echo "$TEMP"
 # Gear ratio reference
 REF_GR=$(echo $TEMP | awk '{print $1}')
@@ -98,12 +113,30 @@ REF_ERR=$(echo $TEMP | awk '{print $4}')
 echo "REF GR=$REF_GR, OFF=$REF_OFF, LEN=$REF_LEN, RESIDUAL=$REF_ERR"
 
 echo "2. ISO230-2 test..."
+
 # Always 5 cycles in standard
 # Get forward direction data points (test numbers 1xx1..1xx)
-
-
 TESTS=$(seq -w 1 1 $ISO230_POS_COUNT)
+
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "# Gear Ratios"
+bash ecmcReport.bash $REPORT "Sensor From | Sensor To | Ratio [] | Offset [mm] | Data count [] | Residual error [mm²]"
+bash ecmcReport.bash $REPORT "Openloop | Resolver | $RES_GR | $RES_OFF | $RES_LEN | $RES_ERR [mm²]"
+bash ecmcReport.bash $REPORT "Openloop | Reference (ILD2300) | $REF_GR | $REF_OFF | $REF_LEN | $REF_ERR [mm²]"
+bash ecmcReport.bash $REPORT ""
+
+# Forward tests
+bash ecmcReport.bash $REPORT "# Forward test sequence"
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "Test | Target Pos [mm] | Openloop Act [mm] | Resolver Act [mm] | ILD2300 [mm] | Diff (ref-act) [mm]"
+bash ecmcReport.bash $REPORT "--- | --- | --- | --- | --- | --- |"
 TESTNUMBER_BASE=1
+DIFF_SUM=0
+TEST_COUNTER=0
+for TEST in $TESTS
+do   
+  eval "DIFF_BWD_SUM_AT_POS_$TEST=0"
+done
 
 for CYCLE in {1..5};
 do
@@ -113,13 +146,26 @@ do
   do   
    TESTNUMBER=$TESTNUMBER_BASE$CYCLE"0"$TEST
    echo "TESTNUMBER=$TESTNUMBER"
-   
+
+   # Target position
+   DATAPV=$MOTORSETPV
+   TRIGGPV=$TESTNUMPV
+   TRIGGVAL=$TESTNUMBER
+   DATACOUNT=1
+   DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
+   DATA=$(echo "scale=$DEC;$DATA/1" | bc )
+   TGT_DATA=$DATA
+   echo "TGT_DATA=$DATA" 
+   eval "TGT_FWD_$CYCLE$TEST=$DATA"
+
    # Open loop counter
    DATAPV=$MOTORACTPV
    TRIGGPV=$TESTNUMPV
    TRIGGVAL=$TESTNUMBER
    DATACOUNT=1
    DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
+   DATA=$(echo "scale=$DEC;$DATA/1" | bc )
+   OL_DATA=$DATA
    echo "OL_DATA=$DATA" 
    eval "OL_FWD_$CYCLE$TEST=$DATA"
 
@@ -130,6 +176,8 @@ do
    DATACOUNT=1
    DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
    DATA=$(bc -l <<< "$DATA*($RES_GR)+($RES_OFF)")
+   DATA=$(echo "scale=$DEC;$DATA/1" | bc )
+   RES_DATA=$DATA
    echo "RES_DATA=$DATA" 
    eval "RES_FWD_$CYCLE$TEST=$DATA"
 
@@ -140,13 +188,57 @@ do
    DATACOUNT=1
    DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
    DATA=$(bc -l <<< "$DATA*($REF_GR)+($REF_OFF)")
+   DATA=$(echo "scale=$DEC;$DATA/1" | bc )
+   REF_DATA=$DATA
    echo "REF_DATA=$DATA"   
    eval "REF_FWD_$CYCLE$TEST=$DATA"
+   
+   # Calc diff ref tg Xij
+   DIFF=$(echo "scale=$DEC;$REF_DATA-$TGT_DATA" | bc )
+   eval "X_FWD_$TEST_$CYCLE=$DATA"
+   DIFF_SUM=$(echo "$DIFF_SUM+$DIFF" | bc) 
 
+   # Sum error at this position
+   eval "TEMP=DIFF_FWD_SUM_AT_POS_$TEST"
+   TEMP=$(echo "$TEMP+DIFF" | bc )
+   eval "DIFF_FWD_SUM_AT_POS_$TEST=$TEMP"
+
+   bash ecmcReport.bash $REPORT " $TESTNUMBER | $TGT_DATA | $OL_DATA | $RES_DATA | $REF_DATA | $DIFF |"
+   let TEST_COUNTER=TEST_COUNTER+1
   done
 done
+bash ecmcReport.bash $REPORT ""
+
+# Calc x_dash_i (Mean unidirectional pos deviation at position i)
+for TEST in $TESTS
+do
+  eval "TEMP=DIFF_FWD_SUM_AT_POS_$TEST"
+  TEMP=$("$TEMP/$ISO230_POS_COUNT" | bc)
+  eval "X_AVG_$TEST=$TEMP"  
+done
+
+#Mean unidirectional pos dev at a position
+DIFF_AVG_BWD=$(echo "$DIFF_SUM/$TEST_COUNTER" | bc) 
+
+
+
+
+
+# Backward tests
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "# Backward test sequence"
+bash ecmcReport.bash $REPORT "Test | Target Pos [mm] | Openloop Act [mm] | Resolver Act [mm] | ILD2300 [mm] | Diff (ref-act) [mm]"
+bash ecmcReport.bash $REPORT "--- | --- | --- | --- | --- | --- |"
 
 TESTNUMBER_BASE=2
+DIFF_SUM=0
+TEST_COUNTER=0
+for TEST in $TESTS
+do   
+  eval "DIFF_BWD_SUM_AT_POS_$TEST=0"
+done
+
+
 for CYCLE in {1..5};
 do
   echo "CYCLE=$CYCLE"
@@ -156,12 +248,26 @@ do
    TESTNUMBER=$TESTNUMBER_BASE$CYCLE"0"$TEST
    echo "TESTNUMBER=$TESTNUMBER"
    
+
+   # Target position
+   DATAPV=$MOTORSETPV
+   TRIGGPV=$TESTNUMPV
+   TRIGGVAL=$TESTNUMBER
+   DATACOUNT=1
+   DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
+   DATA=$(echo "scale=$DEC;$DATA/1" | bc )
+   TGT_DATA=$DATA
+   echo "TGT_DATA=$DATA" 
+   eval "TGT_BWD_$CYCLE$TEST=$DATA"
+
    # Open loop counter
    DATAPV=$MOTORACTPV
    TRIGGPV=$TESTNUMPV
    TRIGGVAL=$TESTNUMBER
    DATACOUNT=1
-   DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
+   DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT}) 
+   DATA=$(echo "scale=$DEC;$DATA/1" | bc )
+   OL_DATA=$DATA
    echo "OL_DATA=$DATA" 
    eval "OL_BWD_$CYCLE$TEST=$DATA"
 
@@ -172,6 +278,8 @@ do
    DATACOUNT=1
    DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
    DATA=$(bc -l <<< "$DATA*($RES_GR)+($RES_OFF)")
+   DATA=$(echo "scale=$DEC;$DATA/1" | bc )
+   RES_DATA=$DATA
    echo "RES_DATA=$DATA" 
    eval "RES_BWD_$CYCLE$TEST=$DATA"
 
@@ -182,19 +290,47 @@ do
    DATACOUNT=1
    DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
    DATA=$(bc -l <<< "$DATA*($REF_GR)+($REF_OFF)")
+   DATA=$(echo "scale=$DEC;$DATA/1" | bc )
+   REF_DATA=$DATA
    echo "REF_DATA=$DATA"   
    eval "REF_BWD_$CYCLE$TEST=$DATA"
 
+   # Calc diff ref tg Xij
+   DIFF=$(echo "scale=$DEC;$REF_DATA-$TGT_DATA" | bc )
+   eval "X_BWD_$TEST_$CYCLE=$DATA"
+   
+   # Sum error at this position
+   eval "TEMP=DIFF_BWD_SUM_AT_POS_$TEST"
+   TEMP=$(echo "$TEMP+DIFF" | bc )
+   eval "DIFF_BWD_SUM_AT_POS_$TEST=$TEMP"
+
+   bash ecmcReport.bash $REPORT " $TESTNUMBER | $TGT_DATA | $OL_DATA | $RES_DATA | $REF_DATA | $DIFF |"
+   let TEST_COUNTER=TEST_COUNTER+1
   done
 done
+bash ecmcReport.bash $REPORT ""
+
+# Calc x_dash_i (Mean unidirectional pos deviation at position i)
+for TEST in $TESTS
+do
+  eval "TEMP=DIFF_BWD_SUM_AT_POS_$TEST"
+  TEMP=$("$TEMP/$ISO230_POS_COUNT" | bc)
+  eval "X_BWD_AVG_$TEST=$TEMP"  
+done
+
+# Mean unidirectional pos dev at a position
+DIFF_AVG_BWD=$(echo "$DIFF_SUM/$TEST_COUNTER" | bc) 
+
 echo "OL_FWD_43=$OL_FWD_43"
 echo "REF_FWD_13=$REF_FWD_13"
 echo "RES_FWD_13=$RES_FWD_13"
 echo "OL_BWD_43=$OL_BWD_43"
 echo "REF_BWD_13=$REF_BWD_13"
 echo "RES_BWD_13=$RES_BWD_13"
+
 exit
 
+# Old tests down here
 
 # Find resolver value at 35mm (on open loop counter).
 TRIGGPV="IOC_TEST:TestNumber"
