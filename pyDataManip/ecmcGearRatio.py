@@ -12,7 +12,7 @@ def printOutHelp():
   print ("example stdin: cat data.log | grep -E 'Axis1-ActPos | EL5002' | python ecmcGearRatio.py Axis1 5002" )
   print ("NOTE: data input must be sorted in increasing time since only data pairs with exactly the same timestamp will be used." )
   print ("Only use data for motion in a single direction, otherwise backlash can affect the gearratio." )
-
+  print ("Ouputs z0 z1 datacount residual")
 def main():
    
   if len(sys.argv ) > 4 or len(sys.argv) < 3  :  
@@ -73,7 +73,7 @@ def main():
     fromArray=np.append(fromArray,fromData)
   
   if len(toArray) == len(fromArray) and len(fromArray)>0:
-    z = np.polyfit(toArray, fromArray, 1)
+    z, res, x, x, x = np.polyfit(toArray, fromArray, 1, full=True)
   else:
 
     print ("Array size missmatch")
@@ -81,7 +81,7 @@ def main():
     sys.exit(1)
   
  # print("from *" + fromPvNameFilter + "* to *" + toPvNameFilter + "* [gear ratio, offset]: ")
-  print(str(z[0])+ " " + str(z[1]))
+  print(str(z[0])+ " " + str(z[1]) + " " + str(len(toArray)) + " "+ str(res[0]))
 
 #  print("INVERTED!!! from *" + toPvNameFilter + "* to *" + fromPvNameFilter + "* [gear ratio, offset]: ")
 #  z = np.polyfit(fromArray, toArray, 1)

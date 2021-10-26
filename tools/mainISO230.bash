@@ -56,17 +56,13 @@ RESOLVERPV="IOC_TEST:m0s004-Enc01-PosAct"
 REFERENCEPV="IOC_TEST:m0s005-Enc01-PosAct"
 TESTNUMPV="IOC_TEST:TestNumber"
 
-
 # Calculate gearratios based on this test
-TESTNUM_GEARRATIO=1505
+TESTNUM_GEARRATIO=2501
 # this many sample before this test
-SAMPLES_GEARRATIO=30000
-
+SAMPLES_GEARRATIO=10000
 
 # Defs for ISO230 analysis
 ISO230_POS_COUNT=5
-
-
 
 FILE=$1
 REPORT=$2
@@ -77,41 +73,31 @@ echo "TRIGGVAL  = ${TRIGGVAL}"
 echo "DATAPV    = ${DATAPV}"
 echo "DATACOUNT = ${DATACOUNT}"
 
-#echo "####################################################################"
-#DATA=$(bash ecmcGetLinesBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})
-#DATA=$(echo "${DATA}" | bash ecmcOffsetLines.bash 10.1)
-#echo "${DATA}"
-#echo "####################################################################"
-#DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})
-#DATA=$(echo "${DATA}" | bash ecmcOffsetData.bash 10.1)
-#echo "${DATA}"
-#AVG=$(echo "${DATA}" | bash ecmcAvgData.bash)
-#echo "AVG= ${AVG}" 
-#echo "####################################################################"
-#DATA=$(bash ecmcGetLinesBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})
-#echo "${DATA}"
-#echo "####################################################################"
-
-
 # Use gear ratio python script to find gear ratios
 
 echo "1. Calculate gear ratios..."
 # Resolver to open loop use test 1503
-TEMP=$(cat $FILE | grep -B $SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO" |  python ../pyDataManip/ecmcGearRatio.py "$MOTORACTPV" "$RESOLVERPV")
+TEMP=$(cat $FILE | grep -E "$MOTORACTPV|$RESOLVERPV|$TESTNUMPV" | grep -B $SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO" |  python ../pyDataManip/ecmcGearRatio.py "$MOTORACTPV" "$RESOLVERPV")
 
+echo "$TEMP"
 # Gear ratio resolver
 RES_GR=$(echo $TEMP | awk '{print $1}')
 RES_OFF=$(echo $TEMP | awk '{print $2}')
-echo "RES GR=$RES_GR, OFF=$RES_OFF"
-# Reference to open loop use test 1503
-TEMP=$(cat $FILE | grep -B $SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO" |  python ../pyDataManip/ecmcGearRatio.py "$MOTORACTPV" "$REFERENCEPV")
+RES_LEN=$(echo $TEMP | awk '{print $3}')
+RES_ERR=$(echo $TEMP | awk '{print $4}')
+echo "RES GR=$RES_GR, OFF=$RES_OFF, LEN=$RES_LEN, RESIDUAL=$RES_ERR"
 
+# Reference to open loop use test 1503 filter values above  2000 #awk '{if($4<2000){ print}}'| 
+TEMP=$(cat $FILE | grep -E "$MOTORACTPV|$REFERENCEPV|$TESTNUMPV" | grep -B $SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO" |  python ../pyDataManip/ecmcGearRatio.py "$MOTORACTPV" "$REFERENCEPV")
+echo "$TEMP"
 # Gear ratio reference
 REF_GR=$(echo $TEMP | awk '{print $1}')
 REF_OFF=$(echo $TEMP | awk '{print $2}')
-echo "REF GR=$REF_GR, OFF=$REF_OFF"
-echo "2. ISO230-2 test..."
+REF_LEN=$(echo $TEMP | awk '{print $3}')
+REF_ERR=$(echo $TEMP | awk '{print $4}')
+echo "REF GR=$REF_GR, OFF=$REF_OFF, LEN=$REF_LEN, RESIDUAL=$REF_ERR"
 
+echo "2. ISO230-2 test..."
 # Always 5 cycles in standard
 # Get forward direction data points (test numbers 1xx1..1xx)
 
@@ -143,7 +129,7 @@ do
    TRIGGVAL=$TESTNUMBER
    DATACOUNT=1
    DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
-   DATA=$(bc -l <<< "($DATA*($RES_GR))+($RES_OFF)")
+   DATA=$(bc -l <<< "$DATA*($RES_GR)+($RES_OFF)")
    echo "RES_DATA=$DATA" 
    eval "RES_FWD_$CYCLE$TEST=$DATA"
 
@@ -153,17 +139,60 @@ do
    TRIGGVAL=$TESTNUMBER
    DATACOUNT=1
    DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
-   DATA=$(bc -l <<< "($DATA*($REF_GR))+($REF_OFF)")
+   DATA=$(bc -l <<< "$DATA*($REF_GR)+($REF_OFF)")
    echo "REF_DATA=$DATA"   
    eval "REF_FWD_$CYCLE$TEST=$DATA"
 
   done
 done
 
+TESTNUMBER_BASE=2
+for CYCLE in {1..5};
+do
+  echo "CYCLE=$CYCLE"
+
+  for TEST in $TESTS
+  do   
+   TESTNUMBER=$TESTNUMBER_BASE$CYCLE"0"$TEST
+   echo "TESTNUMBER=$TESTNUMBER"
+   
+   # Open loop counter
+   DATAPV=$MOTORACTPV
+   TRIGGPV=$TESTNUMPV
+   TRIGGVAL=$TESTNUMBER
+   DATACOUNT=1
+   DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
+   echo "OL_DATA=$DATA" 
+   eval "OL_BWD_$CYCLE$TEST=$DATA"
+
+   # Resolver
+   DATAPV=$RESOLVERPV
+   TRIGGPV=$TESTNUMPV
+   TRIGGVAL=$TESTNUMBER
+   DATACOUNT=1
+   DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
+   DATA=$(bc -l <<< "$DATA*($RES_GR)+($RES_OFF)")
+   echo "RES_DATA=$DATA" 
+   eval "RES_BWD_$CYCLE$TEST=$DATA"
+
+   # Reference
+   DATAPV=$REFERENCEPV
+   TRIGGPV=$TESTNUMPV
+   TRIGGVAL=$TESTNUMBER
+   DATACOUNT=1
+   DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
+   DATA=$(bc -l <<< "$DATA*($REF_GR)+($REF_OFF)")
+   echo "REF_DATA=$DATA"   
+   eval "REF_BWD_$CYCLE$TEST=$DATA"
+
+  done
+done
 echo "OL_FWD_43=$OL_FWD_43"
 echo "REF_FWD_13=$REF_FWD_13"
 echo "RES_FWD_13=$RES_FWD_13"
-
+echo "OL_BWD_43=$OL_BWD_43"
+echo "REF_BWD_13=$REF_BWD_13"
+echo "RES_BWD_13=$RES_BWD_13"
 exit
 
 
