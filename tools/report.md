@@ -1,7 +1,7 @@
 # ecmc motion system test report
 
 * Data file   : /home/dev/sources/ecmc_bifrost_slits_sat/tests_2/11360/230_2.log
-* Date        : Tue Oct 26 13:53:57 CEST 2021
+* Date        : Tue Oct 26 14:23:49 CEST 2021
 * Author      : dev
 
 
@@ -82,4 +82,16 @@ Pos (i) | Tgt pos. [mm] | Fwd unidir. pos dev [mm] | Bwd unidir. pos dev [mm] | 
 5 | 55.0000 | .0364 | .0385 | .0374 | -.0021
 
 Axis Reversal Error [mm]: .0028
+
+Axis Avg. Reversal Error [mm]: 0
+
+# Fwd Estimators for unidirectional axis positiong repeatability at a position (Si_fwd)
+
+Pos (i) | Tgt pos. [mm] | Fwd Si [mm] | Bwd Si [mm]
+--- | --- | --- |---
+1| 15.0000 | |
+2| 25.0000 | |
+3| 35.0000 | |
+4| 45.0000 | |
+5| 55.0000 | |
 

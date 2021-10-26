@@ -303,6 +303,7 @@ bash ecmcReport.bash $REPORT ""
 
 # Calc x_dash_i (Mean unidirectional pos deviation at position i)
 B_MAX=0
+B_SUM=0
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "# Mean Position Deviation and Reversal Error"
 bash ecmcReport.bash $REPORT ""
@@ -332,13 +333,65 @@ do
   # abs value ${var#-} (remove -)
   if (( $(echo "${B_i#-} > $B_MAX" |bc -l) )); then
     B_MAX=${B_i#-}
-  fi  
+  fi
+  B_SUM=$(echo "$B_SUM+($B_i)" | bc -l)  
 done
-
-
-
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "Axis Reversal Error [mm]: $B_MAX"
+bash ecmcReport.bash $REPORT ""
+B_AVG=$(echo "scale=$DEC;$B_SUM/($ISO230_POS_COUNT)" | bc -l)  
+bash ecmcReport.bash $REPORT "Axis Avg. Reversal Error [mm]: $B_AVG"
+
+# Calculate Estimators for unidirectional axis repeatability at a position
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "# Fwd Estimators for unidirectional axis positiong repeatability at a position (Si_fwd)"
+bash ecmcReport.bash $REPORT ""
+
+
+# j=cycle 1..n  sqrt(1/(n-1)* E (xij-xi_avg)²)
+# calc sum of (xij-xi_avg)²
+# 
+#xi=X_FWD_$TEST_$CYCLE
+#xi_avg=X_FWD_AVG_$TEST
+
+bash ecmcReport.bash $REPORT "Pos (i) | Tgt pos. [mm] | Fwd Si [mm] | Bwd Si [mm]"
+bash ecmcReport.bash $REPORT "--- | --- | --- |--- "
+
+for TEST in $TESTS
+do
+  TGT_VAR_NAME="TGT_POS_$TEST"
+  TGT=${!TGT_VAR_NAME}
+
+  STEMPSUM_FWD=0
+  for CYCLE in {1..5};
+  do
+    # FORWARD
+    XIJ_VAR="X_FWD_$TEST_$CYCLE"
+    XI_AVG_VAR="X_FWD_AVG_$TEST_"
+    XIJ=${!XIJ_VAR}
+    XI_AVG=${!XI_AVG_VAR}
+    STEMP=$(echo "($XIJ)-($XI_AVG)" | bc -l)
+    STEMP2=$(echo "($STEMP)*($STEMP)" | bc -l)
+    STEMPSUM_FWD=$(echo "($STEMPSUM_FWD)+($STEMP2)" | bc -l)
+
+    # BACKWARD
+    XIJ_VAR="X_BWD_$TEST_$CYCLE"
+    XI_AVG_VAR="X_BWD_AVG_$TEST_"
+    XIJ=${!XIJ_VAR}
+    XI_AVG=${!XI_AVG_VAR}
+    STEMP=$(echo "($XIJ)-($XI_AVG)" | bc -l)
+    STEMP2=$(echo "($STEMP)*($STEMP)" | bc -l)
+    STEMPSUM_BWD=$(echo "($STEMPSUM_BWD)+($STEMP2)" | bc -l)
+  done
+  # * 1/(1-n)
+  STEMP_FWD=$(echo "sqrt(($STEMPSUM_FWD)/4)" | bc -l)
+  eval "S_FWD_$TEST=$STEMP_FWD"
+  STEMP_BWD=$(echo "sqrt(($STEMPSUM_BWD)/4)" | bc -l)
+  eval "S_FWD_$TEST=$STEMP_BWD"
+
+  bash ecmcReport.bash $REPORT " $TEST| $TGT | $STEMP_FWD |$STEMP_BWD "
+
+done
 bash ecmcReport.bash $REPORT ""
 
 # Mean unidirectional pos dev at a position
