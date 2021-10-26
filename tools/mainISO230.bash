@@ -441,6 +441,7 @@ do
   if (( $(echo "$RTEMP_3 > $RI" | bc -l) )); then
     RI=$RTEMP_3
   fi
+  RI=$(echo "scale=$DEC;$RI/1" | bc -l)
   eval "R_I_$TEST=$RI"
   bash ecmcReport.bash $REPORT " $TEST| $TGT | $STEMP_FWD |$STEMP_BWD | $RTEMP_FWD | $RTEMP_BWD | $RI"
 

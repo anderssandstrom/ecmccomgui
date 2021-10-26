@@ -1,7 +1,7 @@
 # ecmc motion system test report
 
 * Data file   : /home/pi/sources/ecmc_bifrost_slits_sat/tests_2/11360/230_2.log
-* Date        : Tue 26 Oct 2021 06:58:36 PM CEST
+* Date        : Tue 26 Oct 2021 07:07:40 PM CEST
 * Author      : pi
 
 
@@ -107,11 +107,11 @@ Ri= Bi-directional position repeatability at a position
 
 Pos (i) | Tgt pos. [mm] | Si_fwd[mm] | Si_bwd [mm] | Ri_fwd | Ri_bwd | Ri
 --- | --- | --- |--- |--- |--- |
-1| 15.0000 | .0648 |.0700 | .2592 | .2800 | .27190000000000000000
-2| 25.0000 | .0632 |.0655 | .2528 | .2620 | .25760000000000000000
-3| 35.0000 | .0458 |.0447 | .1832 | .1788 | .18380000000000000000
-4| 45.0000 | .0200 |.0200 | .0800 | .0800 | .08100000000000000000
-5| 55.0000 | 0 |0 | 0 | 0 | .00210000000000000000
+1| 15.0000 | .0648 |.0700 | .2592 | .2800 | .2719
+2| 25.0000 | .0632 |.0655 | .2528 | .2620 | .2576
+3| 35.0000 | .0458 |.0447 | .1832 | .1788 | .1838
+4| 45.0000 | .0200 |.0200 | .0800 | .0800 | .0810
+5| 55.0000 | 0 |0 | 0 | 0 | .0021
 
 R_fwd = Forward unidirectional positioning repeatability of an axis (max(Ri_fwd))
 
