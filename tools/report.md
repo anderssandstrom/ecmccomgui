@@ -1,14 +1,14 @@
 # ecmc motion system test report
 
 * Data file   : /home/pi/sources/ecmc_bifrost_slits_sat/tests_2/11360/230_2.log
-* Date        : Tue 26 Oct 2021 07:28:10 PM CEST
+* Date        : Tue 26 Oct 2021 07:37:00 PM CEST
 * Author      : pi
 
 
 # Gear Ratios
-Sensor From | Sensor To | Ratio [] | Offset [mm] | Data count [] | Residual error [mm²]
-Openloop | Resolver | -0.999894943126421 | 59.684408645412475 | 1361 | 0.31489351647099656 [mm²]
-Openloop | Reference (ILD2300) | 1.0010683728639105 | 8.744859065397648 | 1359 | 0.3610791708848164 [mm²]
+From | To | Ratio [] | Offset [mm] | Data count [] | Residual error [mm²]
+Openloop | Resolver | -.99989 | 59.68440 | 1361.00000 | .31489
+Openloop | Reference (ILD2300) | 1.00106 | 8.74485 | 1359.00000 | .36107
 
 # Forward test sequence
 

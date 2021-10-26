@@ -120,11 +120,22 @@ echo "2. ISO230-2 test..."
 TESTS=$(seq -w 1 1 $ISO230_POS_COUNT)
 CYCLES=$(seq -w 1 1 $ISO230_CYCLE_COUNT)
 
+RES_ERR_DISP=$(echo "scale=$DEC;$RES_ERR/1" | bc -l)
+RES_LEN_DISP=$(echo "scale=$DEC;$RES_LEN/1" | bc -l)
+RES_GR_DISP=$(echo "scale=$DEC;$RES_GR/1" | bc -l)
+RES_OFF_DISP=$(echo "scale=$DEC;$RES_OFF/1" | bc -l)
+
+
+REF_ERR_DISP=$(echo "scale=$DEC;$REF_ERR/1" | bc -l)
+REF_LEN_DISP=$(echo "scale=$DEC;$REF_LEN/1" | bc -l)
+REF_GR_DISP=$(echo "scale=$DEC;$REF_GR/1" | bc -l)
+REF_OFF_DISP=$(echo "scale=$DEC;$REF_OFF/1" | bc -l)
+
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "# Gear Ratios"
-bash ecmcReport.bash $REPORT "Sensor From | Sensor To | Ratio [] | Offset [mm] | Data count [] | Residual error [mm²]"
-bash ecmcReport.bash $REPORT "Openloop | Resolver | $RES_GR | $RES_OFF | $RES_LEN | $RES_ERR [mm²]"
-bash ecmcReport.bash $REPORT "Openloop | Reference (ILD2300) | $REF_GR | $REF_OFF | $REF_LEN | $REF_ERR [mm²]"
+bash ecmcReport.bash $REPORT "From | To | Ratio [] | Offset [mm] | Data count [] | Residual error [mm²]"
+bash ecmcReport.bash $REPORT "Openloop | Resolver | $RES_GR_DISP | $RES_OFF_DISP | $RES_LEN_DISP | $RES_ERR_DISP "
+bash ecmcReport.bash $REPORT "Openloop | Reference (ILD2300) | $REF_GR_DISP | $REF_OFF_DISP | $REF_LEN_DISP | $REF_ERR_DISP "
 bash ecmcReport.bash $REPORT ""
 
 # Forward tests
@@ -155,7 +166,7 @@ do
    TRIGGVAL=$TESTNUMBER
    DATACOUNT=1
    DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
-   DATA=$(echo "scale=$DEC;$DATA/1" | bc )
+   DATA=$(echo "scale=$DEC;$DATA/1" | bc -l)
    TGT_DATA=$DATA
    echo "TGT_DATA=$DATA" 
    eval "TGT_FWD_$CYCLE$TEST=$DATA"
@@ -167,7 +178,7 @@ do
    TRIGGVAL=$TESTNUMBER
    DATACOUNT=1
    DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
-   DATA=$(echo "scale=$DEC;$DATA/1" | bc )
+   DATA=$(echo "scale=$DEC;$DATA/1" | bc -l)
    OL_DATA=$DATA
    echo "OL_DATA=$DATA" 
    eval "OL_FWD_$CYCLE$TEST=$DATA"
@@ -179,7 +190,7 @@ do
    DATACOUNT=1
    DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
    DATA=$(bc -l <<< "$DATA*($RES_GR)+($RES_OFF)")
-   DATA=$(echo "scale=$DEC;$DATA/1" | bc )
+   DATA=$(echo "scale=$DEC;$DATA/1" | bc -l)
    RES_DATA=$DATA
    echo "RES_DATA=$DATA" 
    eval "RES_FWD_$CYCLE$TEST=$DATA"
