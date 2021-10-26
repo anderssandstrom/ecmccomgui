@@ -128,14 +128,14 @@ bash ecmcReport.bash $REPORT ""
 # Forward tests
 bash ecmcReport.bash $REPORT "# Forward test sequence"
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "Test | Target Pos [mm] | Openloop Act [mm] | Resolver Act [mm] | ILD2300 [mm] | Diff (ref-act) [mm]"
-bash ecmcReport.bash $REPORT "--- | --- | --- | --- | --- | --- |"
+bash ecmcReport.bash $REPORT "Cycle (j)| Pos (i)| Tgt Pos [mm] | Openloop Act [mm] | Resolver Act [mm] | ILD2300 [mm] | Diff ref-tgt (xij) [mm]"
+bash ecmcReport.bash $REPORT "--- | --- | --- | --- | --- | --- |--- |"
 TESTNUMBER_BASE=1
 DIFF_SUM=0
 TEST_COUNTER=0
 for TEST in $TESTS
 do   
-  eval "DIFF_BWD_SUM_AT_POS_$TEST=0"
+  eval "DIFF_FWD_SUM_AT_POS_$TEST=0"
 done
 
 for CYCLE in {1..5};
@@ -157,6 +157,7 @@ do
    TGT_DATA=$DATA
    echo "TGT_DATA=$DATA" 
    eval "TGT_FWD_$CYCLE$TEST=$DATA"
+   eval "TGT_POS_$TEST=$TGT_DATA"
 
    # Open loop counter
    DATAPV=$MOTORACTPV
@@ -195,40 +196,29 @@ do
    
    # Calc diff ref tg Xij
    DIFF=$(echo "scale=$DEC;$REF_DATA-$TGT_DATA" | bc )
-   eval "X_FWD_$TEST_$CYCLE=$DATA"
-   DIFF_SUM=$(echo "$DIFF_SUM+$DIFF" | bc) 
+   eval "X_FWD_$TEST_$CYCLE=$DIFF"
+   DIFF_SUM=$(echo "$DIFF_SUM+($DIFF)" | bc) 
 
    # Sum error at this position
-   eval "TEMP=DIFF_FWD_SUM_AT_POS_$TEST"
-   TEMP=$(echo "$TEMP+DIFF" | bc )
-   eval "DIFF_FWD_SUM_AT_POS_$TEST=$TEMP"
-
-   bash ecmcReport.bash $REPORT " $TESTNUMBER | $TGT_DATA | $OL_DATA | $RES_DATA | $REF_DATA | $DIFF |"
+   TEMP_VAR="DIFF_FWD_SUM_AT_POS_$TEST"
+   TEMP=${!TEMP_VAR}
+   TEMP=$(echo "$TEMP+($DIFF)" | bc )
+   eval "$TEMP_VAR=$TEMP"
+   
+   bash ecmcReport.bash $REPORT " $CYCLE | $TEST | $TGT_DATA | $OL_DATA | $RES_DATA | $REF_DATA | $DIFF |"
    let TEST_COUNTER=TEST_COUNTER+1
   done
 done
 bash ecmcReport.bash $REPORT ""
 
-# Calc x_dash_i (Mean unidirectional pos deviation at position i)
-for TEST in $TESTS
-do
-  eval "TEMP=DIFF_FWD_SUM_AT_POS_$TEST"
-  TEMP=$("$TEMP/$ISO230_POS_COUNT" | bc)
-  eval "X_AVG_$TEST=$TEMP"  
-done
-
 #Mean unidirectional pos dev at a position
-DIFF_AVG_BWD=$(echo "$DIFF_SUM/$TEST_COUNTER" | bc) 
-
-
-
-
+DIFF_AVG_FWD=$(echo "$DIFF_SUM/$TEST_COUNTER" | bc) 
 
 # Backward tests
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "# Backward test sequence"
-bash ecmcReport.bash $REPORT "Test | Target Pos [mm] | Openloop Act [mm] | Resolver Act [mm] | ILD2300 [mm] | Diff (ref-act) [mm]"
-bash ecmcReport.bash $REPORT "--- | --- | --- | --- | --- | --- |"
+bash ecmcReport.bash $REPORT "Cycle (j)| Pos (i)| Tgt Pos [mm] | Openloop Act [mm] | Resolver Act [mm] | ILD2300 [mm] | Diff ref-tgt (xij) [mm]"
+bash ecmcReport.bash $REPORT "--- | --- | --- | --- | --- | --- |--- |"
 
 TESTNUMBER_BASE=2
 DIFF_SUM=0
@@ -248,7 +238,6 @@ do
    TESTNUMBER=$TESTNUMBER_BASE$CYCLE"0"$TEST
    echo "TESTNUMBER=$TESTNUMBER"
    
-
    # Target position
    DATAPV=$MOTORSETPV
    TRIGGPV=$TESTNUMPV
@@ -259,6 +248,7 @@ do
    TGT_DATA=$DATA
    echo "TGT_DATA=$DATA" 
    eval "TGT_BWD_$CYCLE$TEST=$DATA"
+   eval "TGT_POS_$TEST=$TGT_DATA"
 
    # Open loop counter
    DATAPV=$MOTORACTPV
@@ -296,26 +286,49 @@ do
    eval "REF_BWD_$CYCLE$TEST=$DATA"
 
    # Calc diff ref tg Xij
-   DIFF=$(echo "scale=$DEC;$REF_DATA-$TGT_DATA" | bc )
-   eval "X_BWD_$TEST_$CYCLE=$DATA"
+   DIFF=$(echo "scale=$DEC;$REF_DATA-($TGT_DATA)" | bc )
+   eval "X_BWD_$TEST_$CYCLE=$DIFF"
    
    # Sum error at this position
-   eval "TEMP=DIFF_BWD_SUM_AT_POS_$TEST"
-   TEMP=$(echo "$TEMP+DIFF" | bc )
-   eval "DIFF_BWD_SUM_AT_POS_$TEST=$TEMP"
+   TEMP_VAR="DIFF_BWD_SUM_AT_POS_$TEST"
+   TEMP=${!TEMP_VAR}
+   TEMP=$(echo "$TEMP+($DIFF)" | bc )
+   eval "$TEMP_VAR=$TEMP"
 
-   bash ecmcReport.bash $REPORT " $TESTNUMBER | $TGT_DATA | $OL_DATA | $RES_DATA | $REF_DATA | $DIFF |"
+   bash ecmcReport.bash $REPORT " $CYCLE | $TEST | $TGT_DATA | $OL_DATA | $RES_DATA | $REF_DATA | $DIFF |"
    let TEST_COUNTER=TEST_COUNTER+1
   done
 done
 bash ecmcReport.bash $REPORT ""
 
 # Calc x_dash_i (Mean unidirectional pos deviation at position i)
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "# Mean position deviation"
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "Pos (i) | Tgt pos. [mm] | Fwd unidir. pos dev [mm] | Bwd unidir. pos dev [mm] | Bi-dir pos. dev [mm] | Reversal Error"
+bash ecmcReport.bash $REPORT "--- | --- | --- |--- |--- |"
 for TEST in $TESTS
 do
-  eval "TEMP=DIFF_BWD_SUM_AT_POS_$TEST"
-  TEMP=$("$TEMP/$ISO230_POS_COUNT" | bc)
-  eval "X_BWD_AVG_$TEST=$TEMP"  
+  TGT_VAR_NAME="TGT_POS_$TEST"
+  TGT=${!TGT_VAR_NAME}
+  # Forward
+  TEMP_VAR_NAME="DIFF_FWD_SUM_AT_POS_$TEST"
+  TEMP_FWD=${!TEMP_VAR_NAME}
+  TEMP_FWD=$(echo "scale=$DEC;$TEMP_FWD/$ISO230_POS_COUNT" | bc -l)
+  eval "X_FWD_AVG_$TEST=$TEMP_FWD"  
+
+  # Backward
+  TEMP_VAR_NAME="DIFF_BWD_SUM_AT_POS_$TEST"
+  TEMP_BWD=${!TEMP_VAR_NAME}
+  TEMP_BWD=$(echo "scale=$DEC;$TEMP_BWD/$ISO230_POS_COUNT" | bc -l)
+  eval "X_BWD_AVG_$TEST=$TEMP_BWD"  
+
+  TEMP_AVG=$(echo "scale=$DEC;($TEMP_BWD+$TEMP_FWD)/2" | bc -l)
+  eval "X_AVG_$TEST=$TEMP_AVG"
+
+  TEMP_REV_ERR=$(echo "scale=$DEC;($TEMP_FWD)-($TEMP_BWD)" | bc -l)
+  bash ecmcReport.bash $REPORT " $TEST | $TGT | $TEMP_FWD | $TEMP_BWD | $TEMP_AVG | $TEMP_REV_ERR"
+
 done
 
 # Mean unidirectional pos dev at a position
