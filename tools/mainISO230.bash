@@ -363,11 +363,12 @@ do
   TGT=${!TGT_VAR_NAME}
 
   STEMPSUM_FWD=0
+  STEMPSUM_BWD=0
   for CYCLE in {1..5};
   do
     # FORWARD
     XIJ_VAR="X_FWD_$TEST_$CYCLE"
-    XI_AVG_VAR="X_FWD_AVG_$TEST_"
+    XI_AVG_VAR="X_FWD_AVG_$TEST"
     XIJ=${!XIJ_VAR}
     XI_AVG=${!XI_AVG_VAR}
     STEMP=$(echo "($XIJ)-($XI_AVG)" | bc -l)
@@ -376,7 +377,7 @@ do
 
     # BACKWARD
     XIJ_VAR="X_BWD_$TEST_$CYCLE"
-    XI_AVG_VAR="X_BWD_AVG_$TEST_"
+    XI_AVG_VAR="X_BWD_AVG_$TEST"
     XIJ=${!XIJ_VAR}
     XI_AVG=${!XI_AVG_VAR}
     STEMP=$(echo "($XIJ)-($XI_AVG)" | bc -l)
