@@ -69,6 +69,7 @@ SAMPLES_GEARRATIO=1000000
 
 # Defs for ISO230 analysis
 ISO230_POS_COUNT=5
+ISO230_CYCLE_COUNT=5
 
 FILE=$1
 REPORT=$2
@@ -117,6 +118,7 @@ echo "2. ISO230-2 test..."
 # Always 5 cycles in standard
 # Get forward direction data points (test numbers 1xx1..1xx)
 TESTS=$(seq -w 1 1 $ISO230_POS_COUNT)
+CYCLES=$(seq -w 1 1 $ISO230_CYCLE_COUNT)
 
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "# Gear Ratios"
@@ -138,7 +140,7 @@ do
   eval "DIFF_FWD_SUM_AT_POS_$TEST=0"
 done
 
-for CYCLE in {1..5};
+for CYCLE in $CYCLES;
 do
   echo "CYCLE=$CYCLE"
 
@@ -229,7 +231,7 @@ do
 done
 
 
-for CYCLE in {1..5};
+for CYCLE in $CYCLES;
 do
   echo "CYCLE=$CYCLE"
 
@@ -307,8 +309,16 @@ B_SUM=0
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "# Mean Position Deviation and Reversal Error"
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "Pos (i) | Tgt pos. [mm] | Fwd unidir. pos dev [mm] | Bwd unidir. pos dev [mm] | Bi-dir pos. dev [mm] | Reversal Error [mm]"
-bash ecmcReport.bash $REPORT "--- | --- | --- |--- |--- |"
+bash ecmcReport.bash $REPORT "Xi_fwd = Mean unidirectional positioning deviation at a position (fwd dir)"
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "Xi_bwd = Mean unidirectional positioning deviation at a position (bwd dir)"
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "Xi_avg = Mean bi-directional positioning deviation at a position"
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "Bi = Reversal error at a position "
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "Pos (i) | Tgt pos. [mm] | Xi_fwd [mm] | Xi_bwd [mm] | Xi_avg [mm] | Bi [mm]"
+bash ecmcReport.bash $REPORT "--- | --- | --- |--- |--- |--- |"
 for TEST in $TESTS
 do
   TGT_VAR_NAME="TGT_POS_$TEST"
@@ -354,20 +364,28 @@ bash ecmcReport.bash $REPORT ""
 #xi=X_FWD_$TEST_$CYCLE
 #xi_avg=X_FWD_AVG_$TEST
 
-bash ecmcReport.bash $REPORT "Si = Estimators for unidirectional axis positiong repeatability at a position"
-bash ecmcReport.bash $REPORT "Ri = Unidirectional positioning repeatability at a position"
+bash ecmcReport.bash $REPORT "Si_fwd = Forward estimator for unidirectional axis positiong repeatability at a position."
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "Pos (i) | Tgt pos. [mm] | Si Fwd[mm] | Si Bwd [mm] | Ri Fwd | Ri Bwd"
+bash ecmcReport.bash $REPORT "Si_bwd = Backward estimator for unidirectional axis positiong repeatability at a position."
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "Ri_fwd = Forward unidirectional positioning repeatability at a position."
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "Ri_bwd = Backward unidirectional positioning repeatability at a position."
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "Ri= Bi-directional position repeatability at a position"
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "Pos (i) | Tgt pos. [mm] | Si_fwd[mm] | Si_bwd [mm] | Ri_fwd | Ri_bwd | Ri"
 bash ecmcReport.bash $REPORT "--- | --- | --- |--- |--- |--- |"
+R_FWD_MAX=0
+R_BWD_MAX=0
 
 for TEST in $TESTS
 do
   TGT_VAR_NAME="TGT_POS_$TEST"
   TGT=${!TGT_VAR_NAME}
-
   STEMPSUM_FWD=0
   STEMPSUM_BWD=0
-  for CYCLE in {1..5};
+  for CYCLE in $CYCLES;
   do
     # FORWARD
     XIJ_VAR="X_FWD_$TEST_$CYCLE"
@@ -397,7 +415,16 @@ do
   eval "R_FWD_$TEST=$RTEMP_FWD"
   RTEMP_BWD=$(echo "scale=$DEC;4*$STEMP_BWD" | bc -l)
   eval "R_BWD_$TEST=$RTEMP_BWD"
-  bash ecmcReport.bash $REPORT " $TEST| $TGT | $STEMP_FWD |$STEMP_BWD | $RTEMP_FWD | $RTEMP_BWD"
+  
+  #Rmaxfwd
+  if (( $(echo "$RTEMP_FWD > $R_FWD_MAX" | bc -l) )); then
+    R_FWD_MAX=$RTEMP_FWD
+  fi
+  #Rmaxbwd
+  if (( $(echo "$RTEMP_BWD > $R_BWD_MAX" | bc -l) )); then
+    R_BWD_MAX=$RTEMP_BWD
+  fi
+  
   
   # Calc bi-directional positioning repeatability at a position Ri
   BIVAR="B_$TEST"
@@ -406,9 +433,34 @@ do
   RTEMP_1=$(echo "2*($STEMP_FWD)+2*($STEMP_BWD)+sqrt(($BI)*($BI))" | bc -l)
   RTEMP_2=$STEMP_FWD;
   RTEMP_3=$STEMP_BWD;
+  RI=$RTEMP_1
   # R_i is max of RTEMP_1..3
-  
+  if (( $(echo "$RTEMP_2 > $RI" | bc -l) )); then
+    RI=$RTEMP_2
+  fi
+  if (( $(echo "$RTEMP_3 > $RI" | bc -l) )); then
+    RI=$RTEMP_3
+  fi
+  eval "R_I_$TEST=$RI"
+  bash ecmcReport.bash $REPORT " $TEST| $TGT | $STEMP_FWD |$STEMP_BWD | $RTEMP_FWD | $RTEMP_BWD | $RI"
+
 done
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "R_fwd = Forward unidirectional positioning repeatability of an axis (max(Ri_fwd))"
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "R_fwd = $R_FWD_MAX"
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "R_bwd = Backward unidirectional positioning repeatability of an axis (max(Ri_bwd))"
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "R_bwd = $R_BWD_MAX"
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "R = Bi-directional positioning repeatability of an axis (max(Ri_fwd,Ri_bwd))"
+R=$R_FWD_MAX
+if (( $(echo "$R_BWD_MAX > $R" | bc -l) )); then
+  R=$R_BWD_MAX
+fi
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "R = $R"
 bash ecmcReport.bash $REPORT ""
 
 # Mean unidirectional pos dev at a position

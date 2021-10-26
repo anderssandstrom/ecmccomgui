@@ -1,14 +1,14 @@
 # ecmc motion system test report
 
-* Data file   : /home/dev/sources/ecmc_bifrost_slits_sat/tests_2/11360/230_2.log
-* Date        : Tue Oct 26 14:28:50 CEST 2021
-* Author      : dev
+* Data file   : /home/pi/sources/ecmc_bifrost_slits_sat/tests_2/11360/230_2.log
+* Date        : Tue 26 Oct 2021 06:58:36 PM CEST
+* Author      : pi
 
 
 # Gear Ratios
 Sensor From | Sensor To | Ratio [] | Offset [mm] | Data count [] | Residual error [mm²]
-Openloop | Resolver | -0.999894943126 | 59.6844086454 | 1361 | 0.314893516471 [mm²]
-Openloop | Reference (ILD2300) | 1.00106837286 | 8.7448590654 | 1359 | 0.361079170885 [mm²]
+Openloop | Resolver | -0.999894943126421 | 59.684408645412475 | 1361 | 0.31489351647099656 [mm²]
+Openloop | Reference (ILD2300) | 1.0010683728639105 | 8.744859065397648 | 1359 | 0.3610791708848164 [mm²]
 
 # Forward test sequence
 
@@ -73,8 +73,16 @@ Cycle (j)| Pos (i)| Tgt Pos [mm] | Openloop Act [mm] | Resolver Act [mm] | ILD23
 
 # Mean Position Deviation and Reversal Error
 
-Pos (i) | Tgt pos. [mm] | Fwd unidir. pos dev [mm] | Bwd unidir. pos dev [mm] | Bi-dir pos. dev [mm] | Reversal Error [mm]
---- | --- | --- |--- |--- |
+Xi_fwd = Mean unidirectional positioning deviation at a position (fwd dir)
+
+Xi_bwd = Mean unidirectional positioning deviation at a position (bwd dir)
+
+Xi_avg = Mean bi-directional positioning deviation at a position
+
+Bi = Reversal error at a position
+
+Pos (i) | Tgt pos. [mm] | Xi_fwd [mm] | Xi_bwd [mm] | Xi_avg [mm] | Bi [mm]
+--- | --- | --- |--- |--- |--- |
 1 | 15.0000 | -.0219 | -.0242 | -.0230 | .0023
 2 | 25.0000 | -.0201 | -.0203 | -.0202 | .0002
 3 | 35.0000 | -.0048 | -.0020 | -.0034 | -.0028
@@ -85,13 +93,35 @@ Axis Reversal Error [mm]: .0028
 
 Axis Avg. Reversal Error [mm]: -.0006
 
-# Fwd Estimators for unidirectional axis positiong repeatability at a position (Si_fwd)
+# Repeatability
 
-Pos (i) | Tgt pos. [mm] | Fwd Si [mm] | Bwd Si [mm]
---- | --- | --- |---
-1| 15.0000 | .06529582681917734932 |.07033315363326174641
-2| 25.0000 | .06328487180993574549 |.06598227034590428519
-3| 35.0000 | .04619705077166723204 |.04559070628976919019
-4| 45.0000 | .02034422522486418011 |.02190736177635271535
-5| 55.0000 | .00248746859276654988 |.00448330235429197882
+Si_fwd = Forward estimator for unidirectional axis positiong repeatability at a position.
+
+Si_bwd = Backward estimator for unidirectional axis positiong repeatability at a position.
+
+Ri_fwd = Forward unidirectional positioning repeatability at a position.
+
+Ri_bwd = Backward unidirectional positioning repeatability at a position.
+
+Ri= Bi-directional position repeatability at a position
+
+Pos (i) | Tgt pos. [mm] | Si_fwd[mm] | Si_bwd [mm] | Ri_fwd | Ri_bwd | Ri
+--- | --- | --- |--- |--- |--- |
+1| 15.0000 | .0648 |.0700 | .2592 | .2800 | .27190000000000000000
+2| 25.0000 | .0632 |.0655 | .2528 | .2620 | .25760000000000000000
+3| 35.0000 | .0458 |.0447 | .1832 | .1788 | .18380000000000000000
+4| 45.0000 | .0200 |.0200 | .0800 | .0800 | .08100000000000000000
+5| 55.0000 | 0 |0 | 0 | 0 | .00210000000000000000
+
+R_fwd = Forward unidirectional positioning repeatability of an axis (max(Ri_fwd))
+
+R_fwd = .2592
+
+R_bwd = Backward unidirectional positioning repeatability of an axis (max(Ri_bwd))
+
+R_bwd = .2800
+
+R = Bi-directional positioning repeatability of an axis (max(Ri_fwd,Ri_bwd))
+
+R = .2800
 
