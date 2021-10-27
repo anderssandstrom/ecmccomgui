@@ -668,4 +668,4 @@ echo "####################################################################"
 bash mainSwitchISO230.bash $FILE $REPORT $RES_GR $RES_OFF $REF_GR $REF_OFF $DEC
 
 ##### Resolver jitter ###################################################
-bash mainResolverStandstillISO230.bash $FILE $REPORT $RES_OFF $REF_OFF 5 4000
+bash mainResolverStandstillISO230.bash $FILE $REPORT $RES_GR $RES_OFF $REF_GR $REF_OFF 5 4000

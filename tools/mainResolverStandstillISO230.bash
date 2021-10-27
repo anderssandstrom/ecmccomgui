@@ -4,10 +4,12 @@
 #
 # Arg 1 Data file   (input)
 # Arg 2 Report file (output)
-# Arg 3 Resolver offset
-# Arg 4 Opto offset
-# Arg 5 Decimals
-# Arg 6 TestBase
+# Arg 3 Resolver gain
+# Arg 4 Resolver offset
+# Arg 5 Opto gain
+# Arg 6 Opto offset
+# Arg 7 Decimals
+# Arg 8 TestBase
 #
 # Author: Anders Sandström, anders.sandstrom@esss.se
 #
@@ -15,17 +17,19 @@
 # Newline
 nl='
 '
-if [ "$#" -ne 6 ]; then
+if [ "$#" -ne 8 ]; then
    echo "mainResolverStandstill: Wrong arg count... Please specify input and output file."
    exit 1 
 fi
 
 FILE=$1
 REPORT=$2
-RESOLVER_OFFSET=$3
-OPTO_OFFSET=$4
-DEC=$5
-TESTBASE=$6
+RESOLVER_GAIN=$3
+RESOLVER_OFFSET=$4
+OPTO_GAIN=$5
+OPTO_OFFSET=$6
+DEC=$7
+TESTBASE=$8
 
 
 # Finds out what position by reading setpoint
@@ -59,7 +63,7 @@ do
    DATAPV="IOC_TEST:m0s004-Enc01-PosAct"
    
    RESOLVER_VAL=$(bash ecmcGetLinesBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT_RESOLVER})
-   RESOLVER_VAL=$(echo "$RESOLVER_VAL" | bash ecmcScaleOffsetLines.bash 1 ${RESOLVER_OFFSET})
+   RESOLVER_VAL=$(echo "$RESOLVER_VAL" | bash ecmcScaleOffsetLines.bash ${RESOLVER_GAIN} ${RESOLVER_OFFSET})
    RESOLVER_AVG=$(echo "$RESOLVER_VAL" | bash ecmcAvgLines.bash)
    RESOLVER_STD=$(echo "$RESOLVER_VAL" | bash ecmcStdLines.bash)
    DIFF_RESOLVER=$(echo "$RESOLVER_AVG-($SETPOINT)" | bc -l)
