@@ -1,7 +1,7 @@
 # ecmc motion system test report
 
 * Data file   : /home/dev/sources/ecmc_bifrost_slits_sat/tests_2/11360/230_2_slower_rate.log
-* Date        : Wed Oct 27 10:04:10 CEST 2021
+* Date        : Wed Oct 27 10:32:56 CEST 2021
 * Author      : dev
 
 
@@ -134,6 +134,25 @@ E_fwd = .03037
 E_bwd = Backward unidirectional system positioning error of an axis.
 
 E_bwd = .02115
+
 E = Bi-directional system positioning error of an axis.
+
 E = .03037
+
+M = Mean bi-directional system positioning error of an axis.
+
+M = .02576
+
+
+A_fwd = Forward unidirectional accuracy of an axis.
+
+A_fwd = .13564
+
+A_bwd = Forward unidirectional accuracy of an axis.
+
+A_bwd = .09464
+
+A = Bi-directional accuracy of an axis.
+
+A = .13564
 

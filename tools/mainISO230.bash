@@ -555,17 +555,93 @@ fi
 
 E=$(echo "scale=$DEC;$XI_AVG_MAX-($XI_AVG_MIN)" | bc -l)
 bash ecmcReport.bash $REPORT "E = Bi-directional system positioning error of an axis."
+bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "E = $E"
 bash ecmcReport.bash $REPORT ""
 
 # M=max(x_avg)-min(x_avg)
 M=$(echo "scale=$DEC;$XI_MAX-($XI_MIN)" | bc -l)
-bash ecmcReport.bash $REPORT "M = Mena bi-directional system positioning error of an axis."
+bash ecmcReport.bash $REPORT "M = Mean bi-directional system positioning error of an axis."
+bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "M = $M"
 bash ecmcReport.bash $REPORT ""
 
 
 ########## Accuracy
+
+#A_fwd=max(Xi_avg_fwd+2*Si_fwd)-min(Xi_avg_fwd-2*Si_fwd)
+XI_2SI_MAX_FWD=$(echo "$X_FWD_AVG_1+2*($S_FWD_1)" | bc -l)
+XI_2SI_MIN_FWD=$(echo "$X_FWD_AVG_1-2*($S_FWD_1)" | bc -l)
+XI_2SI_MAX_BWD=$(echo "$X_BWD_AVG_1+2*($S_BWD_1)" | bc -l)
+XI_2SI_MIN_BWD=$(echo "$X_BWD_AVG_1-2*($S_BWD_1)" | bc -l)
+
+for TEST in $TESTS
+do
+    # Calc Xi_avg_fwd+2*Si_fwd
+    # FORWARD
+    XI_AVG_VAR="X_FWD_AVG_$TEST"
+    XI_AVG=${!XI_AVG_VAR}
+    SI_VAR="S_FWD_$TEST"
+    SI=${!SI_VAR}
+    XI_PLUS_2SI=$(echo "$XI_AVG+2*($SI)" | bc -l)
+    XI_MINUS_2SI=$(echo "$XI_AVG-2*($SI)" | bc -l)
+    # Check max
+    if (( $(echo "$XI_PLUS_2SI > $XI_2SI_MAX_FWD" | bc -l) )); then
+      XI_2SI_MAX_FWD=$XI_PLUS_2SI
+    fi
+    # Check min
+    if (( $(echo "$XI_MINUS_2SI < $XI_2SI_MIN_FWD" | bc -l) )); then
+      XI_2SI_MIN_FWD=$XI_MINUS_2SI
+    fi 
+
+    # FORWARD
+    XI_AVG_VAR="X_BWD_AVG_$TEST"
+    XI_AVG=${!XI_AVG_VAR}
+    SI_VAR="S_BWD_$TEST"
+    SI=${!SI_VAR}
+    XI_PLUS_2SI=$(echo "$XI_AVG+2*($SI)" | bc -l)
+    XI_MINUS_2SI=$(echo "$XI_AVG-2*($SI)" | bc -l)
+    # Check max
+    if (( $(echo "$XI_PLUS_2SI > $XI_2SI_MAX_BWD" | bc -l) )); then
+      XI_2SI_MAX_BWD=$XI_PLUS_2SI
+    fi
+    # Check min
+    if (( $(echo "$XI_MINUS_2SI < $XI_2SI_MIN_BWD" | bc -l) )); then
+      XI_2SI_MIN_BWD=$XI_MINUS_2SI
+    fi 
+done
+
+# A_fwd=XI_2SI_MAX_FWD-XI_2SI_MIN_FWD
+bash ecmcReport.bash $REPORT ""
+A_fwd=$(echo "scale=$DEC;$XI_2SI_MAX_FWD-($XI_2SI_MIN_FWD)" | bc -l)
+bash ecmcReport.bash $REPORT "A_fwd = Forward unidirectional accuracy of an axis."
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "A_fwd = $A_fwd"
+bash ecmcReport.bash $REPORT ""
+
+A_bwd=$(echo "scale=$DEC;$XI_2SI_MAX_BWD-($XI_2SI_MIN_BWD)" | bc -l)
+bash ecmcReport.bash $REPORT "A_bwd = Forward unidirectional accuracy of an axis."
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "A_bwd = $A_bwd"
+bash ecmcReport.bash $REPORT ""
+
+XI_2SI_MAX=$XI_2SI_MAX_FWD
+# Check max
+if (( $(echo "$XI_2SI_MAX_BWD > $XI_2SI_MAX" | bc -l) )); then
+  XI_2SI_MAX=$XI_PLUS_2SI
+fi
+
+XI_2SI_MIN=$XI_2SI_MIN_FWD
+# Check min
+if (( $(echo "$XI_2SI_MIN_BWD < $XI_2SI_MIN" | bc -l) )); then
+  XI_2SI_MIN=$XI_PLUS_2SI
+fi
+
+A=$(echo "scale=$DEC;$XI_2SI_MAX-($XI_2SI_MIN)" | bc -l)
+bash ecmcReport.bash $REPORT "A = Bi-directional accuracy of an axis."
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "A = $A"
+bash ecmcReport.bash $REPORT ""
 
 
 # Mean unidirectional pos dev at a position
