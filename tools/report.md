@@ -1,7 +1,7 @@
 # ecmc motion system test report
 
 * Data file   : /home/dev/sources/ecmc_bifrost_slits_sat/tests_2/11360/230_2_slower_rate.log
-* Date        : Wed Oct 27 12:05:42 CEST 2021
+* Date        : Wed Oct 27 12:16:11 CEST 2021
 * Author      : dev
 
 
@@ -90,9 +90,13 @@ i (pos id) | Tgt_pos(i) [mm] | X_fwd(i) [mm] | X_bwd(i) [mm] | X_avg(i) [mm] | B
 4 | 45.00000 | .00193 | .00250 | .00221 | -.00057
 5 | 55.00000 | .00509 | .00329 | .00419 | .00180
 
-B = Axis Reversal Error [mm]: .00742
+B = Axis Reversal Error
 
-B_avg = Axis Avg. Reversal Error [mm]: -.00099
+B = .00742 [mm]
+
+B_avg = Axis Avg. Reversal Error.
+
+B_avg = -.00099 [mm]
 
 # Repeatability
 
@@ -106,7 +110,7 @@ R_bwd(i) = Backward unidirectional positioning repeatability at a position.
 
 R(i) = Bi-directional position repeatability at a position.
 
-i (pos id) | Tgt_pos(i) [mm] | S_fwd(i) [mm] | S_bwd(i) [mm] | R_fwd(i) | R_bwd(i) | R(i)
+i (pos id) | Tgt_pos(i) [mm] | S_fwd(i) [mm] | S_bwd(i) [mm] | R_fwd(i) [mm] | R_bwd(i) [mm] | R(i) [mm]
 --- | --- | --- |--- |--- |--- |--- |
 1| 15.00000 | 0 |0 | 0 | 0 | .00273
 2| 25.00000 | .00447 |.00316 | .01788 | .01264 | .01677
@@ -116,47 +120,47 @@ i (pos id) | Tgt_pos(i) [mm] | S_fwd(i) [mm] | S_bwd(i) [mm] | R_fwd(i) | R_bwd(
 
 R_fwd = Forward unidirectional positioning repeatability of an axis (max(R_fwd(i)))
 
-R_fwd = .09464
+R_fwd = .09464 [mm]
 
 R_bwd = Backward unidirectional positioning repeatability of an axis (max(R_bwd(i)))
 
-R_bwd = .05364
+R_bwd = .05364 [mm]
 
 R = Bi-directional positioning repeatability of an axis (max(R_fwd,R_bwd))
 
-R = .09464
+R = .09464 [mm]
 
 
 # Positioning Error
 
 E_fwd = Forward unidirectional system positioning error of an axis.
 
-E_fwd = .02203
+E_fwd = .02203 [mm]
 
 E_bwd = Backward unidirectional system positioning error of an axis.
 
-E_bwd = .01196
+E_bwd = .01196 [mm]
 
 E = Bi-directional system positioning error of an axis.
 
-E = .02203
+E = .02203 [mm]
 
 M = Mean bi-directional system positioning error of an axis.
 
-M = .01695
+M = .01695 [mm]
 
 
 # Accuracy
 
 A_fwd = Forward unidirectional accuracy of an axis.
 
-A_fwd = .09464
+A_fwd = .09464 [mm]
 
 A_bwd = Backward unidirectional accuracy of an axis.
 
-A_bwd = .05364
+A_bwd = .05364 [mm]
 
 A = Bi-directional accuracy of an axis.
 
-A = .09464
+A = .09464 [mm]
 

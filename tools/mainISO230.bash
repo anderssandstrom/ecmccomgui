@@ -65,7 +65,7 @@ TESTNUMPV="IOC_TEST:TestNumber"
 
 # Number decimals
 DEC=5
-
+UNIT="mm"
 # Calculate gearratios based on this test
 #TESTNUM_GEARRATIO_FROM=1501
 #TESTNUM_GEARRATIO_TO=1502
@@ -139,7 +139,7 @@ REF_OFF_DISP=$(echo "scale=$DEC;$REF_OFF/1" | bc -l)
 
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "# Gear Ratios"
-bash ecmcReport.bash $REPORT "From | To | Ratio [] | Offset [mm] | Data count [] | Residual error [mm²]"
+bash ecmcReport.bash $REPORT "From | To | Ratio [] | Offset [$UNIT] | Data count [] | Residual error [$UNIT²]"
 bash ecmcReport.bash $REPORT "--- | --- | --- | --- | --- | --- |"
 bash ecmcReport.bash $REPORT "Openloop | Resolver | $RES_GR_DISP | $RES_OFF_DISP | $RES_LEN_DISP | $RES_ERR_DISP "
 bash ecmcReport.bash $REPORT "Openloop | Reference (ILD2300) | $REF_GR_DISP | $REF_OFF_DISP | $REF_LEN_DISP | $REF_ERR_DISP "
@@ -148,7 +148,7 @@ bash ecmcReport.bash $REPORT ""
 # Forward tests
 bash ecmcReport.bash $REPORT "# Forward test sequence"
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "i (pos id)| j (cycle)| Tgt_pos(i,j) [mm] | Motor(i,j) [mm] | Resolver(i,j) [mm] | Reference(i,j) [mm] | x(i,j) (diff ref-tgt),  [mm]"
+bash ecmcReport.bash $REPORT "i (pos id)| j (cycle)| Tgt_pos(i,j) [$UNIT] | Motor(i,j) [$UNIT] | Resolver(i,j) [$UNIT] | Reference(i,j) [$UNIT] | x(i,j) (diff ref-tgt),  [$UNIT]"
 bash ecmcReport.bash $REPORT "--- | --- | --- | --- | --- | --- |--- |"
 TESTNUMBER_BASE=1
 DIFF_SUM=0
@@ -237,7 +237,7 @@ DIFF_AVG_FWD=$(echo "$DIFF_SUM/$TEST_COUNTER" | bc)
 # Backward tests
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "# Backward test sequence"
-bash ecmcReport.bash $REPORT "i (pos id)| j (cycle)| Tgt_pos(i,j) [mm] | Motor(i,j) [mm] | Resolver(i,j) [mm] | Reference(i,j) [mm] | x(i,j) (diff ref-tgt),  [mm]"
+bash ecmcReport.bash $REPORT "i (pos id)| j (cycle)| Tgt_pos(i,j) [$UNIT] | Motor(i,j) [$UNIT] | Resolver(i,j) [$UNIT] | Reference(i,j) [$UNIT] | x(i,j) (diff ref-tgt),  [$UNIT]"
 bash ecmcReport.bash $REPORT "--- | --- | --- | --- | --- | --- |--- |"
 
 TESTNUMBER_BASE=2
@@ -335,7 +335,7 @@ bash ecmcReport.bash $REPORT "X_avg(i) = Mean bi-directional positioning deviati
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "B(i) = Reversal error at a position "
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "i (pos id) | Tgt_pos(i) [mm] | X_fwd(i) [mm] | X_bwd(i) [mm] | X_avg(i) [mm] | B(i) [mm]"
+bash ecmcReport.bash $REPORT "i (pos id) | Tgt_pos(i) [$UNIT] | X_fwd(i) [$UNIT] | X_bwd(i) [$UNIT] | X_avg(i) [$UNIT] | B(i) [$UNIT]"
 bash ecmcReport.bash $REPORT "--- | --- | --- |--- |--- |--- |"
 for TEST in $TESTS
 do
@@ -366,10 +366,14 @@ do
   B_SUM=$(echo "$B_SUM+($B_i)" | bc -l)  
 done
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "B = Axis Reversal Error [mm]: $B_MAX"
+bash ecmcReport.bash $REPORT "B = Axis Reversal Error"
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "B = $B_MAX [$UNIT]"
 bash ecmcReport.bash $REPORT ""
 B_AVG=$(echo "scale=$DEC;$B_SUM/($ISO230_POS_COUNT)" | bc -l)  
-bash ecmcReport.bash $REPORT "B_avg = Axis Avg. Reversal Error [mm]: $B_AVG"
+bash ecmcReport.bash $REPORT "B_avg = Axis Avg. Reversal Error."
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "B_avg = $B_AVG [$UNIT]"
 
 ########## REPEATABILITY
 bash ecmcReport.bash $REPORT ""
@@ -392,7 +396,7 @@ bash ecmcReport.bash $REPORT "R_bwd(i) = Backward unidirectional positioning rep
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "R(i) = Bi-directional position repeatability at a position."
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "i (pos id) | Tgt_pos(i) [mm] | S_fwd(i) [mm] | S_bwd(i) [mm] | R_fwd(i) | R_bwd(i) | R(i)"
+bash ecmcReport.bash $REPORT "i (pos id) | Tgt_pos(i) [$UNIT] | S_fwd(i) [$UNIT] | S_bwd(i) [$UNIT] | R_fwd(i) [$UNIT] | R_bwd(i) [$UNIT] | R(i) [$UNIT]"
 bash ecmcReport.bash $REPORT "--- | --- | --- |--- |--- |--- |--- |"
 R_FWD_MAX=0
 R_BWD_MAX=0
@@ -469,11 +473,11 @@ done
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "R_fwd = Forward unidirectional positioning repeatability of an axis (max(R_fwd(i)))"
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "R_fwd = $R_FWD_MAX"
+bash ecmcReport.bash $REPORT "R_fwd = $R_FWD_MAX [$UNIT]"
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "R_bwd = Backward unidirectional positioning repeatability of an axis (max(R_bwd(i)))"
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "R_bwd = $R_BWD_MAX"
+bash ecmcReport.bash $REPORT "R_bwd = $R_BWD_MAX [$UNIT]"
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "R = Bi-directional positioning repeatability of an axis (max(R_fwd,R_bwd))"
 R=$R_FWD_MAX
@@ -481,7 +485,7 @@ if (( $(echo "$R_BWD_MAX > $R" | bc -l) )); then
   R=$R_BWD_MAX
 fi
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "R = $R"
+bash ecmcReport.bash $REPORT "R = $R [$UNIT]"
 bash ecmcReport.bash $REPORT ""
 
 ########## Systematic positioning error
@@ -543,11 +547,11 @@ bash ecmcReport.bash $REPORT "# Positioning Error "
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "E_fwd = Forward unidirectional system positioning error of an axis."
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "E_fwd = $E_fwd"
+bash ecmcReport.bash $REPORT "E_fwd = $E_fwd [$UNIT]"
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "E_bwd = Backward unidirectional system positioning error of an axis."
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "E_bwd = $E_bwd"
+bash ecmcReport.bash $REPORT "E_bwd = $E_bwd [$UNIT]"
 bash ecmcReport.bash $REPORT ""
 
 # Check max of fwd bwd
@@ -565,14 +569,14 @@ fi
 E=$(echo "scale=$DEC;$XI_AVG_MAX-($XI_AVG_MIN)" | bc -l)
 bash ecmcReport.bash $REPORT "E = Bi-directional system positioning error of an axis."
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "E = $E"
+bash ecmcReport.bash $REPORT "E = $E [$UNIT]"
 bash ecmcReport.bash $REPORT ""
 
 # M=max(x_avg)-min(x_avg)
 M=$(echo "scale=$DEC;$XI_MAX-($XI_MIN)" | bc -l)
 bash ecmcReport.bash $REPORT "M = Mean bi-directional system positioning error of an axis."
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "M = $M"
+bash ecmcReport.bash $REPORT "M = $M [$UNIT]"
 bash ecmcReport.bash $REPORT ""
 
 
@@ -627,13 +631,13 @@ bash ecmcReport.bash $REPORT ""
 A_fwd=$(echo "scale=$DEC;$XI_2SI_MAX_FWD-($XI_2SI_MIN_FWD)" | bc -l)
 bash ecmcReport.bash $REPORT "A_fwd = Forward unidirectional accuracy of an axis."
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "A_fwd = $A_fwd"
+bash ecmcReport.bash $REPORT "A_fwd = $A_fwd [$UNIT]"
 bash ecmcReport.bash $REPORT ""
 
 A_bwd=$(echo "scale=$DEC;$XI_2SI_MAX_BWD-($XI_2SI_MIN_BWD)" | bc -l)
 bash ecmcReport.bash $REPORT "A_bwd = Backward unidirectional accuracy of an axis."
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "A_bwd = $A_bwd"
+bash ecmcReport.bash $REPORT "A_bwd = $A_bwd [$UNIT]"
 bash ecmcReport.bash $REPORT ""
 
 XI_2SI_MAX=$XI_2SI_MAX_FWD
@@ -651,7 +655,7 @@ fi
 A=$(echo "scale=$DEC;$XI_2SI_MAX-($XI_2SI_MIN)" | bc -l)
 bash ecmcReport.bash $REPORT "A = Bi-directional accuracy of an axis."
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "A = $A"
+bash ecmcReport.bash $REPORT "A = $A [$UNIT]"
 bash ecmcReport.bash $REPORT ""
 
 
