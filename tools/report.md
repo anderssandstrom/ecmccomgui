@@ -1,7 +1,7 @@
 # ecmc motion system test report
 
 * Data file   : /home/dev/sources/ecmc_bifrost_slits_sat/tests_2/11360/230_2_slower_rate.log
-* Date        : Wed Oct 27 10:32:56 CEST 2021
+* Date        : Wed Oct 27 10:37:31 CEST 2021
 * Author      : dev
 
 
@@ -127,6 +127,8 @@ R = Bi-directional positioning repeatability of an axis (max(R_fwd,R_bwd))
 R = .13564
 
 
+# Positioning Error
+
 E_fwd = Forward unidirectional system positioning error of an axis.
 
 E_fwd = .03037
@@ -143,6 +145,8 @@ M = Mean bi-directional system positioning error of an axis.
 
 M = .02576
 
+
+# Accuracy
 
 A_fwd = Forward unidirectional accuracy of an axis.
 

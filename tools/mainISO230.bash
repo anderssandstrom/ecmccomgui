@@ -532,6 +532,9 @@ E_fwd=$(echo "scale=$DEC;$XI_FWD_AVG_MAX-($XI_FWD_AVG_MIN)" | bc -l)
 E_bwd=$(echo "scale=$DEC;$XI_BWD_AVG_MAX-($XI_BWD_AVG_MIN)" | bc -l)
 
 bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "# Positioning Error "
+
+bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "E_fwd = Forward unidirectional system positioning error of an axis."
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "E_fwd = $E_fwd"
@@ -611,6 +614,8 @@ do
     fi 
 done
 
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "# Accuracy"
 # A_fwd=XI_2SI_MAX_FWD-XI_2SI_MIN_FWD
 bash ecmcReport.bash $REPORT ""
 A_fwd=$(echo "scale=$DEC;$XI_2SI_MAX_FWD-($XI_2SI_MIN_FWD)" | bc -l)
