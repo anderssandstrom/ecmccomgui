@@ -7,14 +7,35 @@
 #
 # Author: Anders Sandström, anders.sandstrom@esss.se
 #
-# Data examples:
-# IOC_TEST:Axis1-PosAct          2020-12-11 12:47:59.380804 10.00078125  
-# IOC_TEST:TestNumber 2020-12-11 12:57:31.157767 4008
-# IOC_TEST:m0s004-Enc01-PosAct 2020-12-11 12:45:50.390806 -12.14605904  
-# IOC_TEST:Axis1-PosSet          2020-12-11 12:45:50.390806 0.053556875  
-# IOC_TEST:m0s005-Enc01-PosAct 2020-12-11 12:47:59.400804 50.498368  
-# IOC_TEST:ec0-s2-EL1808-BI1     2020-12-11 12:44:37.040810 1  
-# IOC_TEST:ec0-s2-EL1808-BI2     2020-12-11 12:11:08.720807 1  
+# Data examples: 
+# IOC_TEST:m0s004-Enc01-PosAct   2021-10-27 09:04:48.529180 66.14321041  
+# IOC_TEST:Axis1-PosAct          2021-10-27 09:04:48.529180 1.527265625  
+# IOC_TEST:Axis1-PosSet          2021-10-27 09:04:48.529180 1.527243125  
+# IOC_TEST:m0s004-Enc01-PosAct   2021-10-27 09:04:48.579143 66.12481403  
+# IOC_TEST:m0s005-Enc01-PosAct   2021-10-27 09:04:48.579143 33.08044  
+# IOC_TEST:Axis1-PosAct          2021-10-27 09:04:48.579143 1.564765625  
+# IOC_TEST:Axis1-PosSet          2021-10-27 09:04:48.579143 1.564743125  
+# IOC_TEST:m0s004-Enc01-PosAct   2021-10-27 09:04:48.629165 66.10466003  
+# IOC_TEST:m0s005-Enc01-PosAct   2021-10-27 09:04:48.629165 2147.483643  
+# IOC_TEST:Axis1-PosAct          2021-10-27 09:04:48.629165 1.602265625  
+# IOC_TEST:Axis1-PosSet          2021-10-27 09:04:48.629165 1.602243125  
+# IOC_TEST:m0s004-Enc01-PosAct   2021-10-27 09:04:48.679157 66.06747913  
+# IOC_TEST:m0s005-Enc01-PosAct   2021-10-27 09:04:48.679157 33.08044  
+# IOC_TEST:Axis1-PosAct          2021-10-27 09:04:48.679157 1.639765625  
+# IOC_TEST:Axis1-PosSet          2021-10-27 09:04:48.679157 1.639743125  
+# IOC_TEST:m0s004-Enc01-PosAct   2021-10-27 09:04:48.729143 66.01678658  
+# IOC_TEST:m0s005-Enc01-PosAct   2021-10-27 09:04:48.729143 2147.483643  
+# IOC_TEST:Axis1-PosAct          2021-10-27 09:04:48.729143 1.677265625  
+# IOC_TEST:Axis1-PosSet          2021-10-27 09:04:48.729143 1.677243125  
+# IOC_TEST:m0s004-Enc01-PosAct   2021-10-27 09:04:48.779143 65.96195507  
+# IOC_TEST:m0s005-Enc01-PosAct   2021-10-27 09:04:48.779143 33.35992  
+# IOC_TEST:Axis1-PosAct          2021-10-27 09:04:48.779143 1.714765625  
+# IOC_TEST:Axis1-PosSet          2021-10-27 09:04:48.779143 1.714743125  
+# IOC_TEST:m0s004-Enc01-PosAct   2021-10-27 09:04:48.829164 65.91618061  
+# IOC_TEST:m0s005-Enc01-PosAct   2021-10-27 09:04:48.829164 2147.483643  
+# IOC_TEST:Axis1-PosAct          2021-10-27 09:04:48.829164 1.752265625  
+# IOC_TEST:Axis1-PosSet          2021-10-27 09:04:48.829164 1.752243125  
+# IOC_TEST:m0s004-Enc01-PosAct   2021-10-27 09:04:48.879143 65.88419342  
 #
 # Markdown to PDF notes
 # 1: https://www.markdowntopdf.com
@@ -23,19 +44,7 @@
 # grip your_markdown.md
 # grip will render the markdown on localhost:5000 or similar (ex: go to http://localhost:5000/) - just edit away and refresh the browser. Print when ready.
 
-# Example table
-#Test | Openloop [mm]| Resolver [mm]| 
-#--- | --- | --- |
-#1  |  0.0010 | -0.4760
-#2  |  0.0010 | -0.4765
-#3  |  0.0015 | -0.4770
-#4  |  0.0020 | -0.4780
-#5  |  0.005  | -0.4785
-#6  |  -0.001 | -0.4790
-#7  |  0.000  | -0.4795
-#8  |  0.0015 | -0.4800
-#9  |  0.005  | -0.4805
-#10 |  -0.001 | -0.4815
+
 
 
 # Newline
@@ -74,11 +83,8 @@ ISO230_CYCLE_COUNT=5
 FILE=$1
 REPORT=$2
 
-echo "FILE      = ${FILE}"
-echo "TRIGGPV   = ${TRIGGPV}"
-echo "TRIGGVAL  = ${TRIGGVAL}"
-echo "DATAPV    = ${DATAPV}"
-echo "DATACOUNT = ${DATACOUNT}"
+echo "Collect gear ratio data (only at test points in the matrix)...."
+GEAR_RATIO_DATA=$(bash mainCollectDataForGearRatioCalc.bash $FILE $ISO230_CYCLE_COUNT $ISO230_POS_COUNT)
 
 ## Init report file
 bash ecmcReportInit.bash $REPORT $FILE
@@ -86,14 +92,14 @@ bash ecmcReportInit.bash $REPORT $FILE
 # Use gear ratio python script to find gear ratios
 echo "1. Calculate gear ratios..."
 
+#### Use these lines if gear rations should be based on all data colelcted in iso230 cycle
 # Filter data for gear ratio calculations
-GEAR_RATIO_DATA=$(cat $FILE | grep -A$SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO_FROM" | grep -B$SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO_TO" )
-
+#GEAR_RATIO_DATA=$(cat $FILE | grep -A$SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO_FROM" | grep -B$SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO_TO" )
 # Filter outlieres of Micro epsilon sensor (values above 2000 is excluded)
-GEAR_RATIO_DATA=$(echo "$GEAR_RATIO_DATA " |  awk ' {if ($4<2000) print;}')
+#GEAR_RATIO_DATA=$(echo "$GEAR_RATIO_DATA " |  awk ' {if ($4<2000) print;}')
 
 # Resolver to open loop use test 1503
-TEMP=$(echo "$GEAR_RATIO_DATA " | grep -E "$MOTORACTPV|$RESOLVERPV|$TESTNUMPV" | grep -B $SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO" |  python ../pyDataManip/ecmcGearRatio.py "$MOTORACTPV" "$RESOLVERPV")
+TEMP=$(echo "$GEAR_RATIO_DATA " | grep -E "$MOTORACTPV|$RESOLVERPV|$TESTNUMPV" | grep -B $SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO" |  python ../pyDataManip/ecmcGearRatioIgnoreTimeStamps.py "$MOTORACTPV" "$RESOLVERPV")
 
 echo "$TEMP"
 # Gear ratio resolver
@@ -104,7 +110,7 @@ RES_ERR=$(echo $TEMP | awk '{print $4}')
 echo "RES GR=$RES_GR, OFF=$RES_OFF, LEN=$RES_LEN, RESIDUAL=$RES_ERR"
 
 # Reference to open loop use test 1503 filter values above  2000 #awk '{if($4<2000){ print}}'| 
-TEMP=$(echo "$GEAR_RATIO_DATA " | grep -E "$MOTORACTPV|$REFERENCEPV|$TESTNUMPV" | grep -B $SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO" |  python ../pyDataManip/ecmcGearRatio.py "$MOTORACTPV" "$REFERENCEPV")
+TEMP=$(echo "$GEAR_RATIO_DATA " | grep -E "$MOTORACTPV|$REFERENCEPV|$TESTNUMPV" | grep -B $SAMPLES_GEARRATIO " $TESTNUM_GEARRATIO" |  python ../pyDataManip/ecmcGearRatioIgnoreTimeStamps.py "$MOTORACTPV" "$REFERENCEPV")
 echo "$TEMP"
 # Gear ratio reference
 REF_GR=$(echo $TEMP | awk '{print $1}')
