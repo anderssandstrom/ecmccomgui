@@ -49,5 +49,16 @@ fi
 # IOC_TEST:TestNumber 2020-12-11 12:57:31.157767 4008
 
 #                    grep TRIGGPV or DATAPV         trim spaces           grep 50 rows before: "TRIGGPV"*" TRIGGVAL"        remove last line                        
-DATA=$(cat ${FILE} | grep "${TRIGGPV}\|${DATAPV}" | awk '{$1=$1;print}' | grep -B${LINECOUNT} "^${TRIGGPV}.* ${TRIGGVAL}$" | head -n -1)
+
+# DATA=$(cat ${FILE} | grep "${TRIGGPV}\|${DATAPV}")
+# echo "1: ${DATA}"
+# DATA=$(echo "$DATA " | awk '{$1=$1;print}')
+# echo "2: ${DATA}"
+# DATA=$(echo "$DATA " | grep -B${LINECOUNT} "${TRIGGPV}.* ${TRIGGVAL}")
+# echo "3: ${DATA}"
+# DATA=$(echo "$DATA " | head -n -1)
+# echo "4: ${DATA}"
+
+
+DATA=$(cat ${FILE} | grep "${TRIGGPV}\|${DATAPV}" | awk '{$1=$1;print}' | grep -B${LINECOUNT} "${TRIGGPV}.* ${TRIGGVAL}" | head -n -1)
 echo "${DATA}"

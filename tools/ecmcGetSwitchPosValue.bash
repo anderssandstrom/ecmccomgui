@@ -48,6 +48,7 @@ fi
 DATAPVS="$DATAPV\|$SWITCHPV"
 DATA=$(bash ecmcGetLinesBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPVS} ${DATACOUNT})
 # Get one openloop counter value just before BI1 1/0
-DATACOUNT="1" 
+
+DATACOUNT=1
 DATA=$(echo "$DATA" | bash ecmcGetDataBeforeTrigg.bash ${SWITCHPV} ${SWITCHVAL} ${DATAPV} ${DATACOUNT})
 echo "$DATA"

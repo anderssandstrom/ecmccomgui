@@ -29,7 +29,7 @@ TESTBASE=$6
 
 
 # Finds out what position by reading setpoint
-DATACOUNT_RESOLVER="75"
+DATACOUNT_RESOLVER="10"
 TESTCOUNT=8
 
 bash ecmcReport.bash $REPORT ""

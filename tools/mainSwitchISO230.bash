@@ -38,7 +38,7 @@ bash ecmcReport.bash $REPORT "--- | --- | --- |--- |"
 # Get one openloop counter value just before BI1 0
 TRIGGPV="IOC_TEST:TestNumber"
 DATAPV="IOC_TEST:Axis1-PosAct"
-DATACOUNT="350"  # Must be enough to capture the switch transition
+DATACOUNT="100"  # Must be enough to capture the switch transition
 SWITCHPV="IOC_TEST:m0s002-BI01"                   
 SWITCHVAL=0
 OPENLOOPVALS=""
@@ -55,12 +55,15 @@ do
    let "COUNTER=$COUNTER+1"
    DATAPV="IOC_TEST:Axis1-PosAct"
    OPENLOOPVAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
+   echo "!!!!!OPENLOOPVAL=$OPENLOOPVAL"
    OPENLOOPVALS+="$OPENLOOPVAL "
    DATAPV="IOC_TEST:m0s004-Enc01-PosAct"
    RESOLVERVAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
    RESOLVERVAL=$(echo $RESOLVERVAL | bash ecmcScaleOffsetData.bash 1 ${RESOLVER_OFFSET})
    RESOLVERVALS+="$RESOLVERVAL "
    echo "BWD switch engage position $TRIGGVAL: $OPENLOOPVAL, $RESOLVERVAL"
+   echo "OPENLOOPVAL=$OPENLOOPVAL"
+   echo "RESOLVERVAL=$RESOLVERVAL"
    DIFF=$(awk "BEGIN {print ($RESOLVERVAL-($OPENLOOPVAL))}")
    DIFFS+="$DIFF "
    printf "%d | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $COUNTER $OPENLOOPVAL $RESOLVERVAL $DIFF >> $REPORT
