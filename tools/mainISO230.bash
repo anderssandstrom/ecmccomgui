@@ -148,7 +148,7 @@ bash ecmcReport.bash $REPORT ""
 # Forward tests
 bash ecmcReport.bash $REPORT "# Forward test sequence"
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "j (cycle)| i (pos id)| Tgt_pos [mm] | Motor_pos [mm] | Resolver_pos [mm] | Reference [mm] | Diff ref-tgt, X(i,j) [mm]"
+bash ecmcReport.bash $REPORT "i (pos id)| j (cycle)| Tgt_pos(i,j) [mm] | Motor(i,j) [mm] | Resolver(i,j) [mm] | Reference(i,j) [mm] | x(i,j) (diff ref-tgt),  [mm]"
 bash ecmcReport.bash $REPORT "--- | --- | --- | --- | --- | --- |--- |"
 TESTNUMBER_BASE=1
 DIFF_SUM=0
@@ -225,7 +225,7 @@ do
    TEMP=$(echo "$TEMP+($DIFF)" | bc )
    eval "$TEMP_VAR=$TEMP"
    
-   bash ecmcReport.bash $REPORT " $CYCLE | $TEST | $TGT_DATA | $OL_DATA | $RES_DATA | $REF_DATA | $DIFF |"
+   bash ecmcReport.bash $REPORT " $TEST | $CYCLE | $TGT_DATA | $OL_DATA | $RES_DATA | $REF_DATA | $DIFF |"
    let TEST_COUNTER=TEST_COUNTER+1
   done
 done
@@ -237,7 +237,7 @@ DIFF_AVG_FWD=$(echo "$DIFF_SUM/$TEST_COUNTER" | bc)
 # Backward tests
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "# Backward test sequence"
-bash ecmcReport.bash $REPORT "j (cycle)| i (pos id)| Tgt_pos(i) [mm] | Motor_pos(i) [mm] | Resolver_pos(i) [mm] | Reference(i) [mm] | Diff ref-tgt, X(i,j) [mm]"
+bash ecmcReport.bash $REPORT "i (pos id)| j (cycle)| Tgt_pos(i,j) [mm] | Motor(i,j) [mm] | Resolver(i,j) [mm] | Reference(i,j) [mm] | x(i,j) (diff ref-tgt),  [mm]"
 bash ecmcReport.bash $REPORT "--- | --- | --- | --- | --- | --- |--- |"
 
 TESTNUMBER_BASE=2
@@ -315,7 +315,7 @@ do
    TEMP=$(echo "$TEMP+($DIFF)" | bc )
    eval "$TEMP_VAR=$TEMP"
 
-   bash ecmcReport.bash $REPORT " $CYCLE | $TEST | $TGT_DATA | $OL_DATA | $RES_DATA | $REF_DATA | $DIFF |"
+   bash ecmcReport.bash $REPORT " $TEST | $CYCLE | $TGT_DATA | $OL_DATA | $RES_DATA | $REF_DATA | $DIFF |"
    let TEST_COUNTER=TEST_COUNTER+1
   done
 done
