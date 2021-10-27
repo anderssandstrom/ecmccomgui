@@ -625,7 +625,7 @@ bash ecmcReport.bash $REPORT "A_fwd = $A_fwd"
 bash ecmcReport.bash $REPORT ""
 
 A_bwd=$(echo "scale=$DEC;$XI_2SI_MAX_BWD-($XI_2SI_MIN_BWD)" | bc -l)
-bash ecmcReport.bash $REPORT "A_bwd = Forward unidirectional accuracy of an axis."
+bash ecmcReport.bash $REPORT "A_bwd = Backward unidirectional accuracy of an axis."
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "A_bwd = $A_bwd"
 bash ecmcReport.bash $REPORT ""

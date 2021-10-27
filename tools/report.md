@@ -1,7 +1,7 @@
 # ecmc motion system test report
 
 * Data file   : /home/dev/sources/ecmc_bifrost_slits_sat/tests_2/11360/230_2_slower_rate.log
-* Date        : Wed Oct 27 10:37:31 CEST 2021
+* Date        : Wed Oct 27 10:39:32 CEST 2021
 * Author      : dev
 
 
@@ -152,7 +152,7 @@ A_fwd = Forward unidirectional accuracy of an axis.
 
 A_fwd = .13564
 
-A_bwd = Forward unidirectional accuracy of an axis.
+A_bwd = Backward unidirectional accuracy of an axis.
 
 A_bwd = .09464
 
