@@ -478,11 +478,94 @@ bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "R = $R"
 bash ecmcReport.bash $REPORT ""
 
+########## Systematic positioning error
+# E_fwd = max(x_fwd_avg(i))-min(x_fwd_avg(i))
 
-########## Bi Directional systematic positioning error of an axis E
-# E_fwd = max(x_fwd_avg(i))
+# Init with forst value
+XI_FWD_AVG_MAX=$X_FWD_AVG_1
+XI_BWD_AVG_MAX=$X_BWD_AVG_1
+XI_FWD_AVG_MIN=$X_FWD_AVG_1
+XI_BWD_AVG_MIN=$X_BWD_AVG_1
+XI_MAX=$X_AVG_1
+XI_MIN=$X_AVG_1
+for TEST in $TESTS
+do
+    # FORWARD
+    XI_AVG_VAR="X_FWD_AVG_$TEST"
+    XI_AVG=${!XI_AVG_VAR}
+    # Check max
+    if (( $(echo "$XI_AVG > $XI_FWD_AVG_MAX" | bc -l) )); then
+      XI_FWD_AVG_MAX=$XI_AVG
+    fi
+    # Check min
+    if (( $(echo "$XI_AVG < $XI_FWD_AVG_MIN" | bc -l) )); then
+      XI_FWD_AVG_MIN=$XI_AVG
+    fi
+
+    # BACKWARD
+    XI_AVG_VAR="X_BWD_AVG_$TEST"    
+    XI_AVG=${!XI_AVG_VAR}
+    # Check max
+    if (( $(echo "$XI_AVG > $XI_BWD_AVG_MAX" | bc -l) )); then
+      XI_BWD_AVG_MAX=$XI_AVG
+    fi
+    # Check min
+    if (( $(echo "$XI_AVG < $XI_BWD_AVG_MIN" | bc -l) )); then
+      XI_BWD_AVG_MIN=$XI_AVG
+    fi
+        
+    # Bi dir
+    XI_AVG_VAR="X_AVG_$TEST"    
+    XI_AVG=${!XI_AVG_VAR}
+    # Check max
+    if (( $(echo "$XI_AVG > $XI_MAX" | bc -l) )); then
+      XI_MAX=$XI_AVG
+    fi
+    # Check min
+    if (( $(echo "$XI_AVG < $XI_MIN" | bc -l) )); then
+      XI_MIN=$XI_AVG
+    fi
+
+done
+
+E_fwd=$(echo "scale=$DEC;$XI_FWD_AVG_MAX-($XI_FWD_AVG_MIN)" | bc -l)
+E_bwd=$(echo "scale=$DEC;$XI_BWD_AVG_MAX-($XI_BWD_AVG_MIN)" | bc -l)
+
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "E_fwd = Forward unidirectional system positioning error of an axis."
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "E_fwd = $E_fwd"
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "E_bwd = Backward unidirectional system positioning error of an axis."
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "E_bwd = $E_bwd"
+bash ecmcReport.bash $REPORT ""
+
+# Check max of fwd bwd
+XI_AVG_MAX=$XI_FWD_AVG_MAX
+if (( $(echo "$XI_BWD_AVG_MAX > $XI_AVG_MAX" | bc -l) )); then
+  XI_AVG_MAX=$XI_BWD_AVG_MAX
+fi
+
+# Check min of fwd bwd
+XI_AVG_MIN=$XI_FWD_AVG_MIN
+if (( $(echo "$XI_BWD_AVG_MIN < $XI_AVG_MIN" | bc -l) )); then
+  XI_AVG_MIN=$XI_BWD_AVG_MIN
+fi
+
+E=$(echo "scale=$DEC;$XI_AVG_MAX-($XI_AVG_MIN)" | bc -l)
+bash ecmcReport.bash $REPORT "E = Bi-directional system positioning error of an axis."
+bash ecmcReport.bash $REPORT "E = $E"
+bash ecmcReport.bash $REPORT ""
+
+# M=max(x_avg)-min(x_avg)
+M=$(echo "scale=$DEC;$XI_MAX-($XI_MIN)" | bc -l)
+bash ecmcReport.bash $REPORT "M = Mena bi-directional system positioning error of an axis."
+bash ecmcReport.bash $REPORT "M = $M"
+bash ecmcReport.bash $REPORT ""
 
 
+########## Accuracy
 
 
 # Mean unidirectional pos dev at a position

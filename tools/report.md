@@ -1,7 +1,7 @@
 # ecmc motion system test report
 
-* Data file   : /home/dev/sources/ecmc_bifrost_slits_sat/tests_2/11360/230_2_2.log
-* Date        : Wed Oct 27 09:32:58 CEST 2021
+* Data file   : /home/dev/sources/ecmc_bifrost_slits_sat/tests_2/11360/230_2_slower_rate.log
+* Date        : Wed Oct 27 10:04:10 CEST 2021
 * Author      : dev
 
 
@@ -13,7 +13,7 @@ Openloop | Reference (ILD2300) | 1.00004 | 8.43081 | 2396.00000 | .42606
 
 # Forward test sequence
 
-j (cycle)| i (pos id)| Tgt_pos(i) [mm] | Motor_pos(i) [mm] | Resolver_pos(i) [mm] | Reference(i) [mm] | Diff ref-tgt, X(i,j) [mm]
+j (cycle)| i (pos id)| Tgt_pos [mm] | Motor_pos [mm] | Resolver_pos [mm] | Reference [mm] | Diff ref-tgt, X(i,j) [mm]
 --- | --- | --- | --- | --- | --- |--- |
 1 | 1 | 15.00000 | 15.00070 | 15.02085 | 14.99906 | -.00094 |
 1 | 2 | 25.00000 | 25.00078 | 25.02085 | 24.99832 | -.00168 |
@@ -125,4 +125,15 @@ R_bwd = .09464
 R = Bi-directional positioning repeatability of an axis (max(R_fwd,R_bwd))
 
 R = .13564
+
+
+E_fwd = Forward unidirectional system positioning error of an axis.
+
+E_fwd = .03037
+
+E_bwd = Backward unidirectional system positioning error of an axis.
+
+E_bwd = .02115
+E = Bi-directional system positioning error of an axis.
+E = .03037
 
