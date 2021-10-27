@@ -1,7 +1,7 @@
 # ecmc motion system test report
 
 * Data file   : /home/dev/sources/ecmc_bifrost_slits_sat/tests_2/11360/230_2_slower_rate.log
-* Date        : Wed Oct 27 12:16:11 CEST 2021
+* Date        : Wed Oct 27 12:35:26 CEST 2021
 * Author      : dev
 
 
@@ -164,3 +164,18 @@ A = Bi-directional accuracy of an axis.
 
 A = .09464 [mm]
 
+# Limit Switch Performance
+
+## Low Limit Engage Position
+
+Test | Openloop [mm]| Resolver [mm]| Diff [mm]
+--- | --- | --- |--- |
+1 | 67.66751 | 0.00000 | 0.00000
+2 | 67.66751 | 0.00000 | 0.00000
+3 | 67.66751 | 0.00000 | 0.00000
+4 | 67.66751 | 0.00000 | 0.00000
+5 | 67.66751 | 0.00000 | 0.00000
+6 | 67.66751 | 0.00000 | 0.00000
+7 | 67.66751 | 0.00000 | 0.00000
+8 | 67.66751 | 0.00000 | 0.00000
+9 | 67.66751 | 0.00000 | 0.00000

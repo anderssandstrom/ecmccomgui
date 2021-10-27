@@ -662,97 +662,10 @@ bash ecmcReport.bash $REPORT ""
 # Mean unidirectional pos dev at a position
 DIFF_AVG_BWD=$(echo "$DIFF_SUM/$TEST_COUNTER" | bc) 
 
-echo "OL_FWD_43=$OL_FWD_43"
-echo "REF_FWD_13=$REF_FWD_13"
-echo "RES_FWD_13=$RES_FWD_13"
-echo "OL_BWD_43=$OL_BWD_43"
-echo "REF_BWD_13=$REF_BWD_13"
-echo "RES_BWD_13=$RES_BWD_13"
-
-exit
-
-# Old tests down here
-
-# Find resolver value at 35mm (on open loop counter).
-TRIGGPV="IOC_TEST:TestNumber"
-TRIGGVAL="3305"
-DATAPV="IOC_TEST:m0s004-Enc01-PosAct"
-DATACOUNT="50"
-DATA=$(bash ecmcGetLinesBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})
-RESOLVER_VAL_AT_35=$(echo "${DATA}" | bash ecmcAvgLines.bash)
-echo "Resolver val at 35mm                = ${RESOLVER_VAL_AT_35}"
-
-# Find microepsilon optical sensor value at 35mm (on open loop counter).
-TRIGGPV="IOC_TEST:TestNumber"
-TRIGGVAL="3305"
-DATAPV="IOC_TEST:m0s005-Enc01-PosAct"
-DATACOUNT="1"  # Not updating every cycle
-DATA=$(bash ecmcGetLinesBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})
-# Need to reverse sign since positive in negative ditrection
-OPTO_VAL_AT_35=$(echo "${DATA}" | bash ecmcScaleLines.bash -1 | bash ecmcAvgLines.bash)
-echo "Opto val at 35mm                    = ${OPTO_VAL_AT_35}"
-
-# Find open loop sensor value at 35mm (on open loop counter) (should be very close 35, just to check!!).
-TRIGGPV="IOC_TEST:TestNumber"
-TRIGGVAL="3305"
-DATAPV="IOC_TEST:Axis1-PosAct"
-DATACOUNT="1" # Just one value since on change and open loop counter is not changing at standstill
-DATA=$(bash ecmcGetLinesBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})
-# Need to reverse sign since positive in negative ditrection
-OPEN_LOOP_VAL_AT_35=$(echo "${DATA}" | bash ecmcAvgLines.bash)
-echo "Openloop val at 35mm                = ${OPEN_LOOP_VAL_AT_35}"
-
-echo "This leads to the following offsets to open loop counter:"
-# Calculate offsets for the sensors to get in same coord system (origo at 35mm open loop counter)
-OPTO_OFFSET=$(awk -v sensor=${OPTO_VAL_AT_35} -v ref=${OPEN_LOOP_VAL_AT_35} "BEGIN {print ref-sensor}")
-echo "Opto offset     = ${OPTO_OFFSET}"
-
-# Calculate offsets for the sensors to get in same coord system (origo at 35mm open loop counter)
-RESOLVER_OFFSET=$(awk -v sensor=${RESOLVER_VAL_AT_35} -v ref=${OPEN_LOOP_VAL_AT_35} "BEGIN {print ref-sensor}")
-echo "Resolver offset = ${RESOLVER_OFFSET}"
-
-## Init report file
-bash ecmcReportInit.bash $REPORT $FILE
-
-## Write sensor information
-bash ecmcReport.bash $REPORT "# Sensors"
-bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "## Open loop step counter of stepper"
-bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "The stepper motors was run in open loop during all the tests. The openloop step counter"
-bash ecmcReport.bash $REPORT "reflects the actual position of the contolsystem."
-bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "## Resolver:"
-bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "Conversion data (to open loop coord syst):"
-bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "1. Scale factor  : 1"
-bash ecmcReport.bash $REPORT "2. Offset : ${RESOLVER_OFFSET}mm"
-bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "## External verification system, Micro-Epsilon ILD2300 sensor"
-bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "Conversion data (to open loop coord syst):"
-bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "1. Scale factor  : -1 (measure from top)"
-bash ecmcReport.bash $REPORT "2. Offset : ${OPTO_OFFSET}mm"
-bash ecmcReport.bash $REPORT ""
-
 echo "####################################################################"
 
 ##### Switches ##########################################################
-bash mainSwitch.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET $DEC
-
-##### Repeatability #####################################################
-bash mainRepeatability.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET $DEC
+bash mainSwitchISO230.bash $FILE $REPORT $RES_OFF $REF_OFF $DEC
 
 ##### Resolver jitter ###################################################
-bash mainResolverStandstill.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET 5 1000
-
-##### Accuracy FWD ######################################################
-bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "## Accuracy based on Resolver and ILD2300 Sensor Positive Direction"
-bash mainAccuracy.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET $DEC 8000 0
-
-##### Accuracy BWD ######################################################
-bash ecmcReport.bash $REPORT "## Accuracy based on Resolver and ILD2300 Sensor Negative Direction"
-bash mainAccuracy.bash $FILE $REPORT $RESOLVER_OFFSET $OPTO_OFFSET $DEC 7000 1
+bash mainResolverStandstillISO230.bash $FILE $REPORT $RES_OFF $REF_OFF 5 4000
