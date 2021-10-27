@@ -4,9 +4,11 @@
 #
 # Arg 1 Data file   (input)
 # Arg 2 Report file (output)
-# Arg 3 Resolver offset
-# Arg 4 Opto offset
-# Arg 5 Decimals
+# Arg 3 Resolver gain
+# Arg 4 Resolver offset
+# Arg 5 Opto gain
+# Arg 6 Opto offset
+# Arg 7 Decimals
 #
 # Author: Anders Sandström, anders.sandstrom@esss.se
 #
@@ -14,16 +16,18 @@
 # Newline
 nl='
 '
-if [ "$#" -ne 5 ]; then
+if [ "$#" -ne 7 ]; then
    echo "mainSwitch: Wrong arg count... Please specify input and output file."
    exit 1 
 fi
 
 FILE=$1
 REPORT=$2
-RESOLVER_OFFSET=$3
-OPTO_OFFSET=$4
-DEC=$5
+RESOLVER_GAIN=$3
+RESOLVER_OFFSET=$4
+OPTO_FAIN=$5
+OPTO_OFFSET=$6
+DEC=$7
 
 ############ Limits #####################################################"
 
@@ -38,7 +42,7 @@ bash ecmcReport.bash $REPORT "--- | --- | --- |--- |"
 # Get one openloop counter value just before BI1 0
 TRIGGPV="IOC_TEST:TestNumber"
 DATAPV="IOC_TEST:Axis1-PosAct"
-DATACOUNT="100"  # Must be enough to capture the switch transition
+DATACOUNT="400"  # Must be enough to capture the switch transition
 SWITCHPV="IOC_TEST:m0s002-BI01"                   
 SWITCHVAL=0
 OPENLOOPVALS=""
@@ -59,7 +63,7 @@ do
    OPENLOOPVALS+="$OPENLOOPVAL "
    DATAPV="IOC_TEST:m0s004-Enc01-PosAct"
    RESOLVERVAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
-   RESOLVERVAL=$(echo $RESOLVERVAL | bash ecmcScaleOffsetData.bash 1 ${RESOLVER_OFFSET})
+   RESOLVERVAL=$(echo $RESOLVERVAL | bash ecmcScaleOffsetData.bash ${RESOLVER_GAIN} ${RESOLVER_OFFSET})
    RESOLVERVALS+="$RESOLVERVAL "
    echo "BWD switch engage position $TRIGGVAL: $OPENLOOPVAL, $RESOLVERVAL"
    echo "OPENLOOPVAL=$OPENLOOPVAL"
@@ -68,16 +72,16 @@ do
    DIFFS+="$DIFF "
    printf "%d | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $COUNTER $OPENLOOPVAL $RESOLVERVAL $DIFF >> $REPORT
 
-   if (( $(echo "$RESOLVERVAL > $RES_MAX" |bc -l) )); then
+   if (( $(echo "$RESOLVERVAL > $RES_MAX" | bc -l) )); then
      RES_MAX=$RESOLVERVAL
    fi
-   if (( $(echo "$RESOLVERVAL < $RES_MIN" |bc -l) )); then
+   if (( $(echo "$RESOLVERVAL < $RES_MIN" | bc -l) )); then
      RES_MIN=$RESOLVERVAL
    fi
-   if (( $(echo "$OPENLOOPVAL > $OPEN_MAX" |bc -l) )); then
+   if (( $(echo "$OPENLOOPVAL > $OPEN_MAX" | bc -l) )); then
      OPEN_MAX=$OPENLOOPVAL
    fi
-   if (( $(echo "$OPENLOOPVAL < $OPEN_MIN" |bc -l) )); then
+   if (( $(echo "$OPENLOOPVAL < $OPEN_MIN" | bc -l) )); then
      OPEN_MIN=$OPENLOOPVAL
    fi
 
@@ -127,7 +131,7 @@ do
    OPENLOOPVALS+="$OPENLOOPVAL "
    DATAPV="IOC_TEST:m0s004-Enc01-PosAct"
    RESOLVERVAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
-   RESOLVERVAL=$(echo $RESOLVERVAL | bash ecmcScaleOffsetData.bash 1 ${RESOLVER_OFFSET})
+   RESOLVERVAL=$(echo $RESOLVERVAL | bash ecmcScaleOffsetData.bash ${RESOLVER_GAIN} ${RESOLVER_OFFSET})
    RESOLVERVALS+="$RESOLVERVAL "
    echo "BWD switch disengage position $TRIGGVAL: $OPENLOOPVAL, $RESOLVERVAL"
    DIFF=$(awk "BEGIN {print ($RESOLVERVAL-($OPENLOOPVAL))}")
@@ -192,7 +196,7 @@ do
    OPENLOOPVALS+="$OPENLOOPVAL "
    DATAPV="IOC_TEST:m0s004-Enc01-PosAct"
    RESOLVERVAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
-   RESOLVERVAL=$(echo $RESOLVERVAL | bash ecmcScaleOffsetData.bash 1 ${RESOLVER_OFFSET})
+   RESOLVERVAL=$(echo $RESOLVERVAL | bash ecmcScaleOffsetData.bash ${RESOLVER_GAIN} ${RESOLVER_OFFSET})
    RESOLVERVALS+="$RESOLVERVAL "
    echo "FWD switch engage position $TRIGGVAL: $OPENLOOPVAL, $RESOLVERVAL"
    DIFF=$(awk "BEGIN {print ($RESOLVERVAL-($OPENLOOPVAL))}")
@@ -254,7 +258,7 @@ do
    OPENLOOPVALS+="$OPENLOOPVAL "
    DATAPV="IOC_TEST:m0s004-Enc01-PosAct"
    RESOLVERVAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
-   RESOLVERVAL=$(echo $RESOLVERVAL | bash ecmcScaleOffsetData.bash 1 ${RESOLVER_OFFSET})
+   RESOLVERVAL=$(echo $RESOLVERVAL | bash ecmcScaleOffsetData.bash ${RESOLVER_GAIN} ${RESOLVER_OFFSET})
    RESOLVERVALS+="$RESOLVERVAL "
    echo "FWD switch disengage position $TRIGGVAL: $OPENLOOPVAL, $RESOLVERVAL"
    DIFF=$(awk "BEGIN {print ($RESOLVERVAL-($OPENLOOPVAL))}")

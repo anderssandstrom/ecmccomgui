@@ -665,7 +665,7 @@ DIFF_AVG_BWD=$(echo "$DIFF_SUM/$TEST_COUNTER" | bc)
 echo "####################################################################"
 
 ##### Switches ##########################################################
-bash mainSwitchISO230.bash $FILE $REPORT $RES_OFF $REF_OFF $DEC
+bash mainSwitchISO230.bash $FILE $REPORT $RES_GR $RES_OFF $REF_GR $REF_OFF $DEC
 
 ##### Resolver jitter ###################################################
 bash mainResolverStandstillISO230.bash $FILE $REPORT $RES_OFF $REF_OFF 5 4000
