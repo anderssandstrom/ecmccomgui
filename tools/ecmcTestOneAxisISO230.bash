@@ -28,7 +28,7 @@ END_POS=60
 
 ## PREPS
 # Calc how many positions to tests
-POS_COUNTER=$((($LAST_TEST_POS-$FIRST_TEST_POS)/$POS_STEP+1))
+POS_COUNTER=$(echo "scale=0;($LAST_TEST_POS-$FIRST_TEST_POS)/$POS_STEP+1" | bc -l)
 
 echo "POS_COUNT: $POS_COUNTER"
 echo "Starting ecmc automatic FAT/SAT script!"

@@ -87,10 +87,10 @@ while not done:
     testPv.put(testNumberBase - counter)
 
   if startpos>stoppos:
-    pos = pos - stepsize
+    pos = round(pos - stepsize,6)
     done = pos < stoppos
   if startpos<stoppos:    
-    pos = pos + stepsize
+    pos = round(pos + stepsize,6)
     done = pos > stoppos
 
 time.sleep(1)

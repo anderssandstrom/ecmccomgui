@@ -215,14 +215,14 @@ do
    eval "REF_FWD_$CYCLE$TEST=$DATA"
    
    # Calc diff ref tg Xij
-   DIFF=$(echo "scale=$DEC;$REF_DATA-$TGT_DATA" | bc )
+   DIFF=$(echo "scale=$DEC;$REF_DATA-$TGT_DATA" | bc -l)
    eval "X_FWD_$TEST_$CYCLE=$DIFF"
-   DIFF_SUM=$(echo "$DIFF_SUM+($DIFF)" | bc) 
+   DIFF_SUM=$(echo "$DIFF_SUM+($DIFF)" | bc -l) 
 
    # Sum error at this position
    TEMP_VAR="DIFF_FWD_SUM_AT_POS_$TEST"
    TEMP=${!TEMP_VAR}
-   TEMP=$(echo "$TEMP+($DIFF)" | bc )
+   TEMP=$(echo "$TEMP+($DIFF)" | bc -l)
    eval "$TEMP_VAR=$TEMP"
    
    bash ecmcReport.bash $REPORT " $TEST | $CYCLE | $TGT_DATA | $OL_DATA | $RES_DATA | $REF_DATA | $DIFF |"
@@ -232,7 +232,7 @@ done
 bash ecmcReport.bash $REPORT ""
 
 #Mean unidirectional pos dev at a position
-DIFF_AVG_FWD=$(echo "$DIFF_SUM/$TEST_COUNTER" | bc) 
+DIFF_AVG_FWD=$(echo "$DIFF_SUM/$TEST_COUNTER" | bc -l) 
 
 # Backward tests
 bash ecmcReport.bash $REPORT ""
@@ -264,7 +264,7 @@ do
    TRIGGVAL=$TESTNUMBER
    DATACOUNT=1
    DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
-   DATA=$(echo "scale=$DEC;$DATA/1" | bc )
+   DATA=$(echo "scale=$DEC;$DATA/1" | bc -l)
    TGT_DATA=$DATA
    echo "TGT_DATA=$DATA" 
    eval "TGT_BWD_$CYCLE$TEST=$DATA"
@@ -276,7 +276,7 @@ do
    TRIGGVAL=$TESTNUMBER
    DATACOUNT=1
    DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT}) 
-   DATA=$(echo "scale=$DEC;$DATA/1" | bc )
+   DATA=$(echo "scale=$DEC;$DATA/1" | bc -l)
    OL_DATA=$DATA
    echo "OL_DATA=$DATA" 
    eval "OL_BWD_$CYCLE$TEST=$DATA"
@@ -288,7 +288,7 @@ do
    DATACOUNT=1
    DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
    DATA=$(bc -l <<< "$DATA*($RES_GR)+($RES_OFF)")
-   DATA=$(echo "scale=$DEC;$DATA/1" | bc )
+   DATA=$(echo "scale=$DEC;$DATA/1" | bc -l)
    RES_DATA=$DATA
    echo "RES_DATA=$DATA" 
    eval "RES_BWD_$CYCLE$TEST=$DATA"
@@ -300,14 +300,23 @@ do
    DATACOUNT=1
    DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})   
    DATA=$(bc -l <<< "$DATA*($REF_GR)+($REF_OFF)")
-   DATA=$(echo "scale=$DEC;$DATA/1" | bc )
+   DATA=$(echo "scale=$DEC;$DATA/1" | bc -l)
    REF_DATA=$DATA
    echo "REF_DATA=$DATA"   
    eval "REF_BWD_$CYCLE$TEST=$DATA"
 
+
+   # Sum error at this position
+   TEMP_VAR="DIFF_FWD_SUM_AT_POS_$TEST"
+   TEMP=${!TEMP_VAR}
+   TEMP=$(echo "$TEMP+($DIFF)" | bc -l)
+   eval "$TEMP_VAR=$TEMP"
+
+
    # Calc diff ref tg Xij
-   DIFF=$(echo "scale=$DEC;$REF_DATA-($TGT_DATA)" | bc )
+   DIFF=$(echo "scale=$DEC;$REF_DATA-($TGT_DATA)" | bc -l)
    eval "X_BWD_$TEST_$CYCLE=$DIFF"
+   DIFF_SUM=$(echo "$DIFF_SUM+($DIFF)" | bc -l) 
    
    # Sum error at this position
    TEMP_VAR="DIFF_BWD_SUM_AT_POS_$TEST"
@@ -320,6 +329,9 @@ do
   done
 done
 bash ecmcReport.bash $REPORT ""
+
+# Mean unidirectional pos dev at a position
+DIFF_AVG_BWD=$(echo "$DIFF_SUM/$TEST_COUNTER" | bc) 
 
 # Calc x_dash_i (Mean unidirectional pos deviation at position i)
 B_MAX=0
@@ -428,9 +440,11 @@ do
     STEMPSUM_BWD=$(echo "($STEMPSUM_BWD)+($STEMP2)" | bc -l)
   done
   # * 1/(1-n)
+  echo "HEHEHEHEHEH: STEMPSUM_FWD=$STEMPSUM_FWD"
   STEMP_FWD=$(echo "scale=$DEC;sqrt(($STEMPSUM_FWD)/4)" | bc -l)
   eval "S_FWD_$TEST=$STEMP_FWD"
   echo "S_FWD_$TEST=$STEMP_FWD, $STEMPSUM_FWD"
+  echo "HEHEHEHEHEH: STEMPSUM_BWD=$STEMPSUM_BWD"
   STEMP_BWD=$(echo "scale=$DEC;sqrt(($STEMPSUM_BWD)/4)" | bc -l)
   eval "S_BWD_$TEST=$STEMP_BWD"
   echo "S_BWD_$TEST=$STEMP_BWD, $STEMPSUM_BWD"
@@ -583,21 +597,38 @@ bash ecmcReport.bash $REPORT ""
 ########## Accuracy
 
 #A_fwd=max(Xi_avg_fwd+2*Si_fwd)-min(Xi_avg_fwd-2*Si_fwd)
+
+
+echo "0 X_FWD_AVG_1=$X_FWD_AVG_1" 
+echo "0 S_FWD_1=$S_FWD_1" 
+echo "0 X_BWD_AVG_1=$X_BWD_AVG_1" 
+echo "0 S_BWD_1=$S_BWD_1" 
+
+
 XI_2SI_MAX_FWD=$(echo "$X_FWD_AVG_1+2*($S_FWD_1)" | bc -l)
 XI_2SI_MIN_FWD=$(echo "$X_FWD_AVG_1-2*($S_FWD_1)" | bc -l)
 XI_2SI_MAX_BWD=$(echo "$X_BWD_AVG_1+2*($S_BWD_1)" | bc -l)
 XI_2SI_MIN_BWD=$(echo "$X_BWD_AVG_1-2*($S_BWD_1)" | bc -l)
 
+echo "1 XI_2SI_MAX_FWD=$XI_2SI_MAX_FWD" 
+echo "1 XI_2SI_MIN_FWD=$XI_2SI_MAX_FWD" 
+echo "1 XI_2SI_MAX_BWD=$XI_2SI_MAX_FWD" 
+echo "1 XI_2SI_MIN_BWD=$XI_2SI_MAX_FWD" 
+
 for TEST in $TESTS
 do
+    echo "TEST=$TEST"
     # Calc Xi_avg_fwd+2*Si_fwd
     # FORWARD
     XI_AVG_VAR="X_FWD_AVG_$TEST"
     XI_AVG=${!XI_AVG_VAR}
     SI_VAR="S_FWD_$TEST"
     SI=${!SI_VAR}
+    echo "XI_AVG=$XI_AVG"
+    echo "SI=$SI"
     XI_PLUS_2SI=$(echo "$XI_AVG+2*($SI)" | bc -l)
     XI_MINUS_2SI=$(echo "$XI_AVG-2*($SI)" | bc -l)
+
     # Check max
     if (( $(echo "$XI_PLUS_2SI > $XI_2SI_MAX_FWD" | bc -l) )); then
       XI_2SI_MAX_FWD=$XI_PLUS_2SI
@@ -607,11 +638,16 @@ do
       XI_2SI_MIN_FWD=$XI_MINUS_2SI
     fi 
 
+    echo "2 XI_2SI_MAX_FWD=$XI_2SI_MAX_FWD" 
+    echo "2 XI_2SI_MIN_FWD=$XI_2SI_MIN_FWD" 
+
     # FORWARD
     XI_AVG_VAR="X_BWD_AVG_$TEST"
     XI_AVG=${!XI_AVG_VAR}
     SI_VAR="S_BWD_$TEST"
     SI=${!SI_VAR}
+    echo "XI_AVG=$XI_AVG"
+    echo "SI=$SI"
     XI_PLUS_2SI=$(echo "$XI_AVG+2*($SI)" | bc -l)
     XI_MINUS_2SI=$(echo "$XI_AVG-2*($SI)" | bc -l)
     # Check max
@@ -622,7 +658,13 @@ do
     if (( $(echo "$XI_MINUS_2SI < $XI_2SI_MIN_BWD" | bc -l) )); then
       XI_2SI_MIN_BWD=$XI_MINUS_2SI
     fi 
+    echo "2 XI_2SI_MAX_BWD=$XI_2SI_MAX_FWD" 
+    echo "2 XI_2SI_MIN_BWD=$XI_2SI_MIN_FWD" 
+
 done
+
+
+
 
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "# Accuracy"
@@ -659,8 +701,6 @@ bash ecmcReport.bash $REPORT "A = $A [$UNIT]"
 bash ecmcReport.bash $REPORT ""
 
 
-# Mean unidirectional pos dev at a position
-DIFF_AVG_BWD=$(echo "$DIFF_SUM/$TEST_COUNTER" | bc) 
 
 echo "####################################################################"
 
