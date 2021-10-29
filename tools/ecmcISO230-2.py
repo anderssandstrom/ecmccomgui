@@ -35,6 +35,16 @@ class ecmcISO230_2:
         self.x_i_j_bwd={}
         self.R_i_fwd={}
         self.R_i_bwd={}
+        self.R_i={}
+        self.R_fwd=0
+        self.R_bwd=0
+        self.E_fwd=0
+        self.E_bwd=0
+        self.E=0
+        self.M=0
+        self.A_fwd=0
+        self.A_bwd=0
+        self.A=0
 
     def parseLine(self, line):
         print(line)
@@ -130,11 +140,111 @@ class ecmcISO230_2:
           self.s_i_bwd[i]=np.sqrt(s_bwd_tmp_sum/(self.cycles-1))
 
     def calcR(self):
+        self.R_fwd=0
+        self.R_bwd=0
+
         for i in range(1,self.positions+1):
           #fwd
           self.R_i_fwd[i]=4*self.s_i_fwd[i]
+          if self.R_i_fwd[i]>self.R_fwd:
+              self.R_fwd=self.R_i_fwd[i]
           #bwd
           self.R_i_bwd[i]=4*self.s_i_bwd[i]
+          if self.R_i_fbwd[i]>self.R_bwd:
+              self.R_bwd=self.R_i_fwd[i]
+
+          term1=2*self.s_i_fwd[i] + 2*self.s_i_bwd[i] + np.abs(self.B_i[i])
+          term2=R_i_fwd[i]
+          term3=R_i_bwd[i]
+          termMax=term1
+          if term2>termMax:
+              termMax=term2
+          if term3>termMax:
+              termMax=term3
+          self.R_i[i]=termMax
+
+        self.R=self.R_fwd
+        if self.R_fwd>self.R:
+            self.R=self.R_fwd
+          
+
+    def calcE(self):
+        x_i_avg_fwd_max=self.x_i_fwd_avg[1]
+        x_i_avg_fwd_min=self.x_i_fwd_avg[1]
+        x_i_avg_bwd_max=self.x_i_bwd_avg[1]
+        x_i_avg_bwd_min=self.x_i_bwd_avg[1]
+        for i in range(1,self.positions+1):
+          #fwd
+          if self.x_i_fwd_avg[i]>x_i_avg_fwd_max:
+              x_i_avg_fwd_max=self.x_i_fwd_avg[i]
+          if self.x_i_fwd_avg[i]<x_i_avg_fwd_min:
+              x_i_avg_fwd_min=self.x_i_fwd_avg[i]
+
+          #bwd
+          if self.x_i_bwd_avg[i]>x_i_avg_bwd_max:
+              x_i_avg_bwd_max=self.x_i_bwd_avg[i]
+          if self.x_i_bwd_avg[i]<x_i_avg_bwd_min:
+              x_i_avg_bwd_min=self.x_i_bwd_avg[i]
+        
+        self.E_fwd=x_i_avg_fwd_max-x_i_avg_fwd_min
+        self.E_bwd=x_i_avg_bwd_max-x_i_avg_bwd_min
+
+        x_i_avg_max=x_i_avg_fwd_max
+        if x_i_avg_bwd_max>x_i_avg_max:
+            x_i_avg_max=x_i_avg_bwd_max
+        x_i_avg_min=x_i_avg_fwd_min
+        if x_i_avg_bwd_min>x_i_avg_min:
+            x_i_avg_min=x_i_avg_bwd_min
+            
+        self.E=x_i_avg_max-x_i_avg_min
+
+    def calcM(self):
+        x_i_avg_max=self.x_i_avg[1]
+        x_i_avg_min=self.x_i_avg[1]
+
+        for i in range(1,self.positions+1):
+          #fwd
+          if self.x_i_avg[i]>x_i_avg_max:
+            x_i_avg_max=self.x_i_avg[i]
+          if self.x_i_avg[i]<x_i_avg_min:
+            x_i_avg_min=self.x_i_avg[i]
+
+        self.M=x_i_avg_max-x_i_avg_min
+
+    def calcA(self):
+        term_max_fwd=self.x_i_fwd_avg[1]+2*self.s_i_fwd[1]
+        term_min_fwd=self.x_i_fwd_avg[1]-2*self.s_i_fwd[1]
+        term_max_bwd=self.x_i_bwd_avg[1]+2*self.s_i_bwd[1]
+        term_min_bwd=self.x_i_bwd_avg[1]-2*self.s_i_bwd[1]
+
+        for i in range(1,self.positions+1):
+          #fwd
+          term_temp_fwd_max=self.x_i_fwd_avg[1]+2*self.s_i_fwd[i]
+          term_temp_fwd_min=self.x_i_fwd_avg[1]-2*self.s_i_fwd[i]
+          if term_temp_fwd_max>term_max_fwd:
+            term_max_fwd=term_temp_fwd_max
+          if term_temp_fwd_min<term_min_fwd:
+            term_min_fwd=term_temp_fwd_min
+          #bwd
+          term_temp_bwd_max=self.x_i_bwd_avg[1]+2*self.s_i_bwd[i]
+          term_temp_bwd_min=self.x_i_bwd_avg[1]-2*self.s_i_bwd[i]
+          if term_temp_bwd_max>term_max_bwd:
+            term_max_bwd=term_temp_bwd_max
+          if term_temp_bwd_min<term_min_bwd:
+            term_min_bwd=term_temp_bwd_min
+        
+        self.A_fwd=term_max_fwd-term_min_fwd
+        self.A_bwd=term_max_bwd-term_min_bwd
+
+        term_max_max=term_max_fwd
+        term_min_min=term_min_fwd
+        if term_max_bwd>term_max_max:
+            term_max_max=term_max_bwd
+        if term_min_bwd<term_min_min:
+            term_min_min=term_min_bwd
+        self.A=term_max_max-term_min_min
+        print("AAAAAAA=" + str(self.A))
+
 
 def main():
    
@@ -157,6 +267,9 @@ def main():
   iso.calcX()
   iso.calcB()
   iso.calcS()
+  iso.calcE()
+  iso.calcM()
+  iso.calcA()
    
 if __name__ == "__main__":
   main()

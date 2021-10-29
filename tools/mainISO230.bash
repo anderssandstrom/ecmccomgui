@@ -231,6 +231,7 @@ do
 done
 bash ecmcReport.bash $REPORT ""
 
+
 #Mean unidirectional pos dev at a position
 DIFF_AVG_FWD=$(echo "$DIFF_SUM/$TEST_COUNTER" | bc -l) 
 
