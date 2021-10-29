@@ -47,21 +47,16 @@ class ecmcISO230_2:
         self.A=0
 
     def parseLine(self, line):
-        print(line)
         if line.find(UNIT)>=0:
             self.unit=line.split("=")[1]
-            print("UNIT!!!!!!!!")
-
             return
 
         if line.find(CYCLES)>=0:
             self.cycles=int(line.split("=")[1])
-            print("CYCLES!!!!!!!!")
             return
 
         if line.find(POSITIONS)>=0:
             self.positions=int(line.split("=")[1])
-            print("POSITIONS!!!!!!!!")
             return
 
         if line.find(REF_DATA_FWD)>=0:
@@ -71,7 +66,6 @@ class ecmcISO230_2:
             i=int(indexStr.split(",")[0])
             j=int(indexStr.split(",")[1])
             self.refData_bwd[i,j]=float(line.split("=")[1])
-            print("REFDATA_FWD!!!!!!!!")
             return
 
         if line.find(REF_DATA_BWD)>=0:
@@ -81,7 +75,6 @@ class ecmcISO230_2:
             i=int(indexStr.split(",")[0])
             j=int(indexStr.split(",")[1])
             self.refData_fwd[i,j]=float(line.split("=")[1])
-            print("REFDATA_BWD!!!!!!!!")
             return
 
         if line.find(TGT_DATA)>=0:
@@ -89,7 +82,6 @@ class ecmcISO230_2:
             indexStr=indexStr.split("[")[1]
             i=int(indexStr.split("]")[0])
             self.tgtData[i]=float(line.split("=")[1])
-            print("TGT_DATA!!!!!!!!")
             return
 
     def calcX(self):
@@ -150,12 +142,12 @@ class ecmcISO230_2:
               self.R_fwd=self.R_i_fwd[i]
           #bwd
           self.R_i_bwd[i]=4*self.s_i_bwd[i]
-          if self.R_i_fbwd[i]>self.R_bwd:
+          if self.R_i_bwd[i]>self.R_bwd:
               self.R_bwd=self.R_i_fwd[i]
 
           term1=2*self.s_i_fwd[i] + 2*self.s_i_bwd[i] + np.abs(self.B_i[i])
-          term2=R_i_fwd[i]
-          term3=R_i_bwd[i]
+          term2=self.R_i_fwd[i]
+          term3=self.R_i_bwd[i]
           termMax=term1
           if term2>termMax:
               termMax=term2
@@ -166,6 +158,7 @@ class ecmcISO230_2:
         self.R=self.R_fwd
         if self.R_fwd>self.R:
             self.R=self.R_fwd
+        print("R="+ str(self.R))
           
 
     def calcE(self):
@@ -197,6 +190,7 @@ class ecmcISO230_2:
             x_i_avg_min=x_i_avg_bwd_min
             
         self.E=x_i_avg_max-x_i_avg_min
+        print("E="+ str(self.E))
 
     def calcM(self):
         x_i_avg_max=self.x_i_avg[1]
@@ -210,6 +204,7 @@ class ecmcISO230_2:
             x_i_avg_min=self.x_i_avg[i]
 
         self.M=x_i_avg_max-x_i_avg_min
+        print("M="+ str(self.M))
 
     def calcA(self):
         term_max_fwd=self.x_i_fwd_avg[1]+2*self.s_i_fwd[1]
@@ -243,7 +238,7 @@ class ecmcISO230_2:
         if term_min_bwd<term_min_min:
             term_min_min=term_min_bwd
         self.A=term_max_max-term_min_min
-        print("AAAAAAA=" + str(self.A))
+        print("A=" + str(self.A))
 
 
 def main():
@@ -267,6 +262,7 @@ def main():
   iso.calcX()
   iso.calcB()
   iso.calcS()
+  iso.calcR()
   iso.calcE()
   iso.calcM()
   iso.calcA()
