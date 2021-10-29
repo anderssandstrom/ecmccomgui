@@ -92,16 +92,17 @@ class ecmcISO230_2:
           for j in range(1,self.cycles+1):
             #fwd
             self.x_i_j_fwd[i,j]=self.refData_fwd[i,j]-self.tgtData[i]
-            self.x_i_fwd[i,j]=self.x_i_j_fwd[i,j]
             x_sum_fwd+=self.x_i_j_fwd[i,j]
             #bwd
             self.x_i_j_bwd[i,j]=self.refData_bwd[i,j]-self.tgtData[i]
-            self.x_i_bwd[i,j]=self.x_i_j_bwd[i,j]
             x_sum_bwd+=self.x_i_j_bwd[i,j]
 
-          self.x_i_fwd_avg[i]=x_sum_fwd/self.positions
-          self.x_i_bwd_avg[i]=x_sum_bwd/self.positions
-          self.x_i_avg[i]=(self.x_i_fwd_avg[i]+self.x_i_bwd_avg[i])/2 
+          self.x_i_fwd_avg[i]=x_sum_fwd/float(self.positions)
+          self.x_i_bwd_avg[i]=x_sum_bwd/float(self.positions)
+          self.x_i_avg[i]=(self.x_i_fwd_avg[i]+self.x_i_bwd_avg[i])/float(2)
+          print("X_fwd_avg" + str(self.x_i_fwd_avg[i]))
+          print("X_bwd_avg" + str(self.x_i_bwd_avg[i]))
+          print("X_avg" + str(self.x_i_avg[i]))
           
     def calcB(self):
         B_sum=0
@@ -112,7 +113,9 @@ class ecmcISO230_2:
           if abs(self.B_i[i])>self.B:
               self.B=abs(self.B_i[i])
         
-        self.B_avg=B_sum/self.positions
+        self.B_avg=B_sum/float(self.positions)
+        print("B_avg="+str(self.B_avg))
+        print("B="+str(self.B))
 
     def calcS(self):
         for i in range(1,self.positions+1):
@@ -128,8 +131,10 @@ class ecmcISO230_2:
             s_bwd_tmp=s_bwd_tmp*s_bwd_tmp
             s_bwd_tmp_sum+=s_bwd_tmp
 
-          self.s_i_fwd[i]=np.sqrt(s_fwd_tmp_sum/(self.cycles-1))
-          self.s_i_bwd[i]=np.sqrt(s_bwd_tmp_sum/(self.cycles-1))
+          self.s_i_fwd[i]=np.sqrt(s_fwd_tmp_sum/float(self.cycles-1))
+          self.s_i_bwd[i]=np.sqrt(s_bwd_tmp_sum/float(self.cycles-1))
+          print("S_fwd=" + str(self.s_i_fwd[i]))
+          print("S_bwd=" + str(self.s_i_bwd[i]))
 
     def calcR(self):
         self.R_fwd=0
@@ -158,6 +163,9 @@ class ecmcISO230_2:
         self.R=self.R_fwd
         if self.R_fwd>self.R:
             self.R=self.R_fwd
+            
+        print("R_fwd="+ str(self.R_fwd))
+        print("R_bwd="+ str(self.R_bwd))
         print("R="+ str(self.R))
           
 
@@ -190,6 +198,8 @@ class ecmcISO230_2:
             x_i_avg_min=x_i_avg_bwd_min
             
         self.E=x_i_avg_max-x_i_avg_min
+        print("E_fwd="+ str(self.E_fwd))
+        print("E_bwd="+ str(self.E_bwd))
         print("E="+ str(self.E))
 
     def calcM(self):
@@ -238,6 +248,9 @@ class ecmcISO230_2:
         if term_min_bwd<term_min_min:
             term_min_min=term_min_bwd
         self.A=term_max_max-term_min_min
+        print("A_fwd=" + str(self.A_fwd))
+        print("A_bwd=" + str(self.A_bwd))
+
         print("A=" + str(self.A))
 
 
