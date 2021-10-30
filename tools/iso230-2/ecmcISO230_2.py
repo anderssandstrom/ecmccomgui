@@ -135,7 +135,7 @@ class ecmcISO230_2:
             return
 
         if line.find(UNIT)>=0:
-            self.unit=line.split("=")[1]
+            self.unit=line.split("=")[1].strip()
             return
 
         if line.find(CYCLES)>=0:
@@ -339,6 +339,22 @@ class ecmcISO230_2:
         print("A_bwd = " + str(self.A_bwd))
         print("A = " + str(self.A))
 
+    def addUnit(self, start):
+        return start + "[" + self.unit + "]"
+
+    def reportMarkDown(self):
+        print("# Data forward direction:")
+        # build table first row
+        tableStr=self.addUnit("Tgt pos ") + "|"
+        for j in range(1,self.cycles+1):
+            tableStr += self.addUnit("Pos " + str(j)+ " ") + "|"
+
+
+        for i in range(1,self.positions+1):          
+          for j in range(1,self.cycles+1):
+             print("123s")  
+        self  
+        print(tableStr)
 
 def main():
   fname = "" 
@@ -360,6 +376,7 @@ def main():
 
   # Calc process performance
   iso.calcAll()
+  iso.reportMarkDown() 
    
 if __name__ == "__main__":
   main()
