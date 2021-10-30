@@ -341,7 +341,7 @@ class ecmcISO230_2:
 
 
 def main():
-   
+  fname = "" 
   if len(sys.argv ) > 2  :  
       printOutHelp()
       sys.exit()
@@ -350,8 +350,7 @@ def main():
     fname=sys.argv[1]
     dataFile=open(fname,'r')
 
-  if len(sys.argv)==3:
-    fname=""
+  if len(sys.argv)==1:
     dataFile=sys.stdin
 
   iso=ecmcISO230_2()
