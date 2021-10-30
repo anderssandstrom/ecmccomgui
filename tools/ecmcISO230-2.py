@@ -3,6 +3,66 @@
 import sys
 import numpy as np
 
+## Example  input file:
+# UNIT=mm
+# CYCLES=5
+# POSITIONS=5
+# TGT_DATA[1]=15.00000
+# TGT_DATA[2]=25.00000
+# TGT_DATA[3]=35.00000
+# TGT_DATA[4]=45.00000
+# TGT_DATA[5]=55.00000
+# REF_DATA_FWD[1,1]=15.00161 
+# REF_DATA_FWD[2,1]=25.02160 
+# REF_DATA_FWD[3,1]=34.99089
+# REF_DATA_FWD[4,1]=44.96872
+# REF_DATA_FWD[5,1]=55.02660 
+# REF_DATA_FWD[1,2]=15.00161 
+# REF_DATA_FWD[2,2]=25.02160 
+# REF_DATA_FWD[3,2]=34.98946
+# REF_DATA_FWD[4,2]=44.96811
+# REF_DATA_FWD[5,2]=55.02619 
+# REF_DATA_FWD[1,3]=15.00141 
+# REF_DATA_FWD[2,3]=25.02120 
+# REF_DATA_FWD[3,3]=34.99007
+# REF_DATA_FWD[4,3]=44.96791
+# REF_DATA_FWD[5,3]=55.02476 
+# REF_DATA_FWD[1,4]=15.00181 
+# REF_DATA_FWD[2,4]=25.02120 
+# REF_DATA_FWD[3,4]=34.98987
+# REF_DATA_FWD[4,4]=44.96771
+# REF_DATA_FWD[5,4]=55.02558 
+# REF_DATA_FWD[1,5]=15.00202 
+# REF_DATA_FWD[2,5]=25.02099 
+# REF_DATA_FWD[3,5]=34.98967 
+# REF_DATA_FWD[4,5]=44.96811
+# REF_DATA_FWD[5,5]=55.0255
+# REF_DATA_BWD[1,1]=14.99876
+# REF_DATA_BWD[2,1]=25.01468
+# REF_DATA_BWD[3,1]=34.98743
+# REF_DATA_BWD[4,1]=44.96689
+# REF_DATA_BWD[5,1]=55.02598
+# REF_DATA_BWD[1,2]=14.99896
+# REF_DATA_BWD[2,2]=25.01529
+# REF_DATA_BWD[3,2]=34.98681
+# REF_DATA_BWD[4,2]=44.96628
+# REF_DATA_BWD[5,2]=55.02558
+# REF_DATA_BWD[1,3]=14.99937
+# REF_DATA_BWD[2,3]=25.01488
+# REF_DATA_BWD[3,3]=34.98661
+# REF_DATA_BWD[4,3]=44.96669
+# REF_DATA_BWD[5,3]=55.02578
+# REF_DATA_BWD[1,4]=14.99917
+# REF_DATA_BWD[2,4]=25.01448
+# REF_DATA_BWD[3,4]=34.98783
+# REF_DATA_BWD[4,4]=44.96689
+# REF_DATA_BWD[5,4]=55.02537
+# REF_DATA_BWD[1,5]=14.99896
+# REF_DATA_BWD[2,5]=25.01468
+# REF_DATA_BWD[3,5]=34.98804
+# REF_DATA_BWD[4,5]=44.96567
+# REF_DATA_BWD[5,5]=55.02517
+
 UNIT="UNIT="
 CYCLES="CYCLES="
 POSITIONS="POSITIONS"
@@ -45,8 +105,35 @@ class ecmcISO230_2:
         self.A_fwd=0
         self.A_bwd=0
         self.A=0
+    
 
+    # Load file. If fileName is empty then uses stdin
+    def loadFile(self, fileName):
+        if len(fileName)==0:
+            dataFile=sys.stdin
+        else:
+            dataFile=open(fileName,'r')
+
+        # Parse data
+        for line in dataFile:
+            self.parseLine(line)
+
+    # Execute all calcs
+    def calcAll(self):
+        self.calcX()
+        self.calcB()
+        self.calcS()
+        self.calcR()
+        self.calcE()
+        self.calcM()
+        self.calcA()
+
+    # parse one line  of data
     def parseLine(self, line):
+        # Ignore if "#"
+        if line.strip()[0]=="#":
+            return
+
         if line.find(UNIT)>=0:
             self.unit=line.split("=")[1]
             return
@@ -268,16 +355,12 @@ def main():
     dataFile=sys.stdin
 
   iso=ecmcISO230_2()
+  
+  #Load data (empty equals stdin)
+  iso.loadFile(fname)
 
-  for line in dataFile:
-      iso.parseLine(line)
-  iso.calcX()
-  iso.calcB()
-  iso.calcS()
-  iso.calcR()
-  iso.calcE()
-  iso.calcM()
-  iso.calcA()
+  # Calc process performance
+  iso.calcAll()
    
 if __name__ == "__main__":
   main()
