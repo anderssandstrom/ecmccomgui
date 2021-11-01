@@ -69,6 +69,7 @@ POSITIONS="POSITIONS"
 TGT_DATA="TGT_DATA["
 REF_DATA_FWD="REF_DATA_FWD["
 REF_DATA_BWD="REF_DATA_BWD["
+DEC="DEC="
 
 def printOutHelp():
   print ("python ecmcGearRatecmcISO230-2.py <filename>]")
@@ -81,6 +82,7 @@ class ecmcISO230_2:
         self.refData_bwd = {}
         self.tgtData = {}
         self.unit = ""
+        self.decimals=4
         self.x_i_fwd={}
         self.x_i_fwd_avg={}
         self.x_i_bwd={}
@@ -146,6 +148,10 @@ class ecmcISO230_2:
 
         if line.find(CYCLES)>=0:
             self.cycles=int(line.split("=")[1])
+            return
+
+        if line.find(DEC)>=0:
+            self.decimals=int(line.split("=")[1])
             return
 
         if line.find(POSITIONS)>=0:
@@ -379,19 +385,43 @@ class ecmcISO230_2:
     def addUnit(self, start):
         return start + "[" + self.unit + "]"
 
-    def reportMarkDown(self):
+    def addDataPointToTableRow(self, data):        
+        return str(round(data,self.decimals))+ "|"
+
+
+    def reportInputDataMD(self):
         print("# Data forward direction:")
         # build table first row
-        tableStr=self.addUnit("Tgt pos ") + "|"
+        tableStr=self.addUnit("Tgt pos ") + "|"        
+        subStr="--- |"
+
         for j in range(1,self.cycles+1):
-            tableStr += self.addUnit("Pos " + str(j)+ " ") + "|"
+            tableStr += self.addUnit("Cycle " + str(j)+ " ") + "|"
+            subStr+=subStr
 
-
-        for i in range(1,self.positions+1):          
-          for j in range(1,self.cycles+1):
-             print("123s")  
-        self  
         print(tableStr)
+        print(subStr)
+
+        for i in range(1,self.positions+1): 
+          tempStr=""
+          tempStr+=addDataPointToTableRow(self.tgtData[i])          
+          for j in range(1,self.cycles+1):            
+            tempStr+=addDataPointToTableRow(self.refData_fwd[i])        
+          print (tempStr)
+
+        print("# Data backward direction:")
+        print(tableStr)
+        print(subStr)
+
+        for i in range(1,self.positions+1): 
+          tempStr=""
+          tempStr+=addDataPointToTableRow(self.tgtData[i])          
+          for j in range(1,self.cycles+1):            
+            tempStr+=addDataPointToTableRow(self.refData_bwd[i])        
+          print (tempStr)
+
+    def reportMarkDown(self):
+        self.reportInputDataMD()
 
 def main():
   fname = "" 

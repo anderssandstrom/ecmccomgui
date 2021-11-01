@@ -1,7 +1,7 @@
 # ecmc motion system test report
 
 * Data file   : /home/dev/sources/ecmc_bifrost_slits_sat/tests_2/11360/axis2/230_2_step_10_only230.log
-* Date        : Mon Nov  1 11:19:12 CET 2021
+* Date        : Mon Nov  1 12:03:56 CET 2021
 * Author      : dev
 
 
