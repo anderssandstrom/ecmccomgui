@@ -397,29 +397,31 @@ class ecmcISO230_2:
 
         for j in range(1,self.cycles+1):
             tableStr += self.addUnit("Cycle " + str(j)+ " ") + "|"
-            subStr+=subStr
-
+            subStr+="--- |"
+        print("")
         print(tableStr)
         print(subStr)
 
         for i in range(1,self.positions+1): 
           tempStr=""
-          tempStr+=addDataPointToTableRow(self.tgtData[i])          
+          tempStr+=self.addDataPointToTableRow(self.tgtData[i])          
           for j in range(1,self.cycles+1):            
-            tempStr+=addDataPointToTableRow(self.refData_fwd[i])        
+            tempStr+=self.addDataPointToTableRow(self.refData_fwd[i,j])        
           print (tempStr)
 
+        print("")
         print("# Data backward direction:")
         print(tableStr)
         print(subStr)
 
         for i in range(1,self.positions+1): 
           tempStr=""
-          tempStr+=addDataPointToTableRow(self.tgtData[i])          
+          tempStr+=self.addDataPointToTableRow(self.tgtData[i])          
           for j in range(1,self.cycles+1):            
-            tempStr+=addDataPointToTableRow(self.refData_bwd[i])        
+            tempStr+=self.addDataPointToTableRow(self.refData_bwd[i,j])        
           print (tempStr)
-
+        print("")
+        
     def reportMarkDown(self):
         self.reportInputDataMD()
 

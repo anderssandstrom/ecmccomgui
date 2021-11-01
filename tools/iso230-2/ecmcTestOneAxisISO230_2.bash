@@ -7,8 +7,10 @@ VELO=0.75
 
 # TEST Positions 15,25,35,45,55
 FIRST_TEST_POS=15
-LAST_TEST_POS=55
-POS_STEP=10
+
+POS_STEP=10.2
+POS_COUNTER=5
+
 RESOLVER_TEST_POS=35
 
 # Approach first test position from 10
@@ -17,18 +19,17 @@ START_POS=10
 # Approch last test from when going backward
 END_POS=60
 
-
 #################################### FUNCTIONS
 # No functions yet
 
-
-
 #################################### MAIN
-
-
 ## PREPS
+LAST_TEST_POS=$(echo "$FIRST_TEST_POS+($POS_COUNTER-1)*$POS_STEP" | bc -l)
+
+echo "LAST_TEST_POS=$LAST_TEST_POS"
+
 # Calc how many positions to tests
-POS_COUNTER=$(echo "scale=0;($LAST_TEST_POS-$FIRST_TEST_POS)/$POS_STEP+1" | bc -l)
+#POS_COUNTER=$(echo "scale=0;($LAST_TEST_POS-$FIRST_TEST_POS)/$POS_STEP+1" | bc -l)
 
 echo "POS_COUNT: $POS_COUNTER"
 echo "Starting ecmc automatic FAT/SAT script!"
