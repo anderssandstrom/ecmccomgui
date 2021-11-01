@@ -105,7 +105,10 @@ class ecmcISO230_2:
         self.A_fwd=0
         self.A_bwd=0
         self.A=0
-    
+        self.gearRatio=0
+        self.offset=0
+        self.refPosGrArray=np.array([])
+        self.tgtPosGrArray=np.array([])
 
     # Load file. If fileName is empty then uses stdin
     def loadFile(self, fileName):
@@ -130,6 +133,9 @@ class ecmcISO230_2:
 
     # parse one line  of data
     def parseLine(self, line):
+        if len(line.strip())==0:
+            return
+
         # Ignore if "#"
         if line.strip()[0]=="#":
             return
@@ -338,6 +344,37 @@ class ecmcISO230_2:
         print("A_fwd = " + str(self.A_fwd))
         print("A_bwd = " + str(self.A_bwd))
         print("A = " + str(self.A))
+    
+    def calcGearRatio(self):
+        # Build arrays forward        
+        self.dataPoints=0
+        self.resError=0
+        resError=0
+        for i in range(1,self.positions+1):
+          for j in range(1,self.cycles+1):      
+            self.refPosGrArray=np.append(self.refPosGrArray,self.refData_fwd[i,j])
+            self.tgtPosGrArray=np.append(self.tgtPosGrArray,self.tgtData[i])
+            self.dataPoints+=1
+ 
+        # Build arrays backward
+        for i in range(1,self.positions+1):
+          for j in range(1,self.cycles+1):      
+            self.refPosGrArray=np.append(self.refPosGrArray,self.refData_bwd[i,j])
+            self.tgtPosGrArray=np.append(self.tgtPosGrArray,self.tgtData[i])
+            self.dataPoints+=1
+
+        if len(self.tgtPosGrArray) == len(self.refPosGrArray) and len(self.refPosGrArray)>0:
+          z, res, x, x, x = np.polyfit(self.refPosGrArray, self.tgtPosGrArray, 1, full=True)
+          self.gearRatio=z[0]
+          self.offset=z[1]
+          self.resError=res[0]
+        else:
+          print ("Array size missmatch:")
+          print ("L1: "+ str(len(self.refPosGrArray)) + " L2: " + str(len(fromArray)) )
+
+        print(str(z[0])+ " " + str(z[1]) + " " + str(len(self.refPosGrArray)) + " "+ str(res[0]))
+
+        return self.gearRatio, self.offset, self.dataPoints, self.resError
 
     def addUnit(self, start):
         return start + "[" + self.unit + "]"
