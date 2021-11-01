@@ -2,6 +2,9 @@
 # coding: utf-8
 import sys
 import numpy as np
+import getpass
+from datetime import datetime
+
 
 ## Example  input file:
 # UNIT=mm
@@ -111,9 +114,11 @@ class ecmcISO230_2:
         self.offset=0
         self.refPosGrArray=np.array([])
         self.tgtPosGrArray=np.array([])
+        self.fileName = ""
 
     # Load file. If fileName is empty then uses stdin
     def loadFile(self, fileName):
+        self.fileName=fileName
         if len(fileName)==0:
             dataFile=sys.stdin
         else:
@@ -379,7 +384,6 @@ class ecmcISO230_2:
           print ("L1: "+ str(len(self.refPosGrArray)) + " L2: " + str(len(fromArray)) )
 
         print(str(z[0])+ " " + str(z[1]) + " " + str(len(self.refPosGrArray)) + " "+ str(res[0]))
-
         return self.gearRatio, self.offset, self.dataPoints, self.resError
 
     def addUnit(self, start):
@@ -388,9 +392,9 @@ class ecmcISO230_2:
     def addDataPointToTableRow(self, data):        
         return str(round(data,self.decimals))+ "|"
 
-
     def reportInputDataMD(self):
-        print("# Data forward direction:")
+        print("")
+        print("## Data forward direction:")
         # build table first row
         tableStr=self.addUnit("Tgt pos ") + "|"        
         subStr="--- |"
@@ -410,7 +414,8 @@ class ecmcISO230_2:
           print (tempStr)
 
         print("")
-        print("# Data backward direction:")
+        print("## Data backward direction:")
+        print("")
         print(tableStr)
         print(subStr)
 
@@ -421,8 +426,23 @@ class ecmcISO230_2:
             tempStr+=self.addDataPointToTableRow(self.refData_bwd[i,j])        
           print (tempStr)
         print("")
-        
+    
+    def reportInit(self):
+        print("# ISO 230-2 motion test")
+        print("")
+        #print("# ecmc motion performance report")
+        #print("")
+        #checkuser = getpass.getuser()
+        #print("user: " + checkuser)
+        #if len(self.fileName)>0:
+        #  print("file: " + self.fileName)
+        #else:
+        #  print("file: sys.stdin")
+        #print("time: " + str(datetime.now()))
+        #print("")
+
     def reportMarkDown(self):
+        self.reportInit()
         self.reportInputDataMD()
 
 def main():
