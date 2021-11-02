@@ -1,7 +1,7 @@
 # ecmc motion system test report
 
 * Data file   : /home/pi/sources/ecmc_bifrost_slits_sat/tests_2/11360/axis1/230_2_3.log
-* Date        : Tue 02 Nov 2021 04:25:43 PM CET
+* Date        : Tue 02 Nov 2021 08:52:50 PM CET
 * Author      : pi
 
 
@@ -18,12 +18,12 @@ Target Position | Reference | .99942 | 8.57125 | 50.00000 | .00084733
 Setting | Value
 --- | --- |
 Data file | sys.stdin
-Position count | 5 (i=1..5)
-Cycle count |5 (j=1..5)
-Unit | mm
 Reference position source | IOC_TEST:m0s005-Enc01-PosAct
 Target position source | IOC_TEST:Axis1-PosSet
 Test number source | IOC_TEST:TestNumber
+Position count | 5 (i=1..5)
+Cycle count |5 (j=1..5)
+Unit | mm
 
 
 ## Input data
@@ -191,11 +191,13 @@ A = 0.02197 [mm]
 Setting | Value |
 --- | --- |
 Data file | /home/pi/sources/ecmc_bifrost_slits_sat/tests_2/11360/axis1/230_2_3.log |
-Unit | mm |
 Reference position source | IOC_TEST:m0s004-Enc01-PosAct |
+Reference gear ratio | -0.9999816818 |
+Reference offset | 67.6636365153 |
 Low Limit source | IOC_TEST:m0s002-BI01 |
 High Limit source | IOC_TEST:m0s002-BI02 |
 Test number source | IOC_TEST:TestNumber |
+Unit | mm |
 
 ## Low Limit Engage Position
 
@@ -270,9 +272,23 @@ STD | 0.00354 |
 Range | 0.01110 |
 
 
-## Resolver Value Distribution
+# Resolver Performance
 
-Measured at 8 positions offset by 45deg resolver shaft angle. The distrubution values are based on 10 values at each location.
+## Configuration
+
+Setting | Value |
+--- | --- |
+Data file | /home/pi/sources/ecmc_bifrost_slits_sat/tests_2/11360/axis1/230_2_3.log |
+Resolver position source | IOC_TEST:m0s004-Enc01-PosAct |
+Resolver gain | -0.9999816818 |
+Resolver offset | 67.6636365153 |
+Target position source | IOC_TEST:Axis1-PosSet |
+Test number source | IOC_TEST:TestNumber |
+Unit | mm |
+
+## Resolver reading over one turn
+Measured at 8 positions offset by 45deg resolver shaft angle.
+The distrubution values are based on 10 values at each location.
 
 Test | Setpoint [mm] | Resolver AVG[mm] | Diff [mm} | Resolver STD[mm]
 --- | --- | --- | --- | --- |
@@ -285,5 +301,5 @@ Test | Setpoint [mm] | Resolver AVG[mm] | Diff [mm} | Resolver STD[mm]
 7 | 36.87562 | 36.8362000 | -0.0394250 | 0.0000139
 8 | 37.00062 | 37.0017000 | 0.0010750 | 0.0000168
 
-Accuracy standstill (Resolver): 0.0398250
+Accuracy standstill (Resolver): 0.0398250 [mm]
 

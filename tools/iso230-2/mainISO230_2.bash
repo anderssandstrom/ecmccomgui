@@ -89,7 +89,6 @@ echo "Collect gear ratio data (only at test points in the matrix)...."
 bash ecmcReportInit.bash $REPORT $FILE
 
 ##### Gear Ratio ###################################################
-
 # Use gear ratio python script to find gear ratios
 echo "1. Calculate gear ratios..."
 
@@ -150,7 +149,7 @@ bash mainSwitchISO230_2.bash $FILE $REPORT $TESTNUM_PV $RESOLVER_PV $RES_GR $RES
 
 ##### Resolver jitter ###################################################
 echo "4. Resolver performance test..."
-bash mainResolverStandstillISO230_2.bash $FILE $REPORT $RES_GR $RES_OFF $REF_GR $REF_OFF 5 4000
+bash mainResolverStandstillISO230_2.bash $FILE $REPORT $TESTNUM_PV $RESOLVER_PV $RES_GR $RES_OFF $MOTORSETPV $DEC $UNIT
 
 ##### Finish ###################################################
 echo "5. Report ready..."
