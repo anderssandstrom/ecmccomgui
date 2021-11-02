@@ -519,12 +519,12 @@ class ecmcISO230_2:
           print("Data file | " + self.fileName)
         else:
           print("Data file | sys.stdin")
-        print("Position count | " + str(self.positions) + " (i=1.." + str(self.positions)  + ")")
-        print("Cycle count |" + str(self.cycles) + " (j=1.." + str(self.cycles)  + ")")
-        print("Unit | " + self.unit)
         print("Reference position source | " + self.refpv)
         print("Target position source | " + self.tgtpv)
         print("Test number source | " + self.testpv)
+        print("Position count | " + str(self.positions) + " (i=1.." + str(self.positions)  + ")")
+        print("Cycle count |" + str(self.cycles) + " (j=1.." + str(self.cycles)  + ")")
+        print("Unit | " + self.unit)
         print("")
 
     def reportXB(self):

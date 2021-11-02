@@ -11,16 +11,21 @@
 #  Created on: Oct 20, 2021
 #      Author: anderssandstrom
 #
-# Arg 1 Data file   (input)
-# Arg 2 Report file (output)
-# Arg 3 TEST_PV
-# Arg 4 REF_PV
-# Arg 5 REF gain
-# Arg 6 REF offset
-# Arg 7 LOW_LIM_PV 
-# Arg 8 HIGH_LIM_PV
-# Arg 9 Decimals
-# Arg 10 Unit
+#  Script for extracting and calculating statistics of limit switch
+#  engage/disengage performance.
+#
+#  Arguments:
+#    1 Data file   (input)
+#    2 Report file (output)
+#    3 TEST_PV
+#    4 REF_PV
+#    5 REF gain
+#    6 REF offset
+#    7 LOW_LIM_PV 
+#    8 HIGH_LIM_PV
+#    9 Decimals
+#    10 Unit
+#
 #*************************************************************************/
 
 # Newline
@@ -42,8 +47,7 @@ HIGH_LIM_PV=$8
 DEC=$9
 UNIT=${10}
 
-############ Limits #####################################################"
-
+############ LOW LIMIT SWITCH
 # Low limit
 bash ecmcReport.bash $REPORT "# Limit Switch Performance"
 bash ecmcReport.bash $REPORT ""
@@ -52,11 +56,11 @@ bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "Setting | Value |"
 bash ecmcReport.bash $REPORT "--- | --- |"
 bash ecmcReport.bash $REPORT "Data file | $FILE |"
-bash ecmcReport.bash $REPORT "Unit  | $UNIT |"
 bash ecmcReport.bash $REPORT "Reference position source  | $REF_PV |"
 bash ecmcReport.bash $REPORT "Low Limit source  | $LOW_LIM_PV |"
 bash ecmcReport.bash $REPORT "High Limit source  | $HIGH_LIM_PV |"
 bash ecmcReport.bash $REPORT "Test number source  | $TEST_PV |"
+bash ecmcReport.bash $REPORT "Unit  | $UNIT |"
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "## Low Limit Engage Position "
 bash ecmcReport.bash $REPORT ""
@@ -70,7 +74,7 @@ SWITCHPV=$LOW_LIM_PV
 SWITCHVAL=0
 REF_VALS=""
 COUNTER=0
-DIFFS=""
+
 # this is uggly...
 REF_MIN=10000;
 REF_MAX=-10000;
@@ -99,7 +103,7 @@ done
 REF_AVG=$(echo "$REF_VALS" | bash ecmcAvgDataRow.bash)
 REF_STD=$(echo "$REF_VALS" | bash ecmcStdDataRow.bash)
 REF_RANGE=$(echo "$REF_MAX-($REF_MIN)" | bc -l)
-echo "Resference AVG=$REF_AVG, STD=$REF_STD"
+echo "Reference AVG=$REF_AVG, STD=$REF_STD"
 printf "AVG | %.${DEC}f | \n" $REF_AVG >> $REPORT
 printf "STD | %.${DEC}f | \n" $REF_STD >> $REPORT
 printf "Range | %.${DEC}f\n"  $REF_RANGE >> $REPORT
@@ -148,7 +152,6 @@ printf "STD | %.${DEC}f |\n" $REF_STD >> $REPORT
 printf "Range | %.${DEC}f |\n" $REF_RANGE >> $REPORT
 bash ecmcReport.bash $REPORT ""
 
-
 ############ HIGH LIMIT SWITCH
 # Engage
 SWITCHPV=$HIGH_LIM_PV
@@ -156,7 +159,6 @@ SWITCHVAL=0
 REF_VALS=""
 REF_AVG=""
 COUNTER=0
-DIFFS=""
 REF_MIN=10000;
 REF_MAX=-10000;
 
