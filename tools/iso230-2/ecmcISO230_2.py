@@ -104,6 +104,9 @@ TGT_DATA="TGT_DATA["
 REF_DATA_FWD="REF_DATA_FWD["
 REF_DATA_BWD="REF_DATA_BWD["
 DEC="DEC="
+REF_PV="REF_PV="
+TEST_PV="TEST_PV="
+TGT_SET_PV="TGT_SET_PV="
 
 def printOutHelp():
   print ("python ecmcISO230_2.py <filename>]")
@@ -146,6 +149,9 @@ class ecmcISO230_2:
         self.refPosGrArray=np.array([])
         self.tgtPosGrArray=np.array([])
         self.fileName = ""
+        self.tgtpv = "empty"
+        self.refpv = "empty"
+        self.testpv = "empty"
 
     # Load file. If fileName is empty then uses stdin
     def loadFile(self, fileName):
@@ -192,6 +198,18 @@ class ecmcISO230_2:
 
         if line.find(POSITIONS)>=0:
             self.positions=int(line.split("=")[1])
+            return
+
+        if line.find(REF_PV)>=0:
+            self.refpv=line.split("=")[1]
+            return
+
+        if line.find(TEST_PV)>=0:
+            self.testpv=line.split("=")[1]
+            return
+
+        if line.find(TGT_SET_PV)>=0:
+            self.tgtpv=line.split("=")[1]
             return
 
         if line.find(REF_DATA_FWD)>=0:
@@ -428,7 +446,9 @@ class ecmcISO230_2:
 
     def reportInputDataMD(self):
         print("")
-        print("## Data forward direction:")
+        print("## Input data")
+        print("")
+        print("### Data forward direction")
         print("")
         print("i = Position index []")
         print("")
@@ -461,7 +481,7 @@ class ecmcISO230_2:
           print (tempStr)
 
         print("")
-        print("## Data backward direction:")
+        print("### Data backward direction")
         print("")
         print("i = Position index []")
         print("")
@@ -487,16 +507,30 @@ class ecmcISO230_2:
     def reportInit(self):
         print("# ISO 230-2 motion test")
         print("")
-        #print("# ecmc motion performance report")
-        #print("")
-        #checkuser = getpass.getuser()
-        #print("user: " + checkuser)
-        #if len(self.fileName)>0:
-        #  print("file: " + self.fileName)
-        #else:
-        #  print("file: sys.stdin")
-        #print("time: " + str(datetime.now()))
-        #print("")
+        print("## Configuration")
+        print("")
+        if len(self.fileName)>0:
+          print("file: " + self.fileName)
+        else:
+          print("file: sys.stdin")
+        print("")
+        print("Time: " + str(datetime.now()))
+        print("")
+        checkuser = getpass.getuser()
+        print("user: " + checkuser)
+        print("")
+        print("Cycle count = " + str(self.cycles))
+        print("")
+        print("Position count = " + str(self.positions))
+        print("")
+        print("Unit = [" + self.unit + "]")
+        print("")
+        print("Reference position PV = " + self.refpv)
+        print("")
+        print("Target position PV = " + self.tgtpv)
+        print("")
+        print("Test number PV = " + self.testpv)
+        print("")
 
     def reportXB(self):
         print("")

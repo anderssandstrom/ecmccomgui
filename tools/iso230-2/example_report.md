@@ -1,7 +1,31 @@
 # ISO 230-2 motion test
 
+## Configuration
+file: sys.stdin
 
-## Data forward direction:
+Time: 2021-11-02 11:03:38.628176
+
+user: pi
+
+Cycle count = 5
+
+Position count = 5
+
+Unit = [mm]
+
+Reference position PV = IOC_TEST:m0s005-Enc01-PosAct
+
+
+Target position PV = IOC_TEST:Axis1-PosSet
+
+
+Test number PV = IOC_TEST:TestNumber
+
+
+
+## Input data
+
+### Data forward direction
 
 i = Position index []
 
@@ -20,7 +44,7 @@ i |tgt_pos(i) [mm]|ref_pos(i,1) [mm]|ref_pos(i,2) [mm]|ref_pos(i,3) [mm]|ref_pos
 4|45.0|44.9978|44.99943|44.9982|44.99881|44.99657|
 5|55.0|55.00289|55.00085|55.00717|55.00819|55.00044|
 
-## Data backward direction:
+### Data backward direction
 
 i = Position index []
 
