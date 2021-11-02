@@ -1,11 +1,16 @@
 # ISO 230-2 motion test
 
 ## Configuration
-file: sys.stdin
 
-Time: 2021-11-02 11:03:38.628176
+### General
 
-user: pi
+Input file: sys.stdin
+
+Time: 2021-11-02 11:07:40.900805
+
+User: pi
+
+### Cycle information
 
 Cycle count = 5
 
