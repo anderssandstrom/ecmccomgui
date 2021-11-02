@@ -1,33 +1,46 @@
 #!/bin/bash
 # 
-# Main script for processing data for bifrost slitset SAT.
+
+#*************************************************************************\
+# Copyright (c) 2019 European Spallation Source ERIC
+# ecmc is distributed subject to a Software License Agreement found
+# in file LICENSE that is included with this distribution. 
+#
+#  mainSwitchISO230_2.bash
+#
+#  Created on: Oct 20, 2021
+#      Author: anderssandstrom
 #
 # Arg 1 Data file   (input)
 # Arg 2 Report file (output)
-# Arg 3 Resolver gain
-# Arg 4 Resolver offset
-# Arg 5 Opto gain
-# Arg 6 Opto offset
-# Arg 7 Decimals
-#
-# Author: Anders Sandström, anders.sandstrom@esss.se
-#
+# Arg 3 TEST_PV
+# Arg 4 REF_PV
+# Arg 5 REF gain
+# Arg 6 REF offset
+# Arg 7 LOW_LIM_PV 
+# Arg 8 HIGH_LIM_PV
+# Arg 9 Decimals
+# Arg 10 Unit
+#*************************************************************************/
 
 # Newline
 nl='
 '
-if [ "$#" -ne 7 ]; then
-   echo "mainSwitch: Wrong arg count... Please specify input and output file."
+if [ "$#" -ne 10 ]; then
+   echo "mainSwitch: Wrong arg count... Please specify correct input args."
    exit 1 
 fi
 
 FILE=$1
 REPORT=$2
-RESOLVER_GAIN=$3
-RESOLVER_OFFSET=$4
-OPTO_FAIN=$5
-OPTO_OFFSET=$6
-DEC=$7
+TEST_PV=$3
+REF_PV=$4
+REF_GR=$5
+REF_OFF=$6
+LOW_LIM_PV=$7
+HIGH_LIM_PV=$8
+DEC=$9
+UNIT=${10}
 
 ############ Limits #####################################################"
 
@@ -36,259 +49,176 @@ bash ecmcReport.bash $REPORT "# Limit Switch Performance"
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "## Low Limit Engage Position "
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "Test | Openloop [mm]| Resolver [mm]| Diff [mm]"
-bash ecmcReport.bash $REPORT "--- | --- | --- |--- |"
+bash ecmcReport.bash $REPORT "Test | Reference [$UNIT] "
+bash ecmcReport.bash $REPORT "--- | --- |"
 
-# Get one openloop counter value just before BI1 0
-TRIGGPV="IOC_TEST:TestNumber"
-DATAPV="IOC_TEST:Axis1-PosAct"
+# Get one reference value just before BI1 0
+TRIGGPV=$TEST_PV
 DATACOUNT="400"  # Must be enough to capture the switch transition
-SWITCHPV="IOC_TEST:m0s002-BI01"                   
+SWITCHPV=$LOW_LIM_PV
 SWITCHVAL=0
-OPENLOOPVALS=""
-RESOLVERVALS=""
+REFVALS=""
 COUNTER=0
 DIFFS=""
-RES_MIN=10000;
-RES_MAX=-10000;
-OPEN_MIN=10000;
-OPEN_MAX=-10000;
+# this is uggly...
+REF_MIN=10000;
+REF_MAX=-10000;
 # Engage
 for TRIGGVAL in {3001..3010}
 do
-   let "COUNTER=$COUNTER+1"
-   DATAPV="IOC_TEST:Axis1-PosAct"
-   OPENLOOPVAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
-   OPENLOOPVALS+="$OPENLOOPVAL "
-   DATAPV="IOC_TEST:m0s004-Enc01-PosAct"
-   RESOLVERVAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
-   RESOLVERVAL=$(echo $RESOLVERVAL | bash ecmcScaleOffsetData.bash ${RESOLVER_GAIN} ${RESOLVER_OFFSET})
-   RESOLVERVALS+="$RESOLVERVAL "
-   echo "BWD switch engage position $TRIGGVAL: $OPENLOOPVAL, $RESOLVERVAL"
-   echo "OPENLOOPVAL=$OPENLOOPVAL"
-   echo "RESOLVERVAL=$RESOLVERVAL"
-   DIFF=$(awk "BEGIN {print ($RESOLVERVAL-($OPENLOOPVAL))}")
-   DIFFS+="$DIFF "
-   printf "%d | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $COUNTER $OPENLOOPVAL $RESOLVERVAL $DIFF >> $REPORT
+   let "COUNTER=$COUNTER+1"   
+   DATAPV=$REF_PV
+   REFVAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
+   REFVAL=$(echo $REFVAL | bash ecmcScaleOffsetData.bash ${REF_GR} ${REF_OFF})
+   REFVALS+="$REFVAL "
+   echo "BWD switch engage position $TRIGGVAL: $REFVAL"
+   echo "REFVAL=$REFVAL"
+   
+   printf "%d | %.${DEC}f |\n" $COUNTER $REFVAL >> $REPORT
 
-   if (( $(echo "$RESOLVERVAL > $RES_MAX" | bc -l) )); then
-     RES_MAX=$RESOLVERVAL
+   if (( $(echo "$REFVAL > $REF_MAX" | bc -l) )); then
+     REF_MAX=$REFVAL
    fi
-   if (( $(echo "$RESOLVERVAL < $RES_MIN" | bc -l) )); then
-     RES_MIN=$RESOLVERVAL
-   fi
-   if (( $(echo "$OPENLOOPVAL > $OPEN_MAX" | bc -l) )); then
-     OPEN_MAX=$OPENLOOPVAL
-   fi
-   if (( $(echo "$OPENLOOPVAL < $OPEN_MIN" | bc -l) )); then
-     OPEN_MIN=$OPENLOOPVAL
+   if (( $(echo "$REFVAL < $REF_MIN" | bc -l) )); then
+     REF_MIN=$REFVAL
    fi
 
 done
-# Calc avg and std
-OPENLOOPAVG=$(echo "$OPENLOOPVALS" | bash ecmcAvgDataRow.bash)
-OPENLOOPSTD=$(echo "$OPENLOOPVALS" | bash ecmcStdDataRow.bash)
-echo "Openloop AVG=$OPENLOOPAVG, STD=$OPENLOOPSTD" 
-RESOLVERAVG=$(echo "$RESOLVERVALS" | bash ecmcAvgDataRow.bash)
-RESOLVERSTD=$(echo "$RESOLVERVALS" | bash ecmcStdDataRow.bash)
-DIFF_AVG=$(awk "BEGIN {print ($OPENLOOPAVG-($RESOLVERAVG))}")
-DIFF_STD=$(awk "BEGIN {print ($OPENLOOPSTD-($RESOLVERSTD))}")
-RES_RANGE=$(echo "$RES_MAX-($RES_MIN)" | bc -l)
-OPEN_RANGE=$(echo "$OPEN_MAX-($OPEN_MIN)" | bc -l)
-echo "Resolver AVG=$RESOLVERAVG, STD=$RESOLVERSTD"
-printf "AVG | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $OPENLOOPAVG $RESOLVERAVG $DIFF_AVG >> $REPORT
-printf "STD | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $OPENLOOPSTD $RESOLVERSTD $DIFF_STD>> $REPORT
-printf "Range | %.${DEC}f | %.${DEC}f\n" $OPEN_RANGE $RES_RANGE >> $REPORT
 
-echo "RES_MIN=$RES_MIN, RES_MAX=$RES_MAX, RES_RANGE=$RES_RANGE"
+# Calc avg and std
+REF_AVG=$(echo "$REFVALS" | bash ecmcAvgDataRow.bash)
+REF_STD=$(echo "$REFVALS" | bash ecmcStdDataRow.bash)
+REF_RANGE=$(echo "$REF_MAX-($REF_MIN)" | bc -l)
+echo "Resference AVG=$REF_AVG, STD=$REF_STD"
+printf "AVG | %.${DEC}f | \n" $REF_AVG >> $REPORT
+printf "STD | %.${DEC}f | \n" $REF_STD >> $REPORT
+printf "Range | %.${DEC}f\n"  $REF_RANGE >> $REPORT
+
+echo "REF_MIN=$REF_MIN, REF_MAX=$REF_MAX, REF_RANGE=$REF_RANGE"
 
 bash ecmcReport.bash $REPORT ""
 
 # Disengage
 bash ecmcReport.bash $REPORT "## Low Limit Disengage Position "
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "Test | Openloop [mm]| Resolver [mm]| Diff [mm]"
-bash ecmcReport.bash $REPORT "--- | --- | --- |--- |"
+bash ecmcReport.bash $REPORT "Test | Reference [$UNIT] "
+bash ecmcReport.bash $REPORT "--- | --- |"
 
 SWITCHVAL=1
-OPENLOOPVALS=""
-RESOLVERVALS=""
-OPENLOOPAVG=""
-RESOLVERAVG=""
+REFVALS=""
+REF_AVG=""
 COUNTER=0
-DIFFS=""
-RES_MIN=10000;
-RES_MAX=-10000;
-OPEN_MIN=10000;
-OPEN_MAX=-10000;
+REF_MIN=10000;
+REF_MAX=-10000;
 
 for TRIGGVAL in {3011..3020}
 do
    let "COUNTER=$COUNTER+1"
-   DATAPV="IOC_TEST:Axis1-PosAct"
-   OPENLOOPVAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
-   OPENLOOPVALS+="$OPENLOOPVAL "
-   DATAPV="IOC_TEST:m0s004-Enc01-PosAct"
-   RESOLVERVAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
-   RESOLVERVAL=$(echo $RESOLVERVAL | bash ecmcScaleOffsetData.bash ${RESOLVER_GAIN} ${RESOLVER_OFFSET})
-   RESOLVERVALS+="$RESOLVERVAL "
-   echo "BWD switch disengage position $TRIGGVAL: $OPENLOOPVAL, $RESOLVERVAL"
-   DIFF=$(awk "BEGIN {print ($RESOLVERVAL-($OPENLOOPVAL))}")
-   DIFFS+="$DIFF "
-   printf "%d | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $COUNTER $OPENLOOPVAL $RESOLVERVAL $DIFF >> $REPORT
-   if (( $(echo "$RESOLVERVAL > $RES_MAX" |bc -l) )); then
-     RES_MAX=$RESOLVERVAL
+   DATAPV=$REF_PV
+   REFVAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
+   REFVAL=$(echo $REFVAL | bash ecmcScaleOffsetData.bash ${REF_GR} ${REF_OFF})
+   REFVALS+="$REFVAL "
+   echo "BWD switch disengage position $TRIGGVAL: $REFVAL"
+   printf "%d | %.${DEC}f |\n" $COUNTER $REFVAL >> $REPORT
+   if (( $(echo "$REFVAL > $REF_MAX" |bc -l) )); then
+     REF_MAX=$REFVAL
    fi
-   if (( $(echo "$RESOLVERVAL < $RES_MIN" |bc -l) )); then
-     RES_MIN=$RESOLVERVAL
+   if (( $(echo "$REFVAL < $REF_MIN" |bc -l) )); then
+     REF_MIN=$REFVAL
    fi
-   if (( $(echo "$OPENLOOPVAL > $OPEN_MAX" |bc -l) )); then
-     OPEN_MAX=$OPENLOOPVAL
-   fi
-   if (( $(echo "$OPENLOOPVAL < $OPEN_MIN" |bc -l) )); then
-     OPEN_MIN=$OPENLOOPVAL
-   fi
-
 done
 
 # Calc avg and std
-OPENLOOPAVG=$(echo "$OPENLOOPVALS" | bash ecmcAvgDataRow.bash)
-OPENLOOPSTD=$(echo "$OPENLOOPVALS" | bash ecmcStdDataRow.bash)
-echo "Openloop AVG=$OPENLOOPAVG, STD=$OPENLOOPSTD" 
-RESOLVERAVG=$(echo "$RESOLVERVALS" | bash ecmcAvgDataRow.bash)
-RESOLVERSTD=$(echo "$RESOLVERVALS" | bash ecmcStdDataRow.bash)
-DIFF_AVG=$(awk "BEGIN {print ($OPENLOOPAVG-($RESOLVERAVG))}")
-DIFF_STD=$(awk "BEGIN {print ($OPENLOOPSTD-($RESOLVERSTD))}")
-RES_RANGE=$(echo "$RES_MAX-($RES_MIN)" |bc -l)
-OPEN_RANGE=$(echo "$OPEN_MAX-($OPEN_MIN)" |bc -l)
-echo "Resolver AVG=$RESOLVERAVG, STD=$RESOLVERSTD"
-printf "AVG | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $OPENLOOPAVG $RESOLVERAVG $DIFF_AVG >> $REPORT
-printf "STD | %.${DEC}f | %.${DEC}f| %.${DEC}f\n" $OPENLOOPSTD $RESOLVERSTD $DIFF_STD >> $REPORT
-printf "Range | %.${DEC}f | %.${DEC}f\n" $OPEN_RANGE $RES_RANGE >> $REPORT
+REF_AVG=$(echo "$REFVALS" | bash ecmcAvgDataRow.bash)
+REF_STD=$(echo "$REFVALS" | bash ecmcStdDataRow.bash)
+REF_RANGE=$(echo "$REF_MAX-($REF_MIN)" |bc -l)
+echo "Reference AVG=$REF_AVG, STD=$REF_STD"
+printf "AVG | %.${DEC}f |\n" $REF_AVG >> $REPORT
+printf "STD | %.${DEC}f |\n" $REF_STD >> $REPORT
+printf "Range | %.${DEC}f |\n" $REF_RANGE >> $REPORT
 bash ecmcReport.bash $REPORT ""
+
 
 ############ HIGH LIMIT SWITCH
 # Engage
-SWITCHPV="IOC_TEST:m0s002-BI02"
+SWITCHPV=$HIGH_LIM_PV
 SWITCHVAL=0
-RESOLVERVALS=""
-OPENLOOPVALS=""
-OPENLOOPAVG=""
-RESOLVERAVG=""
+REFVALS=""
+REF_AVG=""
 COUNTER=0
 DIFFS=""
-RES_MIN=10000;
-RES_MAX=-10000;
-OPEN_MIN=10000;
-OPEN_MAX=-10000;
+REF_MIN=10000;
+REF_MAX=-10000;
 
 bash ecmcReport.bash $REPORT "## High Limit Engage Position "
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "Test | Openloop [mm]| Resolver [mm]| Diff [mm]"
-bash ecmcReport.bash $REPORT "--- | --- | --- |--- |"
+bash ecmcReport.bash $REPORT "Test | Reference [$UNIT] | "
+bash ecmcReport.bash $REPORT "--- | --- |"
 
 for TRIGGVAL in {5001..5010}
 do
    let "COUNTER=$COUNTER+1"
-   DATAPV="IOC_TEST:Axis1-PosAct"
-   OPENLOOPVAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
-   OPENLOOPVALS+="$OPENLOOPVAL "
-   DATAPV="IOC_TEST:m0s004-Enc01-PosAct"
-   RESOLVERVAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
-   RESOLVERVAL=$(echo $RESOLVERVAL | bash ecmcScaleOffsetData.bash ${RESOLVER_GAIN} ${RESOLVER_OFFSET})
-   RESOLVERVALS+="$RESOLVERVAL "
-   echo "FWD switch engage position $TRIGGVAL: $OPENLOOPVAL, $RESOLVERVAL"
-   DIFF=$(awk "BEGIN {print ($RESOLVERVAL-($OPENLOOPVAL))}")
-   DIFFS+="$DIFF "
-   printf "%d | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $COUNTER $OPENLOOPVAL $RESOLVERVAL $DIFF >> $REPORT
-   if (( $(echo "$RESOLVERVAL > $RES_MAX" |bc -l) )); then
-     RES_MAX=$RESOLVERVAL
+   DATAPV=$REF_PV
+   REFVAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
+   REFVAL=$(echo $REFVAL | bash ecmcScaleOffsetData.bash ${REF_GR} ${REF_OFF})
+   REFVALS+="$REFVAL "
+   echo "FWD switch engage position $TRIGGVAL: $REFVAL"
+   printf "%d | %.${DEC}f |\n" $COUNTER $REFVAL >> $REPORT
+   if (( $(echo "$REFVAL > $REF_MAX" |bc -l) )); then
+     REF_MAX=$REFVAL
    fi
-   if (( $(echo "$RESOLVERVAL < $RES_MIN" |bc -l) )); then
-     RES_MIN=$RESOLVERVAL
-   fi
-   if (( $(echo "$OPENLOOPVAL > $OPEN_MAX" |bc -l) )); then
-     OPEN_MAX=$OPENLOOPVAL
-   fi
-   if (( $(echo "$OPENLOOPVAL < $OPEN_MIN" |bc -l) )); then
-     OPEN_MIN=$OPENLOOPVAL
+   if (( $(echo "$REFVAL < $REF_MIN" |bc -l) )); then
+     REF_MIN=$REFVAL
    fi
 done
 
 # Calc avg and std
-OPENLOOPAVG=$(echo "$OPENLOOPVALS" | bash ecmcAvgDataRow.bash)
-OPENLOOPSTD=$(echo "$OPENLOOPVALS" | bash ecmcStdDataRow.bash)
-echo "Openloop AVG=$OPENLOOPAVG, STD=$OPENLOOPSTD" 
-RESOLVERAVG=$(echo "$RESOLVERVALS" | bash ecmcAvgDataRow.bash)
-RESOLVERSTD=$(echo "$RESOLVERVALS" | bash ecmcStdDataRow.bash)
-DIFF_AVG=$(awk "BEGIN {print ($OPENLOOPAVG-($RESOLVERAVG))}")
-DIFF_STD=$(awk "BEGIN {print ($OPENLOOPSTD-($RESOLVERSTD))}")
-RES_RANGE=$(echo "$RES_MAX-($RES_MIN)" |bc -l)
-OPEN_RANGE=$(echo "$OPEN_MAX-($OPEN_MIN)" |bc -l)
-echo "Resolver AVG=$RESOLVERAVG, STD=$RESOLVERSTD"
-printf "AVG | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $OPENLOOPAVG $RESOLVERAVG $DIFF_AVG >> $REPORT
-printf "STD | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $OPENLOOPSTD $RESOLVERSTD $DIFF_STD >> $REPORT
-printf "Range | %.${DEC}f | %.${DEC}f\n" $OPEN_RANGE $RES_RANGE >> $REPORT
+REF_AVG=$(echo "$REFVALS" | bash ecmcAvgDataRow.bash)
+REF_STD=$(echo "$REFVALS" | bash ecmcStdDataRow.bash)
+REF_RANGE=$(echo "$REF_MAX-($REF_MIN)" |bc -l)
+echo "Reference AVG=$REF_AVG, STD=$REF_STD"
+printf "AVG | %.${DEC}f |\n" $REF_AVG >> $REPORT
+printf "STD | %.${DEC}f |\n" $REF_STD >> $REPORT
+printf "Range | %.${DEC}f |\n" $REF_RANGE >> $REPORT
 bash ecmcReport.bash $REPORT ""
 
 # Disengage
 SWITCHVAL=1
-RESOLVERVALS=""
-OPENLOOPVALS=""
-OPENLOOPAVG=""
-RESOLVERAVG=""
+REFVALS=""
+REF_AVG=""
+REF_STD=""
 COUNTER=0
-DIFFS=""
-RES_MIN=10000;
-RES_MAX=-10000;
-OPEN_MIN=10000;
-OPEN_MAX=-10000;
+REF_MIN=10000;
+REF_MAX=-10000;
 
 bash ecmcReport.bash $REPORT "## High Limit Disengage Position "
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "Test | Openloop [mm]| Resolver [mm]| Diff [mm]"
-bash ecmcReport.bash $REPORT "--- | --- | --- |--- |"
+bash ecmcReport.bash $REPORT "Test |  Reference [$UNIT]|"
+bash ecmcReport.bash $REPORT "--- | --- |"
 
 for TRIGGVAL in {5011..5020}
 do
    let "COUNTER=$COUNTER+1"
-   DATAPV="IOC_TEST:Axis1-PosAct"
-   OPENLOOPVAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
-   OPENLOOPVALS+="$OPENLOOPVAL "
-   DATAPV="IOC_TEST:m0s004-Enc01-PosAct"
-   RESOLVERVAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
-   RESOLVERVAL=$(echo $RESOLVERVAL | bash ecmcScaleOffsetData.bash ${RESOLVER_GAIN} ${RESOLVER_OFFSET})
-   RESOLVERVALS+="$RESOLVERVAL "
-   echo "FWD switch disengage position $TRIGGVAL: $OPENLOOPVAL, $RESOLVERVAL"
-   DIFF=$(awk "BEGIN {print ($RESOLVERVAL-($OPENLOOPVAL))}")
-   DIFFS+="$DIFF "
-   printf "%d | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $COUNTER $OPENLOOPVAL $RESOLVERVAL $DIFF >> $REPORT
-   if (( $(echo "$RESOLVERVAL > $RES_MAX" |bc -l) )); then
-     RES_MAX=$RESOLVERVAL
+   DATAPV=$REF_PV
+   REFVAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
+   REFVAL=$(echo $REFVAL | bash ecmcScaleOffsetData.bash ${REF_GR} ${REF_OFF})
+   REFVALS+="$REFVAL "
+   echo "FWD switch disengage position $TRIGGVAL: $REFVAL"
+   printf "%d | %.${DEC}f |\n" $COUNTER $REFVAL >> $REPORT
+   if (( $(echo "$REFVAL > $REF_MAX" |bc -l) )); then
+     REF_MAX=$REFVAL
    fi
-   if (( $(echo "$RESOLVERVAL < $RES_MIN" |bc -l) )); then
-     RES_MIN=$RESOLVERVAL
-   fi
-   if (( $(echo "$OPENLOOPVAL > $OPEN_MAX" |bc -l) )); then
-     OPEN_MAX=$OPENLOOPVAL
-   fi
-   if (( $(echo "$OPENLOOPVAL < $OPEN_MIN" |bc -l) )); then
-     OPEN_MIN=$OPENLOOPVAL
+   if (( $(echo "$REFVAL < $REF_MIN" |bc -l) )); then
+     REF_MIN=$REFVAL
    fi
 done
 
 # Calc avg and std
-OPENLOOPAVG=$(echo "$OPENLOOPVALS" | bash ecmcAvgDataRow.bash)
-OPENLOOPSTD=$(echo "$OPENLOOPVALS" | bash ecmcStdDataRow.bash)
-echo "Openloop AVG=$OPENLOOPAVG, STD=$OPENLOOPSTD" 
-RESOLVERAVG=$(echo "$RESOLVERVALS" | bash ecmcAvgDataRow.bash)
-RESOLVERSTD=$(echo "$RESOLVERVALS" | bash ecmcStdDataRow.bash)
-DIFF_AVG=$(awk "BEGIN {print ($OPENLOOPAVG-($RESOLVERAVG))}")
-DIFF_STD=$(awk "BEGIN {print ($OPENLOOPSTD-($RESOLVERSTD))}")
-RES_RANGE=$(echo "$RES_MAX-($RES_MIN)" |bc -l)
-OPEN_RANGE=$(echo "$OPEN_MAX-($OPEN_MIN)" |bc -l)
-echo "Resolver AVG=$RESOLVERAVG, STD=$RESOLVERSTD"
-printf "AVG | %.${DEC}f | %.${DEC}f | %.${DEC}f\n" $OPENLOOPAVG $RESOLVERAVG $DIFF_AVG >> $REPORT
-printf "STD | %.${DEC}f | %.${DEC}f| %.${DEC}f\n" $OPENLOOPSTD $RESOLVERSTD $DIFF_STD >> $REPORT
-printf "Range | %.${DEC}f | %.${DEC}f\n" $OPEN_RANGE $RES_RANGE >> $REPORT
+REF_AVG=$(echo "$REFVALS" | bash ecmcAvgDataRow.bash)
+REF_STD=$(echo "$REFVALS" | bash ecmcStdDataRow.bash)
+REF_RANGE=$(echo "$REF_MAX-($REF_MIN)" |bc -l)
+echo "Reference AVG=$REF_AVG, STD=$REF_STD"
+printf "AVG | %.${DEC}f |\n" $REF_AVG >> $REPORT
+printf "STD | %.${DEC}f |\n" $REF_STD >> $REPORT
+printf "Range | %.${DEC}f |\n" $REF_RANGE >> $REPORT
 bash ecmcReport.bash $REPORT ""
