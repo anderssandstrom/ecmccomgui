@@ -515,12 +515,12 @@ class ecmcISO230_2:
         print("Setting | Value")
         print("--- | --- |")
         if len(self.fileName)>0:
-          print("Input file | " + self.fileName)
+          print("Data file | " + self.fileName)
         else:
-          print("Input file | sys.stdin")
-        print("Time | " + str(datetime.now()))
+          print("Data file | sys.stdin")
+        print("Date | " + str(datetime.now()))
         checkuser = getpass.getuser()
-        print("User | " + checkuser)
+        print("Author | " + checkuser)
         print("")
         print("### Cycle information")
         print("")
