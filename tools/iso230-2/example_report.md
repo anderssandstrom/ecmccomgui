@@ -7,7 +7,7 @@
 Setting | Value
 --- | --- |
 Input file | sys.stdin
-Time | 2021-11-02 11:15:45.113362
+Time | 2021-11-02 11:17:33.281917
 User | pi
 
 ### Cycle information
@@ -16,7 +16,7 @@ Setting | Value
 --- | --- |
 Position count | 5 (i=1..5)
 Cycle count |5 (j=1..5)
-Unit | [mm]
+Unit | mm
 Reference position PV | IOC_TEST:m0s005-Enc01-PosAct
 Target position PV | IOC_TEST:Axis1-PosSet
 Test number PV | IOC_TEST:TestNumber
