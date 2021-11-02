@@ -528,9 +528,9 @@ class ecmcISO230_2:
         print("Position count | " + str(self.positions) + " (i=1.." + str(self.positions)  + ")")
         print("Cycle count |" + str(self.cycles) + " (j=1.." + str(self.cycles)  + ")")
         print("Unit | " + self.unit)
-        print("Reference position PV | " + self.refpv)
-        print("Target position PV | " + self.tgtpv)
-        print("Test number PV | " + self.testpv)
+        print("Reference position source | " + self.refpv)
+        print("Target position source | " + self.tgtpv)
+        print("Test number source | " + self.testpv)
         print("")
 
     def reportXB(self):
