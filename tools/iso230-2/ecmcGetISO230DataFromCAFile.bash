@@ -1,7 +1,18 @@
 #!/bin/bash
-
-# Get data from camonitor log file
+#*************************************************************************\
+# Copyright (c) 2019 European Spallation Source ERIC
+# ecmc is distributed subject to a Software License Agreement found
+# in file LICENSE that is included with this distribution. 
+#
+#  ecmcGetISO230DataFromCAFile.bash
+#
+#  Created on: Oct 20, 2021
+#      Author: anderssandstrom
+#
+# Get data from camonitor log file 
 # Output in format suitable for iso230_2.py
+#
+#*************************************************************************/
 
 FILE=$1
 CYCLES=$2
@@ -12,19 +23,32 @@ REF_OFF=$6
 TESTNUMPV=$7
 MOTORSETPV=$8
 UNIT=$9
+DEC=$10
 
 # Input data file for ISO230-2 calcs.
 # derived from
 nl='
 '
 OUTPUTDATA="# Input data file for ISO230-2 calcs derived from: $FILE$nl"
+OUTPUTDATA+="# variable definitions:$nl"
+OUTPUTDATA+="#     REF_PV                            : Variable name filter for reference position value.$nl"
+OUTPUTDATA+="#     TEST_PV                           : Variable name filter for test number.$nl"
+OUTPUTDATA+="#     TGT_SET_PV                        : Variable name filter for position setpoint.$nl"
+OUTPUTDATA+="#     UNIT                              : Unit for measurenments.$nl"
+OUTPUTDATA+="#     CYCLES                            : ISO230-2 cycle count (normally 5).$nl"
+OUTPUTDATA+="#     POSITIONS                         : ISO230-2 position count (normally 8).$nl"
+OUTPUTDATA+="#     DEC                               : Decimal count for printouts. $nl"
+OUTPUTDATA+="#     TGT_DATA[<pos_id>]                : Target Position for <pos_id> (from TGT_SET_PV).$nl"
+OUTPUTDATA+="#     REF_DATA_FWD[<pos_id>,<cycle_id>] : Fwd. dir. ref system position for <pos_id> and <cycle_id> (from <REF_PV>).$nl"
+OUTPUTDATA+="#     REF_DATA_BWD[<pos_id>,<cycle_id>] : Bwd. dir. ref system position for <pos_id> and <cycle_id> (from <REF_PV>).$nl"
+OUTPUTDATA+="#$nl"
 OUTPUTDATA+="REF_PV=$REFERENCEPV$nl"
 OUTPUTDATA+="TEST_PV=$TESTNUMPV$nl"
 OUTPUTDATA+="TGT_SET_PV=$MOTORSETPV$nl"
 OUTPUTDATA+="UNIT=$UNIT$nl"
 OUTPUTDATA+="CYCLES=$CYCLES$nl"
 OUTPUTDATA+="POSITIONS=$TESTS$nl"
-
+OUTPUTDATA+="DEC=$DEC$nl"
 
 # Get forward direction data points (test numbers 1xx1..1xx)
 TESTS=$(seq -w 1 1 $TESTS)
@@ -46,7 +70,7 @@ do
      TRIGGVAL=$TESTNUMBER
      DATACOUNT=1
      DATA=$(bash ecmcGetDataBeforeTrigg.bash ${FILE} ${TRIGGPV} ${TRIGGVAL} ${DATAPV} ${DATACOUNT})        
-     TGT_DATA=$DATA
+     TGT_DATA=$DATA     
      OUTPUTDATA+="TGT_DATA[$TEST]=$TGT_DATA$nl"
    fi
 

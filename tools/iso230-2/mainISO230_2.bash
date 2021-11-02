@@ -1,13 +1,36 @@
 #!/bin/bash
-# 
-# Main script for processing data for bifrost slitset SAT.
+#*************************************************************************\
+# Copyright (c) 2019 European Spallation Source ERIC
+# ecmc is distributed subject to a Software License Agreement found
+# in file LICENSE that is included with this distribution. 
+#
+#  ecmcGetISO230DataFromCAFile.bash
+#
+#  Created on: Dec 14, 2020
+#      Author: anderssandstrom
+#
+#
+# Main script for processing data for IS=230-2 SAT/FAT.
 #
 # Arg 1 Data file   (input)
 # Arg 2 Report file (output)
 #
-# Author: Anders Sandström, anders.sandstrom@esss.se
+# NOTE: Varaibles below needs to modified for each case:
+#    MOTORACTPV             : Filter for motor open loop counter (actual position).
+#    MOTORSETPV             : Filter for motor setpint position (or target position).
+#    RESOLVERPV             : Filter fir resolver actrual postion.
+#    REFERENCEPV            : Filter for referance position.
+#    TESTNUMPV              : Filter for testnumber.
+#    DEC                    : Decimals in printouts.
+#    UNIT                   : Unit for the position measurement.
+#    TESTNUM_GEARRATIO_FROM : Start from this test to calc gear ratio.
+#    TESTNUM_GEARRATIO_TO   : End at this test for gear ratio calculations.
+#    ISO230_POS_COUNT       : ISO230-2 cycle position count.
+#    ISO230_CYCLE_COUNT     : ISO230-2 cycle count.
 #
-# Data examples: 
+#*************************************************************************/
+#
+# Data examples:
 # IOC_TEST:m0s004-Enc01-PosAct   2021-10-27 09:04:48.529180 66.14321041  
 # IOC_TEST:Axis1-PosAct          2021-10-27 09:04:48.529180 1.527265625  
 # IOC_TEST:Axis1-PosSet          2021-10-27 09:04:48.529180 1.527243125  
@@ -18,43 +41,13 @@
 # IOC_TEST:m0s004-Enc01-PosAct   2021-10-27 09:04:48.629165 66.10466003  
 # IOC_TEST:m0s005-Enc01-PosAct   2021-10-27 09:04:48.629165 2147.483643  
 # IOC_TEST:Axis1-PosAct          2021-10-27 09:04:48.629165 1.602265625  
-# IOC_TEST:Axis1-PosSet          2021-10-27 09:04:48.629165 1.602243125  
-# IOC_TEST:m0s004-Enc01-PosAct   2021-10-27 09:04:48.679157 66.06747913  
-# IOC_TEST:m0s005-Enc01-PosAct   2021-10-27 09:04:48.679157 33.08044  
-# IOC_TEST:Axis1-PosAct          2021-10-27 09:04:48.679157 1.639765625  
-# IOC_TEST:Axis1-PosSet          2021-10-27 09:04:48.679157 1.639743125  
-# IOC_TEST:m0s004-Enc01-PosAct   2021-10-27 09:04:48.729143 66.01678658  
-# IOC_TEST:m0s005-Enc01-PosAct   2021-10-27 09:04:48.729143 2147.483643  
-# IOC_TEST:Axis1-PosAct          2021-10-27 09:04:48.729143 1.677265625  
-# IOC_TEST:Axis1-PosSet          2021-10-27 09:04:48.729143 1.677243125  
-# IOC_TEST:m0s004-Enc01-PosAct   2021-10-27 09:04:48.779143 65.96195507  
-# IOC_TEST:m0s005-Enc01-PosAct   2021-10-27 09:04:48.779143 33.35992  
-# IOC_TEST:Axis1-PosAct          2021-10-27 09:04:48.779143 1.714765625  
-# IOC_TEST:Axis1-PosSet          2021-10-27 09:04:48.779143 1.714743125  
-# IOC_TEST:m0s004-Enc01-PosAct   2021-10-27 09:04:48.829164 65.91618061  
-# IOC_TEST:m0s005-Enc01-PosAct   2021-10-27 09:04:48.829164 2147.483643  
-# IOC_TEST:Axis1-PosAct          2021-10-27 09:04:48.829164 1.752265625  
-# IOC_TEST:Axis1-PosSet          2021-10-27 09:04:48.829164 1.752243125  
-# IOC_TEST:m0s004-Enc01-PosAct   2021-10-27 09:04:48.879143 65.88419342  
-#
-# Markdown to PDF notes
-# 1: https://www.markdowntopdf.com
-# 2: 
-# pip install grip  
-# grip your_markdown.md
-# grip will render the markdown on localhost:5000 or similar (ex: go to http://localhost:5000/) - just edit away and refresh the browser. Print when ready.
 
-
-
-
-# Newline
-nl='
-'
 if [ "$#" -ne 2 ]; then
    echo "main: Wrong arg count... Please specify input and output file."
    exit 1 
 fi
 
+##########################################################################
 ### Need to update these fileds for every FAT sat so everything is correct
 ##PV names:
 MOTORACTPV="IOC_TEST:Axis1-PosAct"
@@ -63,26 +56,28 @@ RESOLVERPV="IOC_TEST:m0s004-Enc01-PosAct"
 REFERENCEPV="IOC_TEST:m0s005-Enc01-PosAct"
 TESTNUMPV="IOC_TEST:TestNumber"
 
-# Number decimals
+# Number decimals in printouts
 DEC=5
+# Units for printouts
 UNIT="mm"
-# Calculate gearratios based on this test
-#TESTNUM_GEARRATIO_FROM=1501
-#TESTNUM_GEARRATIO_TO=1502
-
-TESTNUM_GEARRATIO_FROM=1501
-TESTNUM_GEARRATIO_TO=2501
-
-# this many sample before this test (needs to be bigger than samples between TESTNUM_GEARRATIO_FROM to TESTNUM_GEARRATIO_TO)
-SAMPLES_GEARRATIO=1000000
 
 # Defs for ISO230 analysis
 ISO230_POS_COUNT=5
 ISO230_CYCLE_COUNT=5
 
+##########################################################################
+# Below no variables shold need to be updated
 FILE=$1
 REPORT=$2
 
+# Calculate gearratios based on this test (should be correct defined)
+TESTNUM_GEARRATIO_FROM=1501
+TESTNUM_GEARRATIO_TO=2501
+
+
+# Newline
+nl='
+'
 
 # Always 5 cycles in standard
 # Get forward direction data points (test numbers 1xx1..1xx)
@@ -99,7 +94,7 @@ bash ecmcReportInit.bash $REPORT $FILE
 echo "1. Calculate gear ratios..."
 
 # Get ISO230-2 RESOLVER data from input file for calc of gear ratio (Collect data with GR=1 and OFFSET=0)
-GEAR_RATIO_DATA_RESOLVER=$(bash ecmcGetISO230DataFromCAFile.bash $FILE $ISO230_CYCLE_COUNT $ISO230_POS_COUNT $RESOLVERPV 1 0 $TESTNUMPV $MOTORSETPV $UNIT)
+GEAR_RATIO_DATA_RESOLVER=$(bash ecmcGetISO230DataFromCAFile.bash $FILE $ISO230_CYCLE_COUNT $ISO230_POS_COUNT $RESOLVERPV 1 0 $TESTNUMPV $MOTORSETPV $UNIT $DEC)
 
 echo "$GEAR_RATIO_DATA_RESOLVER "
 TEMP=$( echo "$GEAR_RATIO_DATA_RESOLVER " | python ecmcGearRatioISO230_2.py)
@@ -114,7 +109,7 @@ RES_GR_DISP=$(echo "scale=$DEC;$RES_GR/1" | bc -l)
 RES_OFF_DISP=$(echo "scale=$DEC;$RES_OFF/1" | bc -l)
 
 # Get ISO230-2 REFERENCE data from input file for calc of gear ratio (Collect data with GR=1 and OFFSET=0)
-GEAR_RATIO_DATA_REFERENCE=$(bash ecmcGetISO230DataFromCAFile.bash $FILE $ISO230_CYCLE_COUNT $ISO230_POS_COUNT $REFERENCEPV 1 0 $TESTNUMPV $MOTORSETPV $UNIT)
+GEAR_RATIO_DATA_REFERENCE=$(bash ecmcGetISO230DataFromCAFile.bash $FILE $ISO230_CYCLE_COUNT $ISO230_POS_COUNT $REFERENCEPV 1 0 $TESTNUMPV $MOTORSETPV $UNIT $DEC)
 echo "$GEAR_RATIO_DATA_REFERENCE "
 TEMP=$( echo "$GEAR_RATIO_DATA_REFERENCE " | python ecmcGearRatioISO230_2.py)
 REF_GR=$(echo $TEMP | awk '{print $1}')
