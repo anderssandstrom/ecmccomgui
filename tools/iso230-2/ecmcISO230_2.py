@@ -1,70 +1,101 @@
 #!/usr/bin/python
 # coding: utf-8
+
+#*************************************************************************\
+# Copyright (c) 2019 European Spallation Source ERIC
+# ecmc is distributed subject to a Software License Agreement found
+# in file LICENSE that is included with this distribution. 
+#
+#  ecmcISO230_2.py
+#
+#  Created on: Oct 20, 2021
+#      Author: anderssandstrom
+#
+# Calculate ISO230-2 data
+#
+#*************************************************************************/
+
 import sys
 import numpy as np
 import getpass
 from datetime import datetime
 
-
 ## Example  input file:
-# UNIT=mm
-# CYCLES=5
-# POSITIONS=5
-# TGT_DATA[1]=15.00000
-# TGT_DATA[2]=25.00000
-# TGT_DATA[3]=35.00000
-# TGT_DATA[4]=45.00000
-# TGT_DATA[5]=55.00000
-# REF_DATA_FWD[1,1]=15.00161 
-# REF_DATA_FWD[2,1]=25.02160 
-# REF_DATA_FWD[3,1]=34.99089
-# REF_DATA_FWD[4,1]=44.96872
-# REF_DATA_FWD[5,1]=55.02660 
-# REF_DATA_FWD[1,2]=15.00161 
-# REF_DATA_FWD[2,2]=25.02160 
-# REF_DATA_FWD[3,2]=34.98946
-# REF_DATA_FWD[4,2]=44.96811
-# REF_DATA_FWD[5,2]=55.02619 
-# REF_DATA_FWD[1,3]=15.00141 
-# REF_DATA_FWD[2,3]=25.02120 
-# REF_DATA_FWD[3,3]=34.99007
-# REF_DATA_FWD[4,3]=44.96791
-# REF_DATA_FWD[5,3]=55.02476 
-# REF_DATA_FWD[1,4]=15.00181 
-# REF_DATA_FWD[2,4]=25.02120 
-# REF_DATA_FWD[3,4]=34.98987
-# REF_DATA_FWD[4,4]=44.96771
-# REF_DATA_FWD[5,4]=55.02558 
-# REF_DATA_FWD[1,5]=15.00202 
-# REF_DATA_FWD[2,5]=25.02099 
-# REF_DATA_FWD[3,5]=34.98967 
-# REF_DATA_FWD[4,5]=44.96811
-# REF_DATA_FWD[5,5]=55.0255
-# REF_DATA_BWD[1,1]=14.99876
-# REF_DATA_BWD[2,1]=25.01468
-# REF_DATA_BWD[3,1]=34.98743
-# REF_DATA_BWD[4,1]=44.96689
-# REF_DATA_BWD[5,1]=55.02598
-# REF_DATA_BWD[1,2]=14.99896
-# REF_DATA_BWD[2,2]=25.01529
-# REF_DATA_BWD[3,2]=34.98681
-# REF_DATA_BWD[4,2]=44.96628
-# REF_DATA_BWD[5,2]=55.02558
-# REF_DATA_BWD[1,3]=14.99937
-# REF_DATA_BWD[2,3]=25.01488
-# REF_DATA_BWD[3,3]=34.98661
-# REF_DATA_BWD[4,3]=44.96669
-# REF_DATA_BWD[5,3]=55.02578
-# REF_DATA_BWD[1,4]=14.99917
-# REF_DATA_BWD[2,4]=25.01448
-# REF_DATA_BWD[3,4]=34.98783
-# REF_DATA_BWD[4,4]=44.96689
-# REF_DATA_BWD[5,4]=55.02537
-# REF_DATA_BWD[1,5]=14.99896
-# REF_DATA_BWD[2,5]=25.01468
-# REF_DATA_BWD[3,5]=34.98804
-# REF_DATA_BWD[4,5]=44.96567
-# REF_DATA_BWD[5,5]=55.02517
+#  # Input data file for ISO230-2 calcs derived from: /home/pi/sources/ecmc_bifrost_slits_sat/tests_2/11360/axis1/230_2_3.log
+#  # variable definitions:
+#  #     REF_PV                            : Variable name filter for reference position value.
+#  #     TEST_PV                           : Variable name filter for test number.
+#  #     TGT_SET_PV                        : Variable name filter for position setpoint.
+#  #     UNIT                              : Unit for measurenments.
+#  #     CYCLES                            : ISO230-2 cycle count (normally 5).
+#  #     POSITIONS                         : ISO230-2 position count (normally 8).
+#  #     DEC                               : Decimal count for printouts. 
+#  #     TGT_DATA[<pos_id>]                : Target Position for <pos_id> (from TGT_SET_PV).
+#  #     REF_DATA_FWD[<pos_id>,<cycle_id>] : Fwd. dir. ref system position for <pos_id> and <cycle_id> (from <REF_PV>).
+#  #     REF_DATA_BWD[<pos_id>,<cycle_id>] : Bwd. dir. ref system position for <pos_id> and <cycle_id> (from <REF_PV>).
+#  #
+#  REF_PV=IOC_TEST:m0s005-Enc01-PosAct
+#  TEST_PV=IOC_TEST:TestNumber
+#  TGT_SET_PV=IOC_TEST:Axis1-PosSet
+#  UNIT=mm
+#  CYCLES=5
+#  POSITIONS=5
+#  DEC=5
+#  TGT_DATA[1]=15
+#  REF_DATA_FWD[1,1]=15.00474806227268489274
+#  TGT_DATA[2]=25
+#  REF_DATA_FWD[2,1]=24.99740135477538049142
+#  TGT_DATA[3]=35
+#  REF_DATA_FWD[3,1]=34.98964688373884069080
+#  TGT_DATA[4]=45
+#  REF_DATA_FWD[4,1]=44.99779519073248146343
+#  TGT_DATA[5]=55
+#  REF_DATA_FWD[5,1]=55.00268138941223904155
+#  REF_DATA_FWD[1,2]=15.00474806227268489274
+#  REF_DATA_FWD[2,2]=24.99842076362346898971
+#  REF_DATA_FWD[3,2]=34.99250122851348848600
+#  REF_DATA_FWD[4,2]=44.99840683604133456240
+#  REF_DATA_FWD[5,2]=55.00288527118185674121
+#  REF_DATA_FWD[1,3]=15.00495194404230259240
+#  REF_DATA_FWD[2,3]=24.99740135477538049142
+#  REF_DATA_FWD[3,3]=34.99331675559195928463
+#  REF_DATA_FWD[4,3]=44.99881459958056996172
+#  REF_DATA_FWD[5,3]=55.00696290657421073435
+#  REF_DATA_FWD[1,4]=15.00637911642962649000
+#  REF_DATA_FWD[2,4]=24.99821688185385129005
+#  REF_DATA_FWD[3,4]=34.99413228267043008326
+#  REF_DATA_FWD[4,4]=44.99840683604133456240
+#  REF_DATA_FWD[5,4]=55.00573961595650453641
+#  REF_DATA_FWD[1,5]=15.00678687996886188931
+#  REF_DATA_FWD[2,5]=24.99862464539308668937
+#  REF_DATA_FWD[3,5]=34.99331675559195928463
+#  REF_DATA_FWD[4,5]=45.00024177196789385932
+#  REF_DATA_FWD[5,5]=55.00288527118185674121
+#  REF_DATA_BWD[1,1]=15.00067042688033089959
+#  REF_DATA_BWD[2,1]=24.99964405424117518765
+#  REF_DATA_BWD[3,1]=35.00024873575896107297
+#  REF_DATA_BWD[4,1]=44.99779519073248146343
+#  REF_DATA_BWD[5,1]=55.00288527118185674121
+#  REF_DATA_BWD[1,2]=15.00168983572841939788
+#  REF_DATA_BWD[2,2]=24.99964405424117518765
+#  REF_DATA_BWD[3,2]=34.99290899205272388531
+#  REF_DATA_BWD[4,2]=44.99942624488942306069
+#  REF_DATA_BWD[5,2]=55.00084645348567974463
+#  REF_DATA_BWD[1,3]=15.00209759926765479719
+#  REF_DATA_BWD[2,3]=24.99862464539308668937
+#  REF_DATA_BWD[3,3]=34.99719050921469557811
+#  REF_DATA_BWD[4,3]=44.99820295427171686274
+#  REF_DATA_BWD[5,3]=55.00716678834382843401
+#  REF_DATA_BWD[1,4]=15.00393253519421409411
+#  REF_DATA_BWD[2,4]=25.00005181778041058697
+#  REF_DATA_BWD[3,4]=34.99963709045010797400
+#  REF_DATA_BWD[4,4]=44.99881459958056996172
+#  REF_DATA_BWD[5,4]=55.00818619719191693229
+#  REF_DATA_BWD[1,5]=15.00332088988536099514
+#  REF_DATA_BWD[2,5]=24.99923629070193978834
+#  REF_DATA_BWD[3,5]=34.99535557328813628120
+#  REF_DATA_BWD[4,5]=44.99657190011477526549
+#  REF_DATA_BWD[5,5]=55.00043868994644434532
 
 UNIT="UNIT="
 CYCLES="CYCLES="
@@ -75,7 +106,7 @@ REF_DATA_BWD="REF_DATA_BWD["
 DEC="DEC="
 
 def printOutHelp():
-  print ("python ecmcGearRatecmcISO230-2.py <filename>]")
+  print ("python ecmcISO230_2.py <filename>]")
     
 class ecmcISO230_2:
     def __init__(self):
@@ -396,11 +427,13 @@ class ecmcISO230_2:
         print("")
         print("## Data forward direction:")
         # build table first row
-        tableStr=self.addUnit("Tgt pos ") + "|"        
+        tableStr="i |"
         subStr="--- |"
+        tableStr+=self.addUnit("tgt_pos(i) ") + "|"        
+        subStr+="--- |"
 
         for j in range(1,self.cycles+1):
-            tableStr += self.addUnit("Cycle " + str(j)+ " ") + "|"
+            tableStr += self.addUnit("ref_pos(i," + str(j)+ ") ") + "|"
             subStr+="--- |"
         print("")
         print(tableStr)
@@ -408,9 +441,10 @@ class ecmcISO230_2:
 
         for i in range(1,self.positions+1): 
           tempStr=""
-          tempStr+=self.addDataPointToTableRow(self.tgtData[i])          
-          for j in range(1,self.cycles+1):            
-            tempStr+=self.addDataPointToTableRow(self.refData_fwd[i,j])        
+          tempStr+=self.addDataPointToTableRow(i)
+          tempStr+=self.addDataPointToTableRow(self.tgtData[i])
+          for j in range(1,self.cycles+1):
+            tempStr+=self.addDataPointToTableRow(self.refData_fwd[i,j])
           print (tempStr)
 
         print("")
@@ -421,9 +455,10 @@ class ecmcISO230_2:
 
         for i in range(1,self.positions+1): 
           tempStr=""
+          tempStr+=self.addDataPointToTableRow(i)
           tempStr+=self.addDataPointToTableRow(self.tgtData[i])          
           for j in range(1,self.cycles+1):            
-            tempStr+=self.addDataPointToTableRow(self.refData_bwd[i,j])        
+            tempStr+=self.addDataPointToTableRow(self.refData_bwd[i,j])
           print (tempStr)
         print("")
     
@@ -441,9 +476,89 @@ class ecmcISO230_2:
         #print("time: " + str(datetime.now()))
         #print("")
 
+    def reportXB(self):
+        print("")
+        print("## ISO230-2 calculations:")        
+        print("")
+        print("### Positining deviation and reversal error")
+        print("")  
+        print("#### x(i,j) forward direction (unidirectional)")
+        print("")
+        print("x(i,j) = Position deviation at position i, cycle j (reference position - target position) [" + self.unit + "]")
+        print("x_avg(i) = Mean unidirectional positioning deviation at a position")
+        print("")
+
+        # build table first row
+        tableStr="i |"
+        subStr="--- |"
+
+        for j in range(1,self.cycles+1):            
+            tableStr += self.addUnit("x(i,"+ str(j)+ ") ") + "|"
+            subStr+="--- |"
+        tableStr+=self.addUnit("x_avg(i)") + "|"
+        subStr+="--- |"
+
+        print(tableStr)
+        print(subStr)
+
+        for i in range(1,self.positions+1): 
+          tempStr=""
+          tempStr+=self.addDataPointToTableRow(i)
+          for j in range(1,self.cycles+1):
+            tempStr += str(i) + "|"
+            tempStr+=self.addDataPointToTableRow(self.x_i_j_fwd[i,j])        
+          tempStr+=self.addDataPointToTableRow(self.x_i_fwd_avg[i])
+          print (tempStr)
+
+        print("")
+        print("#### x(i,j) backward direction (unidirectional)")
+        print("")
+        print("x(i,j) = Position deviation at position i, cycle j (reference position - target position) [" + self.unit + "]")
+        print("x_avg(i) = Mean unidirectional positioning deviation at a position")
+        print("")
+
+        print(tableStr)
+        print(subStr)
+
+        for i in range(1,self.positions+1): 
+          tempStr=""
+          tempStr+=self.addDataPointToTableRow(i)
+          for j in range(1,self.cycles+1):
+            tableStr += str(i) + "|"
+            tempStr+=self.addDataPointToTableRow(self.x_i_j_bwd[i,j])
+          tempStr+=self.addDataPointToTableRow(self.x_i_bwd_avg[i])
+          print (tempStr)
+
+        print("")
+        print("#### x(i) bi-directional")
+        print("")
+        print("x_avg(i) = Mean bi-directional positioning deviation at a position[" + self.unit + "]")
+        print("B(i) = Reversal error at a position [" + self.unit + "]")
+        print("")
+
+        # build table first row
+        tableStr="i |"
+        subStr="--- |"
+        tableStr += self.addUnit("x_avg(i) ") + "|"
+        subStr+="--- |"
+        tableStr += self.addUnit("B(i) ") + "|"
+        subStr+="--- |"        
+        print("")
+        print(tableStr)
+        print(subStr)
+
+        for i in range(1,self.positions+1): 
+          tempStr=""
+          tempStr+=self.addDataPointToTableRow(i)          
+          tempStr+=self.addDataPointToTableRow(self.x_i_avg[i])        
+          tempStr+=self.addDataPointToTableRow(self.B_i[i])
+          print (tempStr)
+
+
     def reportMarkDown(self):
         self.reportInit()
         self.reportInputDataMD()
+        self.reportXB()
 
 def main():
   fname = "" 
