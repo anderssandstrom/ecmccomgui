@@ -3,6 +3,15 @@
 
 ## Data forward direction:
 
+i = Position index []
+
+j = Cycle index []
+
+tgt_pos(i) = Target position at position i [mm]
+
+ref_pos(i,j) = Reference position at position i and cycle j [mm]
+
+
 i |tgt_pos(i) [mm]|ref_pos(i,1) [mm]|ref_pos(i,2) [mm]|ref_pos(i,3) [mm]|ref_pos(i,4) [mm]|ref_pos(i,5) [mm]|
 --- |--- |--- |--- |--- |--- |--- |
 1|15.0|15.00067|15.00169|15.0021|15.00393|15.00332|
@@ -12,6 +21,14 @@ i |tgt_pos(i) [mm]|ref_pos(i,1) [mm]|ref_pos(i,2) [mm]|ref_pos(i,3) [mm]|ref_pos
 5|55.0|55.00289|55.00085|55.00717|55.00819|55.00044|
 
 ## Data backward direction:
+
+i = Position index []
+
+j = Cycle index []
+
+tgt_pos(i) = Target position at position i [mm]
+
+ref_pos(i,j) = Reference position at position i and cycle j [mm]
 
 i |tgt_pos(i) [mm]|ref_pos(i,1) [mm]|ref_pos(i,2) [mm]|ref_pos(i,3) [mm]|ref_pos(i,4) [mm]|ref_pos(i,5) [mm]|
 --- |--- |--- |--- |--- |--- |--- |
@@ -114,7 +131,7 @@ E_fwd = Forward unidirectional system positioning error of an axis [mm]
 
 E_fwd = 0.00684 [mm]
 
-E_bwd = Backward unidirectional system positioning error of an axis[mm]
+E_bwd = Backward unidirectional system positioning error of an axis [mm]
 
 E_bwd = 0.01294 [mm]
 
@@ -122,7 +139,7 @@ E = Bi-directional system positioning error of an axis [mm]
 
 E = 0.00845 [mm]
 
-M = Mean bi-directional system positioning error of an axis[mm]
+M = Mean bi-directional system positioning error of an axis [mm]
 
 M = 0.00924 [mm]
 

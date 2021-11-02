@@ -429,6 +429,16 @@ class ecmcISO230_2:
     def reportInputDataMD(self):
         print("")
         print("## Data forward direction:")
+        print("")
+        print("i = Position index []")
+        print("")
+        print("j = Cycle index []")
+        print("")
+        print("tgt_pos(i) = Target position at position i [" + self.unit + "]")
+        print("")
+        print("ref_pos(i,j) = Reference position at position i and cycle j [" + self.unit + "]")
+        print("")
+
         # build table first row
         tableStr="i |"
         subStr="--- |"
@@ -453,6 +463,15 @@ class ecmcISO230_2:
         print("")
         print("## Data backward direction:")
         print("")
+        print("i = Position index []")
+        print("")
+        print("j = Cycle index []")
+        print("")
+        print("tgt_pos(i) = Target position at position i [" + self.unit + "]")
+        print("")
+        print("ref_pos(i,j) = Reference position at position i and cycle j [" + self.unit + "]")
+        print("")
+
         print(tableStr)
         print(subStr)
 
@@ -629,7 +648,7 @@ class ecmcISO230_2:
       print("")
       print(self.addUnit("E_fwd = " + self.roundDataToStr(self.E_fwd) + " "))
       print("")
-      print(self.addUnit("E_bwd = Backward unidirectional system positioning error of an axis"))
+      print(self.addUnit("E_bwd = Backward unidirectional system positioning error of an axis "))
       print("")
       print(self.addUnit("E_bwd = " + self.roundDataToStr(self.E_bwd) + " "))
       print("")
@@ -637,7 +656,7 @@ class ecmcISO230_2:
       print("")
       print(self.addUnit("E = " + self.roundDataToStr(self.E) + " "))
       print("")
-      print(self.addUnit("M = Mean bi-directional system positioning error of an axis"))
+      print(self.addUnit("M = Mean bi-directional system positioning error of an axis "))
       print("")
       print(self.addUnit("M = " + self.roundDataToStr(self.M) + " "))
       print("")
