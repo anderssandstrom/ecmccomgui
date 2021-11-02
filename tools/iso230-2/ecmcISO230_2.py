@@ -433,7 +433,11 @@ class ecmcISO230_2:
           print ("Array size missmatch:")
           print ("L1: "+ str(len(self.refPosGrArray)) + " L2: " + str(len(fromArray)) )
 
-        print(str(z[0])+ " " + str(z[1]) + " " + str(len(self.refPosGrArray)) + " "+ str(res[0]))
+        gr='{0:.10f}'.format(z[0])
+        off='{0:.10f}'.format(z[1])
+        count=str(len(self.refPosGrArray))
+        err='{0:.10f}'.format(res[0]) 
+        print( gr + " " + off + " " + count + " "+ err)        
         return self.gearRatio, self.offset, self.dataPoints, self.resError
 
     def addUnit(self, start):

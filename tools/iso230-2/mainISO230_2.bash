@@ -101,10 +101,10 @@ RES_OFF=$(echo $TEMP | awk '{print $2}')
 RES_LEN=$(echo $TEMP | awk '{print $3}')
 RES_ERR=$(echo $TEMP | awk '{print $4}')
 echo "RES GR=$RES_GR, OFF=$RES_OFF, LEN=$RES_LEN, RESIDUAL=$RES_ERR"
-RES_ERR_DISP=$(echo "scale=8;$RES_ERR/1" | bc -l)
-RES_LEN_DISP=$(echo "scale=$DEC;$RES_LEN/1" | bc -l)
-RES_GR_DISP=$(echo "scale=$DEC;$RES_GR/1" | bc -l)
-RES_OFF_DISP=$(echo "scale=$DEC;$RES_OFF/1" | bc -l)
+RES_ERR_DISP=$(echo "scale=8;$RES_ERR/1.0" | bc -l)
+RES_LEN_DISP=$(echo "scale=$DEC;$RES_LEN/1.0" | bc -l)
+RES_GR_DISP=$(echo "scale=$DEC;$RES_GR/1.0" | bc -l)
+RES_OFF_DISP=$(echo "scale=$DEC;$RES_OFF/1.0" | bc -l)
 
 # Get ISO230-2 REFERENCE data from input file for calc of gear ratio (Collect data with GR=1 and OFFSET=0)
 GEAR_RATIO_DATA_REFERENCE=$(bash ecmcGetISO230DataFromCAFile.bash $FILE $ISO230_CYCLE_COUNT $ISO230_POS_COUNT $REFERENCEPV 1 0 $TESTNUMPV $MOTORSETPV $UNIT $DEC)
@@ -115,10 +115,10 @@ REF_OFF=$(echo $TEMP | awk '{print $2}')
 REF_LEN=$(echo $TEMP | awk '{print $3}')
 REF_ERR=$(echo $TEMP | awk '{print $4}')
 echo "REF GR=$REF_GR, OFF=$REF_OFF, LEN=$REF_LEN, RESIDUAL=$REF_ERR"
-REF_ERR_DISP=$(echo "scale=8;$REF_ERR/1" | bc -l)
-REF_LEN_DISP=$(echo "scale=$DEC;$REF_LEN/1" | bc -l)
-REF_GR_DISP=$(echo "scale=$DEC;$REF_GR/1" | bc -l)
-REF_OFF_DISP=$(echo "scale=$DEC;$REF_OFF/1" | bc -l)
+REF_ERR_DISP=$(echo "scale=8;$REF_ERR/1.0" | bc -l)
+REF_LEN_DISP=$(echo "scale=$DEC;$REF_LEN/1.0" | bc -l)
+REF_GR_DISP=$(echo "scale=$DEC;$REF_GR/1.0" | bc -l)
+REF_OFF_DISP=$(echo "scale=$DEC;$REF_OFF/1.0" | bc -l)
 
 # Report gear ratios
 bash ecmcReport.bash $REPORT ""
