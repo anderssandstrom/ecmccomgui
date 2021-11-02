@@ -623,11 +623,48 @@ class ecmcISO230_2:
       print(self.addUnit("R = " + self.roundDataToStr(self.R) + " " ))
       print("")
 
+    def reportE(self):
+      print("### Positioning Error")
+      print("")
+      print(self.addUnit("E_fwd = Forward unidirectional system positioning error of an axis "))
+      print("")
+      print(self.addUnit("E_fwd = " + self.roundDataToStr(self.E_fwd) + " "))
+      print("")
+      print(self.addUnit("E_bwd = Backward unidirectional system positioning error of an axis"))
+      print("")
+      print(self.addUnit("E_bwd = " + self.roundDataToStr(self.E_bwd) + " "))
+      print("")
+      print(self.addUnit("E = Bi-directional system positioning error of an axis "))
+      print("")
+      print(self.addUnit("E = " + self.roundDataToStr(self.E) + " "))
+      print("")
+      print(self.addUnit("M = Mean bi-directional system positioning error of an axis"))
+      print("")
+      print(self.addUnit("M = " + self.roundDataToStr(self.M) + " "))
+
+    def reportA(self):
+      print("### Accuracy")
+      print("")
+      print(self.addUnit("A_fwd = Forward unidirectional accuracy of an axis "))
+      print("")
+      print(self.addUnit("A_fwd = " + self.roundDataToStr(self.A_fwd) + " "))
+      print("")
+      print(self.addUnit("A_bwd = Backward unidirectional accuracy of an axis "))
+      print("")
+      print(self.addUnit("A_bwd = " + self.roundDataToStr(self.A_bwd) + " "))
+      print("")
+      print(self.addUnit("A = Bi-directional accuracy of an axis "))
+      print("")
+      print(self.addUnit("A = " + self.roundDataToStr(self.A) + " "))
+      print("")
+
     def reportMarkDown(self):
         self.reportInit()
         self.reportInputDataMD()
         self.reportXB()
         self.reportR()
+        self.reportE()
+        self.reportA()
 
 def main():
   fname = "" 
