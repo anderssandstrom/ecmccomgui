@@ -17,7 +17,6 @@
 
 import sys
 import numpy as np
-import getpass
 from datetime import datetime
 
 ## Example  input file:
@@ -514,22 +513,12 @@ class ecmcISO230_2:
         print("")
         print("## Configuration")
         print("")
-        print("### General")
-        print("")
         print("Setting | Value")
         print("--- | --- |")
         if len(self.fileName)>0:
           print("Data file | " + self.fileName)
         else:
           print("Data file | sys.stdin")
-        print("Date | " + str(datetime.now()))
-        checkuser = getpass.getuser()
-        print("Author | " + checkuser)
-        print("")
-        print("### Cycle information")
-        print("")
-        print("Setting | Value")
-        print("--- | --- |")
         print("Position count | " + str(self.positions) + " (i=1.." + str(self.positions)  + ")")
         print("Cycle count |" + str(self.cycles) + " (j=1.." + str(self.cycles)  + ")")
         print("Unit | " + self.unit)

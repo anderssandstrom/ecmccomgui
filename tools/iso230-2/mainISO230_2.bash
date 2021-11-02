@@ -54,7 +54,7 @@ RESOLVER_PV="IOC_TEST:m0s004-Enc01-PosAct"
 REFERENCE_PV="IOC_TEST:m0s005-Enc01-PosAct"
 TESTNUM_PV="IOC_TEST:TestNumber"
 LOW_LIM_PV="IOC_TEST:m0s002-BI01"
-HIGH_LIM_PV="IOC_TEST:m0s002-BI01"
+HIGH_LIM_PV="IOC_TEST:m0s002-BI02"
 # Number decimals in printouts
 DEC=5
 # Units for printouts

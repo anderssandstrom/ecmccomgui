@@ -1,7 +1,7 @@
 # ecmc motion system test report
 
 * Data file   : /home/pi/sources/ecmc_bifrost_slits_sat/tests_2/11360/axis1/230_2_3.log
-* Date        : Tue 02 Nov 2021 04:10:35 PM CET
+* Date        : Tue 02 Nov 2021 04:25:43 PM CET
 * Author      : pi
 
 
@@ -15,18 +15,9 @@ Target Position | Reference | .99942 | 8.57125 | 50.00000 | .00084733
 
 ## Configuration
 
-### General
-
 Setting | Value
 --- | --- |
 Data file | sys.stdin
-Date | 2021-11-02 16:11:28.752416
-Author | pi
-
-### Cycle information
-
-Setting | Value
---- | --- |
 Position count | 5 (i=1..5)
 Cycle count |5 (j=1..5)
 Unit | mm
@@ -195,9 +186,20 @@ A = 0.02197 [mm]
 
 # Limit Switch Performance
 
+## Configuration
+
+Setting | Value |
+--- | --- |
+Data file | /home/pi/sources/ecmc_bifrost_slits_sat/tests_2/11360/axis1/230_2_3.log |
+Unit | mm |
+Reference position source | IOC_TEST:m0s004-Enc01-PosAct |
+Low Limit source | IOC_TEST:m0s002-BI01 |
+High Limit source | IOC_TEST:m0s002-BI02 |
+Test number source | IOC_TEST:TestNumber |
+
 ## Low Limit Engage Position
 
-Test | Reference []
+Test | Reference [mm]
 --- | --- |
 1 | -0.45864 |
 2 | -0.45864 |
@@ -215,7 +217,7 @@ Range | 0.00287
 
 ## Low Limit Disengage Position
 
-Test | Reference []
+Test | Reference [mm]
 --- | --- |
 1 | -0.33053 |
 2 | -0.32939 |
@@ -233,39 +235,39 @@ Range | 0.01157 |
 
 ## High Limit Engage Position
 
-Test | Resolver [] |
+Test | Reference [mm] |
 --- | --- |
-1 | 67.66360 |
-2 | 67.66360 |
-3 | 67.66360 |
-4 | 67.66360 |
-5 | 67.66360 |
-6 | 67.66360 |
-7 | 67.66360 |
-8 | 67.66360 |
-9 | 67.66360 |
-10 | 67.66360 |
-AVG | 67.66360 |
-STD | 0.00000 |
-Range | 0.00000 |
+1 | 67.28490 |
+2 | 67.29710 |
+3 | 67.29140 |
+4 | 67.28880 |
+5 | 67.29610 |
+6 | 67.32490 |
+7 | 67.35490 |
+8 | 67.28870 |
+9 | 67.29180 |
+10 | 67.31060 |
+AVG | 67.30290 |
+STD | 0.02075 |
+Range | 0.07000 |
 
 ## High Limit Disengage Position
 
-Test | Reference []|
+Test | Reference [mm]|
 --- | --- |
-1 | 67.66360 |
-2 | 67.66360 |
-3 | 67.66360 |
-4 | 67.66360 |
-5 | 67.66360 |
-6 | 67.66360 |
-7 | 67.66360 |
-8 | 67.66360 |
-9 | 67.66360 |
-10 | 67.66360 |
-AVG | 67.66360 |
-STD | 0.00000 |
-Range | 0.00000 |
+1 | 66.60030 |
+2 | 66.60300 |
+3 | 66.60400 |
+4 | 66.60500 |
+5 | 66.60600 |
+6 | 66.60120 |
+7 | 66.60390 |
+8 | 66.60860 |
+9 | 66.61040 |
+10 | 66.61140 |
+AVG | 66.60540 |
+STD | 0.00354 |
+Range | 0.01110 |
 
 
 ## Resolver Value Distribution
