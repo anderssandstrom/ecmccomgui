@@ -1,7 +1,7 @@
 # ecmc motion system test report
 
 * Data file   : /home/pi/sources/ecmc_bifrost_slits_sat/tests_2/11360/axis1/230_2_3.log
-* Date        : Tue 02 Nov 2021 12:11:07 PM CET
+* Date        : Tue 02 Nov 2021 12:15:57 PM CET
 * Author      : pi
 
 
@@ -20,7 +20,7 @@ Target Position | Reference | .99942 | 8.57125 | 50.00000 | .00084733
 Setting | Value
 --- | --- |
 Input file | sys.stdin
-Time | 2021-11-02 12:11:59.360692
+Time | 2021-11-02 12:16:55.598636
 User | pi
 
 ### Cycle information
@@ -85,7 +85,7 @@ x(i,j)   = Position deviation at position i, cycle j (reference position - targe
 
 x_avg(i) = Mean unidirectional positioning deviation at a position [mm]
 
-i |x(i,1) [mm]|x(i,2) [mm]|x(i,3) [mm]|x(i,4) [mm]|x(i,5) [mm]|x_avg(i)[mm]|
+i |x(i,1) [mm]|x(i,2) [mm]|x(i,3) [mm]|x(i,4) [mm]|x(i,5) [mm]|x_avg(i) [mm]|
 --- |--- |--- |--- |--- |--- |--- |
 1|0.00067|0.00169|0.0021|0.00393|0.00332|0.00234|
 2|-0.00036|-0.00036|-0.00138|5e-05|-0.00076|-0.00056|
@@ -99,7 +99,7 @@ x(i,j)   = Position deviation at position i, cycle j (reference position - targe
 
 x_avg(i) = Mean unidirectional positioning deviation at a position [mm]
 
-i |x(i,1) [mm]|x(i,2) [mm]|x(i,3) [mm]|x(i,4) [mm]|x(i,5) [mm]|x_avg(i)[mm]|
+i |x(i,1) [mm]|x(i,2) [mm]|x(i,3) [mm]|x(i,4) [mm]|x(i,5) [mm]|x_avg(i) [mm]|
 --- |--- |--- |--- |--- |--- |--- |
 1|0.00475|0.00475|0.00495|0.00638|0.00679|0.00552|
 2|-0.0026|-0.00158|-0.0026|-0.00178|-0.00138|-0.00199|

@@ -553,7 +553,7 @@ class ecmcISO230_2:
         for j in range(1,self.cycles+1):            
             tableStr += self.addUnit("x(i,"+ str(j)+ ") ") + "|"
             subStr+="--- |"
-        tableStr+=self.addUnit("x_avg(i)") + "|"
+        tableStr+=self.addUnit("x_avg(i) ") + "|"
         subStr+="--- |"
 
         print(tableStr)
