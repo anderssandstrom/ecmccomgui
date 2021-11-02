@@ -23,8 +23,6 @@
 #    TESTNUMPV              : Filter for testnumber.
 #    DEC                    : Decimals in printouts.
 #    UNIT                   : Unit for the position measurement.
-#    TESTNUM_GEARRATIO_FROM : Start from this test to calc gear ratio.
-#    TESTNUM_GEARRATIO_TO   : End at this test for gear ratio calculations.
 #    ISO230_POS_COUNT       : ISO230-2 cycle position count.
 #    ISO230_CYCLE_COUNT     : ISO230-2 cycle count.
 #
@@ -66,7 +64,8 @@ ISO230_POS_COUNT=5
 ISO230_CYCLE_COUNT=5
 
 ##########################################################################
-# Below no variables shold need to be updated
+# Below here NO variables should need to be updated/changed
+
 FILE=$1
 REPORT=$2
 
@@ -74,11 +73,9 @@ REPORT=$2
 TESTNUM_GEARRATIO_FROM=1501
 TESTNUM_GEARRATIO_TO=2501
 
-
 # Newline
 nl='
 '
-
 # Always 5 cycles in standard
 # Get forward direction data points (test numbers 1xx1..1xx)
 TESTS=$(seq -w 1 1 $ISO230_POS_COUNT)
@@ -90,13 +87,14 @@ echo "Collect gear ratio data (only at test points in the matrix)...."
 ## Init report file
 bash ecmcReportInit.bash $REPORT $FILE
 
+##### Gear Ratio ###################################################
+
 # Use gear ratio python script to find gear ratios
 echo "1. Calculate gear ratios..."
 
 # Get ISO230-2 RESOLVER data from input file for calc of gear ratio (Collect data with GR=1 and OFFSET=0)
 GEAR_RATIO_DATA_RESOLVER=$(bash ecmcGetISO230DataFromCAFile.bash $FILE $ISO230_CYCLE_COUNT $ISO230_POS_COUNT $RESOLVERPV 1 0 $TESTNUMPV $MOTORSETPV $UNIT $DEC)
-
-echo "$GEAR_RATIO_DATA_RESOLVER "
+#echo "$GEAR_RATIO_DATA_RESOLVER "
 TEMP=$( echo "$GEAR_RATIO_DATA_RESOLVER " | python ecmcGearRatioISO230_2.py)
 RES_GR=$(echo $TEMP | awk '{print $1}')
 RES_OFF=$(echo $TEMP | awk '{print $2}')
@@ -110,7 +108,7 @@ RES_OFF_DISP=$(echo "scale=$DEC;$RES_OFF/1" | bc -l)
 
 # Get ISO230-2 REFERENCE data from input file for calc of gear ratio (Collect data with GR=1 and OFFSET=0)
 GEAR_RATIO_DATA_REFERENCE=$(bash ecmcGetISO230DataFromCAFile.bash $FILE $ISO230_CYCLE_COUNT $ISO230_POS_COUNT $REFERENCEPV 1 0 $TESTNUMPV $MOTORSETPV $UNIT $DEC)
-echo "$GEAR_RATIO_DATA_REFERENCE "
+#echo "$GEAR_RATIO_DATA_REFERENCE "
 TEMP=$( echo "$GEAR_RATIO_DATA_REFERENCE " | python ecmcGearRatioISO230_2.py)
 REF_GR=$(echo $TEMP | awk '{print $1}')
 REF_OFF=$(echo $TEMP | awk '{print $2}')
@@ -131,23 +129,23 @@ bash ecmcReport.bash $REPORT "Openloop | Resolver | $RES_GR_DISP | $RES_OFF_DISP
 bash ecmcReport.bash $REPORT "Openloop | Reference (ILD2300) | $REF_GR_DISP | $REF_OFF_DISP | $REF_LEN_DISP | $REF_ERR_DISP "
 bash ecmcReport.bash $REPORT ""
 
+##### ISO230-2 ###################################################
 echo "2. ISO230-2 test..."
-
-# Again Get ISO230-2 data from input file but with correct gear ratios
+# Again Get ISO230-2 data from input file but with correct gear ratios and offset
 TEST_DATA=$(bash ecmcGetISO230DataFromCAFile.bash $FILE $ISO230_CYCLE_COUNT $ISO230_POS_COUNT $REFERENCEPV $REF_GR $REF_OFF $TESTNUMPV $MOTORSETPV $UNIT $DEC)
 
-echo "TEST_DATA=$TEST_DATA "
+#echo "TEST_DATA=$TEST_DATA "
 # Calc ISO230-2 data
 ISO230_OUTPUT=$( echo "$TEST_DATA " | python ecmcISO230_2.py)
 
+# Add output from python to report
 echo "$ISO230_OUTPUT " >> $REPORT
-
 bash ecmcReport.bash $REPORT ""
 
-echo "####################################################################"
-
 ##### Switches ##########################################################
+echo "3. Limit switch test..."
 bash mainSwitchISO230_2.bash $FILE $REPORT $RES_GR $RES_OFF $REF_GR $REF_OFF $DEC
 
 ##### Resolver jitter ###################################################
+echo "4. Resolver performance test..."
 bash mainResolverStandstillISO230_2.bash $FILE $REPORT $RES_GR $RES_OFF $REF_GR $REF_OFF 5 4000
