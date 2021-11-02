@@ -30,15 +30,23 @@ DEC=${10}
 # derived from
 nl='
 '
+
+#     UNIT                              : Unit for measurenments (optional, defualts to mm).
+#     CYCLES                            : ISO230-2 cycle count (optional, defaults to 5).
+#     POSITIONS                         : ISO230-2 position count (optional, defaults to 8).
+#     DEC                               : Decimal count for printouts (optional, defualts to 4). 
+
+
 OUTPUTDATA="# Input data file for ISO230-2 calcs derived from: $FILE$nl"
-OUTPUTDATA+="# variable definitions:$nl"
-OUTPUTDATA+="#     UNIT                              : Unit for measurenments.$nl"
-OUTPUTDATA+="#     CYCLES                            : ISO230-2 cycle count (normally 5).$nl"
-OUTPUTDATA+="#     POSITIONS                         : ISO230-2 position count (normally 8).$nl"
-OUTPUTDATA+="#     DEC                               : Decimal count for printouts. $nl"
+OUTPUTDATA+="# Mandatory variable definitions:$nl"
 OUTPUTDATA+="#     TGT_DATA[<pos_id>]                : Target Position for <pos_id> (from TGT_SET_PV).$nl"
 OUTPUTDATA+="#     REF_DATA_FWD[<pos_id>,<cycle_id>] : Fwd. dir. ref system position for <pos_id> and <cycle_id> (from <REF_PV>).$nl"
 OUTPUTDATA+="#     REF_DATA_BWD[<pos_id>,<cycle_id>] : Bwd. dir. ref system position for <pos_id> and <cycle_id> (from <REF_PV>).$nl"
+OUTPUTDATA+="# Optional variable definitions:$nl"
+OUTPUTDATA+="#     UNIT                              : Unit for measurenments (optional, defualts to mm).$nl"
+OUTPUTDATA+="#     CYCLES                            : ISO230-2 cycle count (optional, defaults to 5).$nl"
+OUTPUTDATA+="#     POSITIONS                         : ISO230-2 position count (optional, defaults to 8).$nl"
+OUTPUTDATA+="#     DEC                               : Decimal count for printouts (optional, defualts to 4). $nl"
 OUTPUTDATA+="#     REF_PV                            : Variable name filter for reference position value (optional).$nl"
 OUTPUTDATA+="#     TEST_PV                           : Variable name filter for test number (optional).$nl"
 OUTPUTDATA+="#     TGT_SET_PV                        : Variable name filter for position setpoint (optional).$nl"

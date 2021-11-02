@@ -1,7 +1,7 @@
 # ecmc motion system test report
 
 * Data file   : /home/pi/sources/ecmc_bifrost_slits_sat/tests_2/11360/axis1/230_2_3.log
-* Date        : Tue 02 Nov 2021 12:15:57 PM CET
+* Date        : Tue 02 Nov 2021 12:23:52 PM CET
 * Author      : pi
 
 
@@ -20,7 +20,7 @@ Target Position | Reference | .99942 | 8.57125 | 50.00000 | .00084733
 Setting | Value
 --- | --- |
 Input file | sys.stdin
-Time | 2021-11-02 12:16:55.598636
+Time | 2021-11-02 12:24:44.331880
 User | pi
 
 ### Cycle information
