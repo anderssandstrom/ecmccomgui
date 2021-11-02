@@ -421,7 +421,10 @@ class ecmcISO230_2:
         return start + "[" + self.unit + "]"
 
     def addDataPointToTableRow(self, data):        
-        return str(round(data,self.decimals))+ "|"
+        return self.roundDataToStr(data)+ "|"
+
+    def roundDataToStr(self, data):        
+        return str(round(data,self.decimals))
 
     def reportInputDataMD(self):
         print("")
@@ -480,11 +483,12 @@ class ecmcISO230_2:
         print("")
         print("## ISO230-2 calculations:")        
         print("")
-        print("### Positining deviation and reversal error")
+        print("### Positioning deviation and reversal error")
         print("")  
-        print("#### x(i,j) forward direction (unidirectional)")
+        print("#### Positioning deviation forward direction (unidirectional)")
         print("")
-        print("x(i,j) = Position deviation at position i, cycle j (reference position - target position) [" + self.unit + "]")
+        print("x(i,j)   = Position deviation at position i, cycle j (reference position - target position) [" + self.unit + "]")
+        print("")
         print("x_avg(i) = Mean unidirectional positioning deviation at a position")
         print("")
 
@@ -511,9 +515,10 @@ class ecmcISO230_2:
           print (tempStr)
 
         print("")
-        print("#### x(i,j) backward direction (unidirectional)")
+        print("#### Positioning deviation backward direction (unidirectional)")
         print("")
-        print("x(i,j) = Position deviation at position i, cycle j (reference position - target position) [" + self.unit + "]")
+        print("x(i,j)   = Position deviation at position i, cycle j (reference position - target position) [" + self.unit + "]")
+        print("")
         print("x_avg(i) = Mean unidirectional positioning deviation at a position")
         print("")
 
@@ -530,10 +535,11 @@ class ecmcISO230_2:
           print (tempStr)
 
         print("")
-        print("#### x(i) bi-directional")
+        print("#### Positioning deviation bi-directional")
         print("")
         print("x_avg(i) = Mean bi-directional positioning deviation at a position[" + self.unit + "]")
-        print("B(i) = Reversal error at a position [" + self.unit + "]")
+        print("")
+        print("B(i)     = Reversal error at a position [" + self.unit + "]")
         print("")
 
         # build table first row
@@ -543,7 +549,6 @@ class ecmcISO230_2:
         subStr+="--- |"
         tableStr += self.addUnit("B(i) ") + "|"
         subStr+="--- |"        
-        print("")
         print(tableStr)
         print(subStr)
 
@@ -553,12 +558,76 @@ class ecmcISO230_2:
           tempStr+=self.addDataPointToTableRow(self.x_i_avg[i])        
           tempStr+=self.addDataPointToTableRow(self.B_i[i])
           print (tempStr)
+        
+        print("")
+        print(self.addUnit("B = Axis reversal error "))
+        print("")
+        print(self.addUnit("B = " + self.roundDataToStr(self.B) + " "))
+        print("")
+        print(self.addUnit("B_avg = Axis avg. reversal error "))
+        print("")
+        print(self.addUnit("B_avg = " + self.roundDataToStr(self.B_avg) + " "))
+        print("")
 
+    def reportR(self):
+      print("### Rebeatability")
+      print("")
+      print(self.addUnit("S_fwd(i) = Forward estimator for unidirectional axis positiong repeatability at a position "))
+      print("")
+      print(self.addUnit("S_bwd(i) = Backward estimator for unidirectional axis positiong repeatability at a position "))
+      print("")
+      print(self.addUnit("R_fwd(i) = Forward unidirectional positioning repeatability at a position "))
+      print("")
+      print(self.addUnit("R_bwd(i) = Backward unidirectional positioning repeatability at a position "))
+      print("")
+      print(self.addUnit("R(i) = Bi-directional position repeatability at a position "))
+      print("")
+
+      # build table first row
+      tableStr="i |"
+      subStr="--- |"
+      tableStr += self.addUnit("S_fwd(i) ") + "|"
+      subStr+="--- |"
+      tableStr += self.addUnit("S_bwd(i) ") + "|"
+      subStr+="--- |"
+      tableStr += self.addUnit("R_fwd(i) ") + "|"
+      subStr+="--- |"
+      tableStr += self.addUnit("R_bwd(i) ") + "|"
+      subStr+="--- |"
+      tableStr += self.addUnit("R(i) ") + "|"
+      subStr+="--- |"
+      print(tableStr)
+      print(subStr)
+      
+      for i in range(1,self.positions+1): 
+        tempStr=""
+        tempStr+=self.addDataPointToTableRow(i)
+        tempStr+=self.addDataPointToTableRow(self.s_i_fwd[i])
+        tempStr+=self.addDataPointToTableRow(self.s_i_bwd[i])
+        tempStr+=self.addDataPointToTableRow(self.R_i_fwd[i])
+        tempStr+=self.addDataPointToTableRow(self.R_i_bwd[i])
+        tempStr+=self.addDataPointToTableRow(self.R_i[i])
+        print (tempStr)
+
+      print("")
+      print(self.addUnit("R_fwd = Forward unidirectional positioning repeatability of an axis (max(R_fwd(i))) "))
+      print("")
+      print(self.addUnit("R_fwd = " + self.roundDataToStr(self.R_fwd) + " "))
+      print("")
+      print(self.addUnit("R_bwd = Backward unidirectional positioning repeatability of an axis (max(R_bwd(i))) "))
+      print("")
+      print(self.addUnit("R_bwd = " + self.roundDataToStr(self.R_bwd) + " "))
+      print("")
+      print(self.addUnit("R = Bi-directional positioning repeatability of an axis (max(R_fwd,R_bwd)) "))
+      print("")
+      print(self.addUnit("R = " + self.roundDataToStr(self.R) + " " ))
+      print("")
 
     def reportMarkDown(self):
         self.reportInit()
         self.reportInputDataMD()
         self.reportXB()
+        self.reportR()
 
 def main():
   fname = "" 
