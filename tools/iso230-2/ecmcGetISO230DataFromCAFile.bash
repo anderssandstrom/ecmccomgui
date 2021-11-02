@@ -23,7 +23,7 @@ REF_OFF=$6
 TESTNUMPV=$7
 MOTORSETPV=$8
 UNIT=$9
-DEC=$10
+DEC=${10}
 
 # Input data file for ISO230-2 calcs.
 # derived from

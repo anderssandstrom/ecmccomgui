@@ -4,7 +4,7 @@
 # ecmc is distributed subject to a Software License Agreement found
 # in file LICENSE that is included with this distribution. 
 #
-#  ecmcGetISO230DataFromCAFile.bash
+#  mainISO230_2.bash
 #
 #  Created on: Dec 14, 2020
 #      Author: anderssandstrom
@@ -134,7 +134,7 @@ bash ecmcReport.bash $REPORT ""
 echo "2. ISO230-2 test..."
 
 # Again Get ISO230-2 data from input file but with correct gear ratios
-TEST_DATA=$(bash ecmcGetISO230DataFromCAFile.bash $FILE $ISO230_CYCLE_COUNT $ISO230_POS_COUNT $REFERENCEPV $REF_GR $REF_OFF $TESTNUMPV $MOTORSETPV $UNIT)
+TEST_DATA=$(bash ecmcGetISO230DataFromCAFile.bash $FILE $ISO230_CYCLE_COUNT $ISO230_POS_COUNT $REFERENCEPV $REF_GR $REF_OFF $TESTNUMPV $MOTORSETPV $UNIT $DEC)
 
 echo "TEST_DATA=$TEST_DATA "
 
