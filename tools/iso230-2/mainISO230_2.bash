@@ -28,7 +28,7 @@
 #
 #*************************************************************************/
 #
-# Data examples:
+# Data examples (camonitor):
 # IOC_TEST:m0s004-Enc01-PosAct   2021-10-27 09:04:48.529180 66.14321041  
 # IOC_TEST:Axis1-PosAct          2021-10-27 09:04:48.529180 1.527265625  
 # IOC_TEST:Axis1-PosSet          2021-10-27 09:04:48.529180 1.527243125  
@@ -101,7 +101,7 @@ RES_OFF=$(echo $TEMP | awk '{print $2}')
 RES_LEN=$(echo $TEMP | awk '{print $3}')
 RES_ERR=$(echo $TEMP | awk '{print $4}')
 echo "RES GR=$RES_GR, OFF=$RES_OFF, LEN=$RES_LEN, RESIDUAL=$RES_ERR"
-RES_ERR_DISP=$(echo "scale=$DEC;$RES_ERR/1" | bc -l)
+RES_ERR_DISP=$(echo "scale=8;$RES_ERR/1" | bc -l)
 RES_LEN_DISP=$(echo "scale=$DEC;$RES_LEN/1" | bc -l)
 RES_GR_DISP=$(echo "scale=$DEC;$RES_GR/1" | bc -l)
 RES_OFF_DISP=$(echo "scale=$DEC;$RES_OFF/1" | bc -l)
@@ -115,7 +115,7 @@ REF_OFF=$(echo $TEMP | awk '{print $2}')
 REF_LEN=$(echo $TEMP | awk '{print $3}')
 REF_ERR=$(echo $TEMP | awk '{print $4}')
 echo "REF GR=$REF_GR, OFF=$REF_OFF, LEN=$REF_LEN, RESIDUAL=$REF_ERR"
-REF_ERR_DISP=$(echo "scale=$DEC;$REF_ERR/1" | bc -l)
+REF_ERR_DISP=$(echo "scale=8;$REF_ERR/1" | bc -l)
 REF_LEN_DISP=$(echo "scale=$DEC;$REF_LEN/1" | bc -l)
 REF_GR_DISP=$(echo "scale=$DEC;$REF_GR/1" | bc -l)
 REF_OFF_DISP=$(echo "scale=$DEC;$REF_OFF/1" | bc -l)
@@ -125,8 +125,8 @@ bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "# Gear Ratios"
 bash ecmcReport.bash $REPORT "From | To | Ratio [] | Offset [$UNIT] | Data count [] | Residual error [$UNIT²]"
 bash ecmcReport.bash $REPORT "--- | --- | --- | --- | --- | --- |"
-bash ecmcReport.bash $REPORT "Openloop | Resolver | $RES_GR_DISP | $RES_OFF_DISP | $RES_LEN_DISP | $RES_ERR_DISP "
-bash ecmcReport.bash $REPORT "Openloop | Reference (ILD2300) | $REF_GR_DISP | $REF_OFF_DISP | $REF_LEN_DISP | $REF_ERR_DISP "
+bash ecmcReport.bash $REPORT "Target Position | Resolver | $RES_GR_DISP | $RES_OFF_DISP | $RES_LEN_DISP | $RES_ERR_DISP "
+bash ecmcReport.bash $REPORT "Target Position | Reference | $REF_GR_DISP | $REF_OFF_DISP | $REF_LEN_DISP | $REF_ERR_DISP "
 bash ecmcReport.bash $REPORT ""
 
 ##### ISO230-2 ###################################################

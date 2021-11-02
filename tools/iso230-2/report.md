@@ -1,15 +1,15 @@
 # ecmc motion system test report
 
 * Data file   : /home/pi/sources/ecmc_bifrost_slits_sat/tests_2/11360/axis1/230_2_3.log
-* Date        : Tue 02 Nov 2021 11:44:23 AM CET
+* Date        : Tue 02 Nov 2021 12:03:16 PM CET
 * Author      : pi
 
 
 # Gear Ratios
 From | To | Ratio [] | Offset [mm] | Data count [] | Residual error [mm²]
 --- | --- | --- | --- | --- | --- |
-Openloop | Resolver | -.99998 | 67.66363 | 50.00000 |
-Openloop | Reference (ILD2300) | .99942 | 8.57125 | 50.00000 | .00084
+Target Position | Resolver | -.99998 | 67.66363 | 50.00000 |
+Target Position | Reference | .99942 | 8.57125 | 50.00000 | .00084733
 
 # ISO 230-2 motion test
 
@@ -20,7 +20,7 @@ Openloop | Reference (ILD2300) | .99942 | 8.57125 | 50.00000 | .00084
 Setting | Value
 --- | --- |
 Input file | sys.stdin
-Time | 2021-11-02 11:45:13.579476
+Time | 2021-11-02 12:04:16.002073
 User | pi
 
 ### Cycle information
