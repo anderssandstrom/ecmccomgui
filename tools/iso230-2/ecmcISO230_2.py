@@ -541,9 +541,9 @@ class ecmcISO230_2:
         print("")  
         print("#### Positioning deviation forward direction (unidirectional)")
         print("")
-        print("x(i,j)   = Position deviation at position i, cycle j (reference position - target position) [" + self.unit + "]")
+        print(self.addUnit("x(i,j)   = Position deviation at position i, cycle j (reference position - target position) "))
         print("")
-        print("x_avg(i) = Mean unidirectional positioning deviation at a position")
+        print(self.addUnit("x_avg(i) = Mean unidirectional positioning deviation at a position "))
         print("")
 
         # build table first row
@@ -570,9 +570,9 @@ class ecmcISO230_2:
         print("")
         print("#### Positioning deviation backward direction (unidirectional)")
         print("")
-        print("x(i,j)   = Position deviation at position i, cycle j (reference position - target position) [" + self.unit + "]")
+        print(self.addUnit("x(i,j)   = Position deviation at position i, cycle j (reference position - target position) "))
         print("")
-        print("x_avg(i) = Mean unidirectional positioning deviation at a position")
+        print(self.addUnit("x_avg(i) = Mean unidirectional positioning deviation at a position "))
         print("")
 
         print(tableStr)
@@ -590,9 +590,9 @@ class ecmcISO230_2:
         print("")
         print("#### Positioning deviation bi-directional")
         print("")
-        print("x_avg(i) = Mean bi-directional positioning deviation at a position[" + self.unit + "]")
+        print(self.addUnit("x_avg(i) = Mean bi-directional positioning deviation at a position "))
         print("")
-        print("B(i)     = Reversal error at a position [" + self.unit + "]")
+        print(self.addUnit("B(i)     = Reversal error at a position "))
         print("")
 
         # build table first row

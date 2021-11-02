@@ -149,3 +149,6 @@ bash mainSwitchISO230_2.bash $FILE $REPORT $RES_GR $RES_OFF $REF_GR $REF_OFF $DE
 ##### Resolver jitter ###################################################
 echo "4. Resolver performance test..."
 bash mainResolverStandstillISO230_2.bash $FILE $REPORT $RES_GR $RES_OFF $REF_GR $REF_OFF 5 4000
+
+##### Finish ###################################################
+echo "5. Report ready..."

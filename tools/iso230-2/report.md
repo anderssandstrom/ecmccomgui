@@ -1,7 +1,7 @@
 # ecmc motion system test report
 
 * Data file   : /home/pi/sources/ecmc_bifrost_slits_sat/tests_2/11360/axis1/230_2_3.log
-* Date        : Tue 02 Nov 2021 12:03:16 PM CET
+* Date        : Tue 02 Nov 2021 12:11:07 PM CET
 * Author      : pi
 
 
@@ -20,7 +20,7 @@ Target Position | Reference | .99942 | 8.57125 | 50.00000 | .00084733
 Setting | Value
 --- | --- |
 Input file | sys.stdin
-Time | 2021-11-02 12:04:16.002073
+Time | 2021-11-02 12:11:59.360692
 User | pi
 
 ### Cycle information
@@ -83,7 +83,7 @@ i |tgt_pos(i) [mm]|ref_pos(i,1) [mm]|ref_pos(i,2) [mm]|ref_pos(i,3) [mm]|ref_pos
 
 x(i,j)   = Position deviation at position i, cycle j (reference position - target position) [mm]
 
-x_avg(i) = Mean unidirectional positioning deviation at a position
+x_avg(i) = Mean unidirectional positioning deviation at a position [mm]
 
 i |x(i,1) [mm]|x(i,2) [mm]|x(i,3) [mm]|x(i,4) [mm]|x(i,5) [mm]|x_avg(i)[mm]|
 --- |--- |--- |--- |--- |--- |--- |
@@ -97,7 +97,7 @@ i |x(i,1) [mm]|x(i,2) [mm]|x(i,3) [mm]|x(i,4) [mm]|x(i,5) [mm]|x_avg(i)[mm]|
 
 x(i,j)   = Position deviation at position i, cycle j (reference position - target position) [mm]
 
-x_avg(i) = Mean unidirectional positioning deviation at a position
+x_avg(i) = Mean unidirectional positioning deviation at a position [mm]
 
 i |x(i,1) [mm]|x(i,2) [mm]|x(i,3) [mm]|x(i,4) [mm]|x(i,5) [mm]|x_avg(i)[mm]|
 --- |--- |--- |--- |--- |--- |--- |
@@ -109,7 +109,7 @@ i |x(i,1) [mm]|x(i,2) [mm]|x(i,3) [mm]|x(i,4) [mm]|x(i,5) [mm]|x_avg(i)[mm]|
 
 #### Positioning deviation bi-directional
 
-x_avg(i) = Mean bi-directional positioning deviation at a position[mm]
+x_avg(i) = Mean bi-directional positioning deviation at a position [mm]
 
 B(i)     = Reversal error at a position [mm]
 
