@@ -283,7 +283,7 @@ class ecmcISO230_2:
           #bwd
           self.R_i_bwd[i]=4*self.s_i_bwd[i]
           if self.R_i_bwd[i]>self.R_bwd:
-              self.R_bwd=self.R_i_fwd[i]
+              self.R_bwd=self.R_i_bwd[i]
 
           term1=2*self.s_i_fwd[i] + 2*self.s_i_bwd[i] + np.abs(self.B_i[i])
           term2=self.R_i_fwd[i]

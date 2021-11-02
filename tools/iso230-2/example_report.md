@@ -102,7 +102,7 @@ R_fwd = 0.01434 [mm]
 
 R_bwd = Backward unidirectional positioning repeatability of an axis (max(R_bwd(i))) [mm]
 
-R_bwd = 0.01216 [mm]
+R_bwd = 0.00794 [mm]
 
 R = Bi-directional positioning repeatability of an axis (max(R_fwd,R_bwd)) [mm]
 
