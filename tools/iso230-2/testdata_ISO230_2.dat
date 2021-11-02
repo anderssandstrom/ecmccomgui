@@ -1,8 +1,5 @@
 # Input data file for ISO230-2 calcs derived from: /home/pi/sources/ecmc_bifrost_slits_sat/tests_2/11360/axis1/230_2_3.log
 # variable definitions:
-#     REF_PV                            : Variable name filter for reference position value.
-#     TEST_PV                           : Variable name filter for test number.
-#     TGT_SET_PV                        : Variable name filter for position setpoint.
 #     UNIT                              : Unit for measurenments.
 #     CYCLES                            : ISO230-2 cycle count (normally 5).
 #     POSITIONS                         : ISO230-2 position count (normally 8).
@@ -10,6 +7,9 @@
 #     TGT_DATA[<pos_id>]                : Target Position for <pos_id> (from TGT_SET_PV).
 #     REF_DATA_FWD[<pos_id>,<cycle_id>] : Fwd. dir. ref system position for <pos_id> and <cycle_id> (from <REF_PV>).
 #     REF_DATA_BWD[<pos_id>,<cycle_id>] : Bwd. dir. ref system position for <pos_id> and <cycle_id> (from <REF_PV>).
+#     REF_PV                            : Variable name filter for reference position value (optional).
+#     TEST_PV                           : Variable name filter for test number (optional).
+#     TGT_SET_PV                        : Variable name filter for position setpoint (optional).
 #
 REF_PV=IOC_TEST:m0s005-Enc01-PosAct
 TEST_PV=IOC_TEST:TestNumber
