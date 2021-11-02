@@ -201,15 +201,15 @@ class ecmcISO230_2:
             return
 
         if line.find(REF_PV)>=0:
-            self.refpv=line.split("=")[1]
+            self.refpv=line.split("=")[1].strip()
             return
 
         if line.find(TEST_PV)>=0:
-            self.testpv=line.split("=")[1]
+            self.testpv=line.split("=")[1].strip()
             return
 
         if line.find(TGT_SET_PV)>=0:
-            self.tgtpv=line.split("=")[1]
+            self.tgtpv=line.split("=")[1].strip()
             return
 
         if line.find(REF_DATA_FWD)>=0:
@@ -511,29 +511,26 @@ class ecmcISO230_2:
         print("")
         print("### General")
         print("")
+        print("Setting | Value")
+        print("--- | --- |")
         if len(self.fileName)>0:
-          print("Input file: " + self.fileName)
+          print("Input file | " + self.fileName)
         else:
-          print("Input file: sys.stdin")
-        print("")
-        print("Time: " + str(datetime.now()))
-        print("")
+          print("Input file | sys.stdin")
+        print("Time | " + str(datetime.now()))
         checkuser = getpass.getuser()
-        print("User: " + checkuser)
+        print("User | " + checkuser)
         print("")
         print("### Cycle information")
         print("")
-        print("Cycle count = " + str(self.cycles))
-        print("")
-        print("Position count = " + str(self.positions))
-        print("")
-        print("Unit = [" + self.unit + "]")
-        print("")
-        print("Reference position PV = " + self.refpv)
-        print("")
-        print("Target position PV = " + self.tgtpv)
-        print("")
-        print("Test number PV = " + self.testpv)
+        print("Setting | Value")
+        print("--- | --- |")
+        print("Position count | " + str(self.positions) + " (i=1.." + str(self.positions)  + ")")
+        print("Cycle count |" + str(self.cycles) + " (j=1.." + str(self.cycles)  + ")")
+        print("Unit | [" + self.unit + "]")
+        print("Reference position PV | " + self.refpv)
+        print("Target position PV | " + self.tgtpv)
+        print("Test number PV | " + self.testpv)
         print("")
 
     def reportXB(self):

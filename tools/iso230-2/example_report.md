@@ -4,28 +4,22 @@
 
 ### General
 
-Input file: sys.stdin
-
-Time: 2021-11-02 11:07:40.900805
-
-User: pi
+Setting | Value
+--- | --- |
+Input file | sys.stdin
+Time | 2021-11-02 11:15:45.113362
+User | pi
 
 ### Cycle information
 
-Cycle count = 5
-
-Position count = 5
-
-Unit = [mm]
-
-Reference position PV = IOC_TEST:m0s005-Enc01-PosAct
-
-
-Target position PV = IOC_TEST:Axis1-PosSet
-
-
-Test number PV = IOC_TEST:TestNumber
-
+Setting | Value
+--- | --- |
+Position count | 5 (i=1..5)
+Cycle count |5 (j=1..5)
+Unit | [mm]
+Reference position PV | IOC_TEST:m0s005-Enc01-PosAct
+Target position PV | IOC_TEST:Axis1-PosSet
+Test number PV | IOC_TEST:TestNumber
 
 
 ## Input data
