@@ -509,7 +509,6 @@ class ecmcISO230_2:
           tempStr=""
           tempStr+=self.addDataPointToTableRow(i)
           for j in range(1,self.cycles+1):
-            tempStr += str(i) + "|"
             tempStr+=self.addDataPointToTableRow(self.x_i_j_fwd[i,j])        
           tempStr+=self.addDataPointToTableRow(self.x_i_fwd_avg[i])
           print (tempStr)
@@ -570,7 +569,7 @@ class ecmcISO230_2:
         print("")
 
     def reportR(self):
-      print("### Rebeatability")
+      print("### Repeatability")
       print("")
       print(self.addUnit("S_fwd(i) = Forward estimator for unidirectional axis positiong repeatability at a position "))
       print("")
