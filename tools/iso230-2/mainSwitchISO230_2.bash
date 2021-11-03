@@ -80,11 +80,6 @@ REF_VALS_1=""
 REF_AVG_1=""
 REF_VALS_2=""
 REF_AVG_2=""
-# this is uggly...
-REF_MIN_1=10000
-REF_MAX_1=-10000
-REF_MIN_2=10000
-REF_MAX_2=-10000
 DATAPV=$REF_PV
 
 for TRIGGVAL_1 in {3001..3010}
@@ -94,6 +89,11 @@ do
    SWITCHVAL=0
    REF_VAL_1=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL_1 $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
    REF_VAL_1=$(echo $REF_VAL_1 | bash ecmcScaleOffsetData.bash ${REF_GR} ${REF_OFF})
+   # Init
+   if (( $COUNTER == 1 )) ; then
+     REF_MIN_1=$REF_VAL_1
+     REF_MAX_1=$REF_VAL_1
+   fi
    REF_VALS_1+="$REF_VAL_1 "
    echo "BWD switch engage position $TRIGGVAL: $REF_VAL_1"
    if (( $(echo "$REF_VAL_1 > $REF_MAX_1" | bc -l) )); then
@@ -108,6 +108,11 @@ do
    let "TRIGGVAL_2=TRIGGVAL_1+10"
    REF_VAL_2=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL_2 $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
    REF_VAL_2=$(echo $REF_VAL_2 | bash ecmcScaleOffsetData.bash ${REF_GR} ${REF_OFF})
+   # Init
+   if (( $COUNTER == 1 )) ; then
+     REF_MIN_2=$REF_VAL_2
+     REF_MAX_2=$REF_VAL_2
+   fi
    REF_VALS_2+="$REF_VAL_2 "
    echo "BWD switch disengage position $TRIGGVAL: $REF_VAL_2"
    if (( $(echo "$REF_VAL_2 > $REF_MAX_2" |bc -l) )); then
@@ -134,7 +139,10 @@ printf "STD   | %.${DEC}f | %.${DEC}f |\n" $REF_STD_1  $REF_STD_2 >> $REPORT
 printf "Range | %.${DEC}f | %.${DEC}f |\n" $REF_RANGE_1  $REF_RANGE_2 >> $REPORT
 bash ecmcReport.bash $REPORT ""
 printf "Low limit engage range    = %.${DEC}f \n" $REF_RANGE_1 >> $REPORT
+bash ecmcReport.bash $REPORT ""
 printf "Low limit disengage range = %.${DEC}f \n" $REF_RANGE_2 >> $REPORT
+bash ecmcReport.bash $REPORT ""
+bash ecmcReport.bash $REPORT "## High Limit"
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "Test | Engage [$UNIT] | Disengage [$UNIT] |"
 bash ecmcReport.bash $REPORT "--- | --- | --- |"
@@ -147,13 +155,10 @@ DATACOUNT="400"  # Must be enough to capture the switch transition
 SWITCHVAL=0
 REF_VALS=""
 COUNTER=0
+REF_VALS_1=""
+REF_AVG_1=""
 REF_VALS_2=""
 REF_AVG_2=""
-# this is uggly...
-REF_MIN_1=10000
-REF_MAX_1=-10000
-REF_MIN_2=10000
-REF_MAX_2=-10000
 DATAPV=$REF_PV
 
 for TRIGGVAL_1 in {5001..5010}
@@ -163,6 +168,11 @@ do
    SWITCHVAL=0
    REF_VAL_1=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL_1 $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
    REF_VAL_1=$(echo $REF_VAL_1 | bash ecmcScaleOffsetData.bash ${REF_GR} ${REF_OFF})
+   # Init
+   if (( $COUNTER == 1 )) ; then
+     REF_MIN_1=$REF_VAL_1
+     REF_MAX_1=$REF_VAL_1
+   fi
    REF_VALS_1+="$REF_VAL_1 "
    echo "BWD switch engage position $TRIGGVAL: $REF_VAL_1"
    if (( $(echo "$REF_VAL_1 > $REF_MAX_1" | bc -l) )); then
@@ -177,6 +187,11 @@ do
    let "TRIGGVAL_2=TRIGGVAL_1+10"
    REF_VAL_2=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL_2 $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
    REF_VAL_2=$(echo $REF_VAL_2 | bash ecmcScaleOffsetData.bash ${REF_GR} ${REF_OFF})
+   # Init
+   if (( $COUNTER == 1 )) ; then
+     REF_MIN_2=$REF_VAL_2
+     REF_MAX_2=$REF_VAL_2
+   fi
    REF_VALS_2+="$REF_VAL_2 "
    echo "BWD switch disengage position $TRIGGVAL: $REF_VAL_2"
    if (( $(echo "$REF_VAL_2 > $REF_MAX_2" |bc -l) )); then
@@ -203,5 +218,6 @@ printf "STD   | %.${DEC}f | %.${DEC}f |\n" $REF_STD_1  $REF_STD_2 >> $REPORT
 printf "Range | %.${DEC}f | %.${DEC}f |\n" $REF_RANGE_1  $REF_RANGE_2 >> $REPORT
 bash ecmcReport.bash $REPORT ""
 printf "High limit engage range    = %.${DEC}f \n" $REF_RANGE_1 >> $REPORT
+bash ecmcReport.bash $REPORT ""
 printf "High limit disengage range = %.${DEC}f \n" $REF_RANGE_2 >> $REPORT
 bash ecmcReport.bash $REPORT ""
