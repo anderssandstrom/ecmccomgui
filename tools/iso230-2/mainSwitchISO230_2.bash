@@ -131,7 +131,7 @@ REF_RANGE_1=$(echo "$REF_MAX_1-($REF_MIN_1)" | bc -l)
 echo "Reference AVG=$REF_AVG, STD=$REF_STD_1"
 echo "REF_MIN_1=$REF_MIN_1, REF_MAX_1=$REF_MAX_1, REF_RANGE_1=$REF_RANGE_1"
 REF_AVG_2=$(echo "$REF_VALS_2" | bash ecmcAvgDataRow.bash)
-REF_STD=_2$(echo "$REF_VALS_2" | bash ecmcStdDataRow.bash)
+REF_STD_2=$(echo "$REF_VALS_2" | bash ecmcStdDataRow.bash)
 REF_RANGE_2=$(echo "$REF_MAX_2-($REF_MIN_2)" |bc -l)
 echo "Reference AVG=$REF_AVG_2, STD=$REF_STD_2"
 printf "AVG   | %.${DEC}f | %.${DEC}f |\n" $REF_AVG_1  $REF_AVG_2 >> $REPORT
@@ -210,7 +210,7 @@ REF_RANGE_1=$(echo "$REF_MAX_1-($REF_MIN_1)" | bc -l)
 echo "Reference AVG=$REF_AVG, STD=$REF_STD_1"
 echo "REF_MIN_1=$REF_MIN_1, REF_MAX_1=$REF_MAX_1, REF_RANGE_1=$REF_RANGE_1"
 REF_AVG_2=$(echo "$REF_VALS_2" | bash ecmcAvgDataRow.bash)
-REF_STD=_2$(echo "$REF_VALS_2" | bash ecmcStdDataRow.bash)
+REF_STD_2=$(echo "$REF_VALS_2" | bash ecmcStdDataRow.bash)
 REF_RANGE_2=$(echo "$REF_MAX_2-($REF_MIN_2)" |bc -l)
 echo "Reference AVG=$REF_AVG_2, STD=$REF_STD_2"
 printf "AVG   | %.${DEC}f | %.${DEC}f |\n" $REF_AVG_1  $REF_AVG_2 >> $REPORT
