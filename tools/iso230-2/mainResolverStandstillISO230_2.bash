@@ -103,5 +103,5 @@ done
 
 MAX_RES_DIFF=$(echo "$DIFFS_RESOLVER" | bash ecmcAbsMaxDataRow.bash)
 bash ecmcReport.bash $REPORT ""
-printf "Accuracy standstill (Resolver): %.${DEC_STD_AVG}f [$UNIT]\n" $MAX_RES_DIFF >> $REPORT
+printf "Resolver standstill error: %.${DEC_STD_AVG}f [$UNIT]\n" $MAX_RES_DIFF >> $REPORT
 bash ecmcReport.bash $REPORT ""
