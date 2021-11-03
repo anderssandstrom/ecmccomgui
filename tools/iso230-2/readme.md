@@ -1,4 +1,10 @@
 
+## Start test IOC example
+
+```bash
+iocsh.bash bifrost.script
+```
+
 ## Start test sequence example
 
 ```bash
