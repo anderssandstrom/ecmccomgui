@@ -138,9 +138,9 @@ printf "AVG   | %.${DEC}f | %.${DEC}f |\n" $REF_AVG_1  $REF_AVG_2 >> $REPORT
 printf "STD   | %.${DEC}f | %.${DEC}f |\n" $REF_STD_1  $REF_STD_2 >> $REPORT
 printf "Range | %.${DEC}f | %.${DEC}f |\n" $REF_RANGE_1  $REF_RANGE_2 >> $REPORT
 bash ecmcReport.bash $REPORT ""
-printf "**Low limit engage range    = %.${DEC}f **\n" $REF_RANGE_1 >> $REPORT
+printf "**Low limit engage range    = %.${DEC}f**\n" $REF_RANGE_1 >> $REPORT
 bash ecmcReport.bash $REPORT ""
-printf "**Low limit disengage range = %.${DEC}f **\n" $REF_RANGE_2 >> $REPORT
+printf "**Low limit disengage range = %.${DEC}f**\n" $REF_RANGE_2 >> $REPORT
 bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT "## High Limit"
 bash ecmcReport.bash $REPORT ""
@@ -217,7 +217,7 @@ printf "AVG   | %.${DEC}f | %.${DEC}f |\n" $REF_AVG_1  $REF_AVG_2 >> $REPORT
 printf "STD   | %.${DEC}f | %.${DEC}f |\n" $REF_STD_1  $REF_STD_2 >> $REPORT
 printf "Range | %.${DEC}f | %.${DEC}f |\n" $REF_RANGE_1  $REF_RANGE_2 >> $REPORT
 bash ecmcReport.bash $REPORT ""
-printf "**High limit engage range    = %.${DEC}f **\n" $REF_RANGE_1 >> $REPORT
+printf "**High limit engage range    = %.${DEC}f**\n" $REF_RANGE_1 >> $REPORT
 bash ecmcReport.bash $REPORT ""
-printf "**High limit disengage range = %.${DEC}f **\n" $REF_RANGE_2 >> $REPORT
+printf "**High limit disengage range = %.${DEC}f**\n" $REF_RANGE_2 >> $REPORT
 bash ecmcReport.bash $REPORT ""
