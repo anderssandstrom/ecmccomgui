@@ -314,8 +314,8 @@ class ecmcISO230_2:
           self.R_i[i]=termMax
 
         self.R=self.R_fwd
-        if self.R_fwd>self.R:
-            self.R=self.R_fwd
+        if self.R_bwd>self.R:
+            self.R=self.R_bwd
             
         #print("R_fwd = "+ str(self.R_fwd))
         #print("R_bwd = "+ str(self.R_bwd))
