@@ -16,8 +16,7 @@
 #*************************************************************************/
 
 import sys
-import numpy as np
-from datetime import datetime
+import numpy as 
 
 ## Example  input file:
 # # Input data file for ISO230-2 calcs derived from: /home/pi/sources/ecmc_bifrost_slits_sat/tests_2/11360/axis1/230_2_3.log
