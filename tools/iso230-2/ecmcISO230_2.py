@@ -665,9 +665,9 @@ class ecmcISO230_2:
       print("")
       print(self.addUnit("R_bwd = " + self.roundDataToStr(self.R_bwd) + " "))
       print("")
-      print(self.addUnit("R = Bi-directional positioning repeatability of an axis (max(R_fwd,R_bwd)) "))
+      print(self.addUnit("**R = Bi-directional positioning repeatability of an axis (max(R_fwd,R_bwd)) ") + "**")
       print("")
-      print(self.addUnit("R = " + self.roundDataToStr(self.R) + " " ))
+      print(self.addUnit("**R = " + self.roundDataToStr(self.R) + " " ) + "**")
       print("")
 
     def reportE(self):
@@ -703,7 +703,7 @@ class ecmcISO230_2:
       print("")
       print(self.addUnit("A = Bi-directional accuracy of an axis "))
       print("")
-      print(self.addUnit("A = " + self.roundDataToStr(self.A) + " "))
+      print(self.addUnit("**A = " + self.roundDataToStr(self.A) + " ") + "**")
       print("")
 
     def reportMarkDown(self):
