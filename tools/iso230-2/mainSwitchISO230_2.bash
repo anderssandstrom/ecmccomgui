@@ -64,10 +64,10 @@ bash ecmcReport.bash $REPORT "High Limit source  | $HIGH_LIM_PV |"
 bash ecmcReport.bash $REPORT "Test number source  | $TEST_PV |"
 bash ecmcReport.bash $REPORT "Unit  | $UNIT |"
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "## Low Limit Engage Position "
+bash ecmcReport.bash $REPORT "## Low Limit"
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "Test | Reference [$UNIT] "
-bash ecmcReport.bash $REPORT "--- | --- |"
+bash ecmcReport.bash $REPORT "Test | Engage [$UNIT] | Disengage [$UNIT] |"
+bash ecmcReport.bash $REPORT "--- | --- | --- |"
 
 # Get one reference value just before BI1 0
 TRIGGPV=$TEST_PV
@@ -78,80 +78,80 @@ REF_VALS=""
 COUNTER=0
 
 # this is uggly...
-REF_MIN=10000;
-REF_MAX=-10000;
+REF_MIN_1=10000;
+REF_MAX_1=-10000;
 # Engage
 for TRIGGVAL in {3001..3010}
 do
    let "COUNTER=$COUNTER+1"   
    DATAPV=$REF_PV
-   REF_VAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
-   REF_VAL=$(echo $REF_VAL | bash ecmcScaleOffsetData.bash ${REF_GR} ${REF_OFF})
-   REF_VALS+="$REF_VAL "
-   echo "BWD switch engage position $TRIGGVAL: $REF_VAL"
+   REF_VAL_1=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
+   REF_VAL_1=$(echo $REF_VAL_1 | bash ecmcScaleOffsetData.bash ${REF_GR} ${REF_OFF})
+   REF_VALS_1+="$REF_VAL_1 "
+   echo "BWD switch engage position $TRIGGVAL: $REF_VAL_1"
    
-   printf "%d | %.${DEC}f |\n" $COUNTER $REF_VAL >> $REPORT
+   printf "%d | %.${DEC}f |\n" $COUNTER $REF_VAL_1 >> $REPORT
 
-   if (( $(echo "$REF_VAL > $REF_MAX" | bc -l) )); then
-     REF_MAX=$REF_VAL
+   if (( $(echo "$REF_VAL_1 > $REF_MAX_1" | bc -l) )); then
+     REF_MAX_1=$REF_VAL_1
    fi
-   if (( $(echo "$REF_VAL < $REF_MIN" | bc -l) )); then
-     REF_MIN=$REF_VAL
+   if (( $(echo "$REF_VAL_1 < $REF_MIN_1" | bc -l) )); then
+     REF_MIN_1=$REF_VAL_1
    fi
 
 done
 
 # Calc avg and std
-REF_AVG=$(echo "$REF_VALS" | bash ecmcAvgDataRow.bash)
-REF_STD=$(echo "$REF_VALS" | bash ecmcStdDataRow.bash)
-REF_RANGE=$(echo "$REF_MAX-($REF_MIN)" | bc -l)
-echo "Reference AVG=$REF_AVG, STD=$REF_STD"
-printf "AVG | %.${DEC}f | \n" $REF_AVG >> $REPORT
-printf "STD | %.${DEC}f | \n" $REF_STD >> $REPORT
-printf "Range | %.${DEC}f\n"  $REF_RANGE >> $REPORT
+REF_AVG_1=$(echo "$REF_VALS_1" | bash ecmcAvgDataRow.bash)
+REF_STD_1=$(echo "$REF_VALS_1" | bash ecmcStdDataRow.bash)
+REF_RANGE_1=$(echo "$REF_MAX_1-($REF_MIN_1)" | bc -l)
+echo "Reference AVG=$REF_AVG, STD=$REF_STD_1"
+#printf "AVG | %.${DEC}f | \n" $REF_AVG_1 >> $REPORT
+#printf "STD | %.${DEC}f | \n" $REF_STD_1 >> $REPORT
+#printf "Range | %.${DEC}f\n"  $REF_RANGE_1 >> $REPORT
 
-echo "REF_MIN=$REF_MIN, REF_MAX=$REF_MAX, REF_RANGE=$REF_RANGE"
+echo "REF_MIN_1=$REF_MIN_1, REF_MAX_1=$REF_MAX_1, REF_RANGE_1=$REF_RANGE_1"
 
 bash ecmcReport.bash $REPORT ""
 
 # Disengage
-bash ecmcReport.bash $REPORT "## Low Limit Disengage Position "
-bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "Test | Reference [$UNIT] "
-bash ecmcReport.bash $REPORT "--- | --- |"
+#bash ecmcReport.bash $REPORT "## Low Limit Disengage Position "
+#bash ecmcReport.bash $REPORT ""
+#bash ecmcReport.bash $REPORT "Test | Reference [$UNIT] "
+#bash ecmcReport.bash $REPORT "--- | --- |"
 
 SWITCHVAL=1
 REF_VALS=""
 REF_AVG=""
 COUNTER=0
-REF_MIN=10000;
-REF_MAX=-10000;
+REF_MIN_2=10000;
+REF_MAX_2=-10000;
 
 for TRIGGVAL in {3011..3020}
 do
    let "COUNTER=$COUNTER+1"
    DATAPV=$REF_PV
-   REF_VAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
-   REF_VAL=$(echo $REF_VAL | bash ecmcScaleOffsetData.bash ${REF_GR} ${REF_OFF})
-   REF_VALS+="$REF_VAL "
-   echo "BWD switch disengage position $TRIGGVAL: $REF_VAL"
-   printf "%d | %.${DEC}f |\n" $COUNTER $REF_VAL >> $REPORT
-   if (( $(echo "$REF_VAL > $REF_MAX" |bc -l) )); then
-     REF_MAX=$REF_VAL
+   REF_VAL_2=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
+   REF_VAL_2=$(echo $REF_VAL_2 | bash ecmcScaleOffsetData.bash ${REF_GR} ${REF_OFF})
+   REF_VALS_2+="$REF_VAL_2 "
+   echo "BWD switch disengage position $TRIGGVAL: $REF_VAL_2"
+   printf "%d | %.${DEC}f |\n" $COUNTER $REF_VAL_2 >> $REPORT
+   if (( $(echo "$REF_VAL_2 > $REF_MAX_2" |bc -l) )); then
+     REF_MAX_2=$REF_VAL_2
    fi
-   if (( $(echo "$REF_VAL < $REF_MIN" |bc -l) )); then
-     REF_MIN=$REF_VAL
+   if (( $(echo "$REF_VAL_2 < $REF_MIN_2" |bc -l) )); then
+     REF_MIN_2=$REF_VAL_2
    fi
 done
 
 # Calc avg and std
-REF_AVG=$(echo "$REF_VALS" | bash ecmcAvgDataRow.bash)
-REF_STD=$(echo "$REF_VALS" | bash ecmcStdDataRow.bash)
-REF_RANGE=$(echo "$REF_MAX-($REF_MIN)" |bc -l)
-echo "Reference AVG=$REF_AVG, STD=$REF_STD"
-printf "AVG | %.${DEC}f |\n" $REF_AVG >> $REPORT
-printf "STD | %.${DEC}f |\n" $REF_STD >> $REPORT
-printf "Range | %.${DEC}f |\n" $REF_RANGE >> $REPORT
+REF_AVG_2=$(echo "$REF_VALS_2" | bash ecmcAvgDataRow.bash)
+REF_STD=_2$(echo "$REF_VALS_2" | bash ecmcStdDataRow.bash)
+REF_RANGE_2=$(echo "$REF_MAX_2-($REF_MIN_2)" |bc -l)
+echo "Reference AVG=$REF_AVG_2, STD=$REF_STD_2"
+printf "AVG   | %.${DEC}f | %.${DEC}f |\n" $REF_AVG_1  $REF_AVG_2 >> $REPORT
+printf "STD   | %.${DEC}f | %.${DEC}f |\n" $REF_STD_1  $REF_STD_2 >> $REPORT
+printf "Range | %.${DEC}f | %.${DEC}f |\n" $REF_RANGE_1  $REF_RANGE_2 >> $REPORT
 bash ecmcReport.bash $REPORT ""
 
 ############ HIGH LIMIT SWITCH
@@ -161,39 +161,39 @@ SWITCHVAL=0
 REF_VALS=""
 REF_AVG=""
 COUNTER=0
-REF_MIN=10000;
-REF_MAX=-10000;
+REF_MIN_3=10000;
+REF_MAX_3=-10000;
 
-bash ecmcReport.bash $REPORT "## High Limit Engage Position "
+bash ecmcReport.bash $REPORT "## High Limit "
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "Test | Reference [$UNIT] | "
-bash ecmcReport.bash $REPORT "--- | --- |"
+bash ecmcReport.bash $REPORT "Test | Engage [$UNIT] | Disengage [$UNIT] |"
+bash ecmcReport.bash $REPORT "--- | --- | --- |"
 
 for TRIGGVAL in {5001..5010}
 do
    let "COUNTER=$COUNTER+1"
    DATAPV=$REF_PV
-   REF_VAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
-   REF_VAL=$(echo $REF_VAL | bash ecmcScaleOffsetData.bash ${REF_GR} ${REF_OFF})
-   REF_VALS+="$REF_VAL "
-   echo "FWD switch engage position $TRIGGVAL: $REF_VAL"
-   printf "%d | %.${DEC}f |\n" $COUNTER $REF_VAL >> $REPORT
-   if (( $(echo "$REF_VAL > $REF_MAX" |bc -l) )); then
-     REF_MAX=$REF_VAL
+   REF_VAL_3=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
+   REF_VAL_3=$(echo $REF_VAL_3 | bash ecmcScaleOffsetData.bash ${REF_GR} ${REF_OFF})
+   REF_VALS_3+="$REF_VAL_3 "
+   echo "FWD switch engage position $TRIGGVAL: $REF_VAL_3"
+   printf "%d | %.${DEC}f |\n" $COUNTER $REF_VAL_3_3 >> $REPORT
+   if (( $(echo "$REF_VAL_3 > $REF_MAX_3" |bc -l) )); then
+     REF_MAX_3=$REF_VAL_3
    fi
-   if (( $(echo "$REF_VAL < $REF_MIN" |bc -l) )); then
-     REF_MIN=$REF_VAL
+   if (( $(echo "$REF_VAL_3 < $REF_MIN_3" |bc -l) )); then
+     REF_MIN_3=$REF_VAL_3
    fi
 done
 
 # Calc avg and std
-REF_AVG=$(echo "$REF_VALS" | bash ecmcAvgDataRow.bash)
-REF_STD=$(echo "$REF_VALS" | bash ecmcStdDataRow.bash)
-REF_RANGE=$(echo "$REF_MAX-($REF_MIN)" |bc -l)
-echo "Reference AVG=$REF_AVG, STD=$REF_STD"
-printf "AVG | %.${DEC}f |\n" $REF_AVG >> $REPORT
-printf "STD | %.${DEC}f |\n" $REF_STD >> $REPORT
-printf "Range | %.${DEC}f |\n" $REF_RANGE >> $REPORT
+REF_AVG=$(echo "$REF_VALS_3" | bash ecmcAvgDataRow.bash)
+REF_STD=$(echo "$REF_VALS_3" | bash ecmcStdDataRow.bash)
+REF_RANGE=$(echo "$REF_MAX_3-($REF_MIN_3)" |bc -l)
+echo "Reference AVG=$REF_AVG_3, STD=$REF_STD_3"
+#printf "AVG | %.${DEC}f |\n" $REF_AVG >> $REPORT
+#printf "STD | %.${DEC}f |\n" $REF_STD >> $REPORT
+#printf "Range | %.${DEC}f |\n" $REF_RANGE >> $REPORT
 bash ecmcReport.bash $REPORT ""
 
 # Disengage
@@ -202,37 +202,38 @@ REF_VALS=""
 REF_AVG=""
 REF_STD=""
 COUNTER=0
-REF_MIN=10000;
-REF_MAX=-10000;
+REF_MIN_4=10000;
+REF_MAX_4=-10000;
 
-bash ecmcReport.bash $REPORT "## High Limit Disengage Position "
-bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "Test |  Reference [$UNIT]|"
-bash ecmcReport.bash $REPORT "--- | --- |"
+#sbash ecmcReport.bash $REPORT "## High Limit Disengage Position "
+#sbash ecmcReport.bash $REPORT ""
+#sbash ecmcReport.bash $REPORT "Test |  Reference [$UNIT]|"
+#sbash ecmcReport.bash $REPORT "--- | --- |"
 
 for TRIGGVAL in {5011..5020}
 do
    let "COUNTER=$COUNTER+1"
    DATAPV=$REF_PV
-   REF_VAL=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
-   REF_VAL=$(echo $REF_VAL | bash ecmcScaleOffsetData.bash ${REF_GR} ${REF_OFF})
-   REF_VALS+="$REF_VAL "
-   echo "FWD switch disengage position $TRIGGVAL: $REF_VAL"
-   printf "%d | %.${DEC}f |\n" $COUNTER $REF_VAL >> $REPORT
-   if (( $(echo "$REF_VAL > $REF_MAX" |bc -l) )); then
-     REF_MAX=$REF_VAL
+   REF_VAL_4=$(bash ecmcGetSwitchPosValue.bash $FILE $TRIGGPV $TRIGGVAL $DATAPV $DATACOUNT $SWITCHPV $SWITCHVAL)
+   REF_VAL_4=$(echo $REF_VAL_4 | bash ecmcScaleOffsetData.bash ${REF_GR} ${REF_OFF})
+   REF_VALS_4+="$REF_VAL_4 "
+   echo "FWD switch disengage position $TRIGGVAL: $REF_VAL_4_4"
+   printf "%d | %.${DEC}f |\n" $COUNTER $REF_VAL_4 >> $REPORT
+   if (( $(echo "$REF_VAL_4 > $REF_MAX_4" |bc -l) )); then
+     REF_MAX_4=$REF_VAL_4
    fi
-   if (( $(echo "$REF_VAL < $REF_MIN" |bc -l) )); then
-     REF_MIN=$REF_VAL
+   if (( $(echo "$REF_VAL_4 < $REF_MIN_4" |bc -l) )); then
+     REF_MIN_4=$REF_VAL_4v
    fi
 done
 
 # Calc avg and std
-REF_AVG=$(echo "$REF_VALS" | bash ecmcAvgDataRow.bash)
-REF_STD=$(echo "$REF_VALS" | bash ecmcStdDataRow.bash)
-REF_RANGE=$(echo "$REF_MAX-($REF_MIN)" |bc -l)
-echo "Reference AVG=$REF_AVG, STD=$REF_STD"
-printf "AVG | %.${DEC}f |\n" $REF_AVG >> $REPORT
-printf "STD | %.${DEC}f |\n" $REF_STD >> $REPORT
-printf "Range | %.${DEC}f |\n" $REF_RANGE >> $REPORT
+REF_AVG_4=$(echo "$REF_VALS_4" | bash ecmcAvgDataRow.bash)
+REF_STD_4=$(echo "$REF_VALS_4" | bash ecmcStdDataRow.bash)
+REF_RANGE_4=$(echo "$REF_MAX_4-($REF_MIN_4)" |bc -l)
+echo "Reference AVG=$REF_AVG_4, STD=$REF_STD_4"
+printf "AVG   | %.${DEC}f | %.${DEC}f |\n" $REF_AVG_3  $REF_AVG_4 >> $REPORT
+printf "STD   | %.${DEC}f | %.${DEC}f |\n" $REF_STD_3  $REF_STD_4 >> $REPORT
+printf "Range | %.${DEC}f | %.${DEC}f |\n" $REF_RANGE_3  $REF_RANGE_4 >> $REPORT
+bash ecmcReport.bash $REPORT ""
 bash ecmcReport.bash $REPORT ""
