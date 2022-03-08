@@ -16,8 +16,7 @@
 #*************************************************************************/
 
 import sys
-import numpy as np
-from datetime import datetime
+import numpy as 
 
 ## Example  input file:
 # # Input data file for ISO230-2 calcs derived from: /home/pi/sources/ecmc_bifrost_slits_sat/tests_2/11360/axis1/230_2_3.log
@@ -607,13 +606,13 @@ class ecmcISO230_2:
           print (tempStr)
         
         print("")
-        print(self.addUnit("B = Axis reversal error "))
-        print("")
-        print(self.addUnit("B = " + self.roundDataToStr(self.B) + " "))
-        print("")
         print(self.addUnit("B_avg = Axis avg. reversal error "))
         print("")
         print(self.addUnit("B_avg = " + self.roundDataToStr(self.B_avg) + " "))
+        print("")
+        print(self.addUnit("**B = Axis reversal error ") + "**")
+        print("")
+        print(self.addUnit("**B = " + self.roundDataToStr(self.B) + " ") + "**")
         print("")
 
     def reportR(self):
@@ -665,9 +664,9 @@ class ecmcISO230_2:
       print("")
       print(self.addUnit("R_bwd = " + self.roundDataToStr(self.R_bwd) + " "))
       print("")
-      print(self.addUnit("R = Bi-directional positioning repeatability of an axis (max(R_fwd,R_bwd)) "))
+      print(self.addUnit("**R = Bi-directional positioning repeatability of an axis (max(R_fwd,R_bwd)) ") + "**")
       print("")
-      print(self.addUnit("R = " + self.roundDataToStr(self.R) + " " ))
+      print(self.addUnit("**R = " + self.roundDataToStr(self.R) + " " ) + "**")
       print("")
 
     def reportE(self):
@@ -681,13 +680,13 @@ class ecmcISO230_2:
       print("")
       print(self.addUnit("E_bwd = " + self.roundDataToStr(self.E_bwd) + " "))
       print("")
-      print(self.addUnit("E = Bi-directional system positioning error of an axis "))
+      print(self.addUnit("**E = Bi-directional system positioning error of an axis ") + "**")
       print("")
-      print(self.addUnit("E = " + self.roundDataToStr(self.E) + " "))
+      print(self.addUnit("**E = " + self.roundDataToStr(self.E) + " ") + "**")
       print("")
-      print(self.addUnit("M = Mean bi-directional system positioning error of an axis "))
+      print(self.addUnit("**M = Mean bi-directional system positioning error of an axis ") + "**")
       print("")
-      print(self.addUnit("M = " + self.roundDataToStr(self.M) + " "))
+      print(self.addUnit("**M = " + self.roundDataToStr(self.M) + " ") + "**")
       print("")
 
     def reportA(self):
@@ -701,9 +700,9 @@ class ecmcISO230_2:
       print("")
       print(self.addUnit("A_bwd = " + self.roundDataToStr(self.A_bwd) + " "))
       print("")
-      print(self.addUnit("A = Bi-directional accuracy of an axis "))
+      print(self.addUnit("**A = Bi-directional accuracy of an axis ") + "**")
       print("")
-      print(self.addUnit("A = " + self.roundDataToStr(self.A) + " "))
+      print(self.addUnit("**A = " + self.roundDataToStr(self.A) + " ") + "**")
       print("")
 
     def reportMarkDown(self):

@@ -71,7 +71,7 @@ bash ecmcReport.bash $REPORT "## Resolver reading over one turn"
 bash ecmcReport.bash $REPORT "Measured at $TESTCOUNT positions offset by 45deg resolver shaft angle."
 bash ecmcReport.bash $REPORT "The distrubution values are based on $DATACOUNT_RESOLVER values at each location."
 bash ecmcReport.bash $REPORT ""
-bash ecmcReport.bash $REPORT "Test | Setpoint [$UNIT] | Resolver AVG[$UNIT] | Diff [$UNIT} | Resolver STD[$UNIT]"
+bash ecmcReport.bash $REPORT "Test | Setpoint [$UNIT] | Resolver AVG[$UNIT] | Diff [$UNIT] | Resolver STD[$UNIT]"
 bash ecmcReport.bash $REPORT "--- | --- | --- | --- | --- |"
 
 TRIGGPV=$TEST_PV
@@ -103,5 +103,5 @@ done
 
 MAX_RES_DIFF=$(echo "$DIFFS_RESOLVER" | bash ecmcAbsMaxDataRow.bash)
 bash ecmcReport.bash $REPORT ""
-printf "Accuracy standstill (Resolver): %.${DEC_STD_AVG}f [$UNIT]\n" $MAX_RES_DIFF >> $REPORT
+printf "**Resolver accuracy: %.${DEC_STD_AVG}f [$UNIT]**\n" $MAX_RES_DIFF >> $REPORT
 bash ecmcReport.bash $REPORT ""
