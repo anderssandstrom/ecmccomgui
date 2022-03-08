@@ -68,8 +68,6 @@ def main():
   legStr = pvY2.getName() + "[" + str(pvLength) + "] " + str(pvMin) + ".." + str(pvMax) + ", mean: " + str(pvAvg) + ", std: " + str(pvStd)
   print (legStr)
 
-
-
   fig, ax1 = plt.subplots()
 
   ax2 = ax1.twinx()
@@ -77,9 +75,10 @@ def main():
   ax1.plot(y1Time, y1Data, 'o-b')
   ax2.plot(y2Time, y2Data, 'o-g')
   plt.grid()
+  #plt.legend([pvY1name, pvY2name])
   plt.xlabel("time [s]")
-  ax1.set_ylabel(pvY1name)
-  ax2.set_ylabel(pvY2name)
+  ax1.set_ylabel(pvY1name,color='b')
+  ax2.set_ylabel(pvY2name,color='g')
   plt.show()
   
 if __name__ == "__main__":
