@@ -45,17 +45,30 @@ def main():
     
     if pvName.find(pvY1name)>=0:
        pvY1.setValues(timeVal,data)
-       print ("pvName: " + pvName + " pvY1name: " + pvY1name )    
     if pvName.find(pvY2name)>=0:
        pvY2.setValues(timeVal,data)
-       print ("pvName: " + pvName + " pvY2name: " + pvY2name )
-    
-
-  print("Statistics: ")
-  legend=[]
 
   y1Time,y1Data = pvY1.getData()
   y2Time,y2Data = pvY2.getData()
+
+  print("Statistics: ")
+  pvLength = pvY1.getLength()
+  pvMax = np.max(y1Data)
+  pvMin = np.min(y1Data)
+  pvAvg = np.mean(y1Data)
+  pvStd = np.std(y1Data)
+  legStr = pvY1.getName() + "[" + str(pvLength) + "] " + str(pvMin) + ".." + str(pvMax) + ", mean: " + str(pvAvg) + ", std: " + str(pvStd)
+  print (legStr)
+
+  pvLength = pvY2.getLength()
+  pvMax = np.max(y2Data)
+  pvMin = np.min(y2Data)
+  pvAvg = np.mean(y2Data)
+  pvStd = np.std(y2Data)
+  legStr = pvY2.getName() + "[" + str(pvLength) + "] " + str(pvMin) + ".." + str(pvMax) + ", mean: " + str(pvAvg) + ", std: " + str(pvStd)
+  print (legStr)
+
+
 
   fig, ax1 = plt.subplots()
 
