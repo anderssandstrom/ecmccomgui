@@ -6,7 +6,7 @@
 #   npz2csv.py
 #
 #  Created on: October 14, 2020
-#      Author: Anders Sandström
+#      Author: Anders Sandstroem
 #    
 #  Converts npz file to csv files
 #  

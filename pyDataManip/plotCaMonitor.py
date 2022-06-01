@@ -35,11 +35,13 @@ def main():
 
   parser=caMonitorArrayParser()
   pvs=[]
-
+  
+  cc=0
   for line in dataFile:
     if not parser.lineValid(line):      
       continue
-
+    cc=cc+1
+    print (cc)
     pvName, timeVal, data=parser.getValues(line)
     newPv=True;
     pvToAddDataTo=caPVArray(pvName)
