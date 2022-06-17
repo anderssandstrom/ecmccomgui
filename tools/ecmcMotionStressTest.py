@@ -143,7 +143,7 @@ maxTime = (maxPos-minPos) / maxVelo
 print('Max time: ' + str(maxTime))
 while 1:
   
-  exeCmdPv.put(0)
+  #exeCmdPv.put(0)
   errorId = errIdPv.get()
 
   if errorId:

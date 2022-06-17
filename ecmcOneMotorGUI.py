@@ -6,7 +6,7 @@ from ecmcArrayStat import *
 
 #Define pvs
 # Axis
-ECMC_PV_AXIS_DIAG_ARRAY_SUFFIX =       '-Array-Stat'
+ECMC_PV_AXIS_DIAG_ARRAY_SUFFIX =       '-Arr-Stat'
 ECMC_PV_AXIS_ERROR_RESET_SUFFIX =      '-ErrRst'
 # Controller
 ECMC_PV_CNTROLLER_ERROR_ID_SUFFIX =    'MCU-ErrId'
