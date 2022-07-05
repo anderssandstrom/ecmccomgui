@@ -9,14 +9,14 @@ from caPVArrayLib import caPVArray
 from caMonitorArrayParserLib import caMonitorArrayParser 
 
 def printOutHelp():
-  print "python plotCaMonitorFFT.py [<filename>]"
-  print "example: python plotCaMonitorFFT.py xx.txt"
-  print "example stdin: cat data.log | grep -E 'thread|CPU' | python plotCaMonitorFFT.py" 
+  print ("python plotCaMonitorFFT.py [<filename>]")
+  print ("example: python plotCaMonitorFFT.py xx.txt")
+  print ("example stdin: cat data.log | grep -E 'thread|CPU' | python plotCaMonitorFFT.py" )
 
 def main():
   # Check args
   if len(sys.argv)>1:
-    print sys.argv[1] 
+    print( sys.argv[1] )
     pos1=sys.argv[1].find('-h')
     if(pos1>=0):
       printOutHelp()
@@ -54,44 +54,49 @@ def main():
     pvToAddDataTo.setValues(timeVal,data)
     if newPv:       
       pvs.append(pvToAddDataTo)
-      print "Added PV" + pvName
+      print ("Added PV" + pvName)
     
   legend=[]
   for pv in pvs: 
+    fig, axs = plt.subplots(2)
+    axs[0].grid()
+    axs[0].set_title("fft of Sven-test (" + pv.getName() + ")")
+    axs[0].set_xlabel("time")
+    axs[0].set_ylabel("position [mm]")
     legend.append(pv.getName())
-    print  pv.getName()+ ": " + str(pv.getLength())
+    print  (pv.getName()+ ": " + str(pv.getLength()))
     timeSet, dataSet = pv.getData() 
     sampleTime=pv.getSampleTime()
     x=timeSet
     y=dataSet
-    plt.plot(x,y,'o-')
+    axs[0].plot(x,y,'o-')
+  
   
   #print "Sample Mean" + str(np.mean(sampleTime))
-  plt.legend(legend)
-  plt.grid()
-  plt.title(fname)
-  plt.xlabel("time")
   
-  plt.figure()
+  #plt.figure()
   
   
   N = dataSet.size
+  print("Datasize: " + str(N))
   # sample spacing
   T = np.mean(sampleTime)
+  print("Sample time: " + str(T))
+
   x = np.linspace(0.0, N*T, N)
   #normalize data (remove slope)  
   p=np.polyfit(x,dataSet,1)
   
   y = dataSet-np.polyval(p,x)
   yf = scipy.fftpack.fft(y)
-  xf = np.linspace(0.0, 1.0/(2.0*T), N/2)
+  xf = np.linspace(0.0, int(1.0/(2.0*T)), int(N/2))
   yfft=2.0/N * np.abs(yf[:N//2]) # integer division
   
    
   plt.plot(xf,yfft, '*-')
   plt.grid()
-  plt.xlabel("Frequency [Hz]")
-  plt.ylabel("Amplitude")
+  plt.xlabel("frequency [Hz]")
+  plt.ylabel("amplitude [mm]")
     
   plt.show()
   
