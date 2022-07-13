@@ -56,6 +56,8 @@ def main():
   #plt.title(fname)
   plt.xlabel("samples")
   plt.show()
+  print(legStr)
+  
   
 if __name__ == "__main__":
   main()

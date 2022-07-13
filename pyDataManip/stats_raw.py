@@ -36,8 +36,6 @@ def main():
   pvs=[]
 
   for line in dataFile:
-    if not parser.lineValid(line):      
-      continue
 
     pvName, timeVal, data=parser.getValues(line)
     newPv=True
