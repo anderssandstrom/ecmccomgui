@@ -36,6 +36,10 @@ def main():
   cc=0
   # Seconds   , value, alarm state, alarm severity, nanoseconds   
   # 1670828407,-0.1,0,0,13856621
+  oldLine=""
+  timeValue=0
+  oldVal=0
+  oldTimeValue=0
   for line in dataFile:
     
     newLine = line.replace(",", " ")
@@ -46,12 +50,19 @@ def main():
     cc=cc+1
     print (cc)
     # add nanos to seconds (epoch)
-    timeStampStr = newList[0] + "." + newList[4]
-    dataStr = newList [1]
-    dataValue = float(dataStr)
+    timeStampStr = newList[0]    
+    dataValue = float(newList[1])
     y = np.append(y,dataValue)
-    timeValue = datetime.fromtimestamp( float(timeStampStr ))
+    newVal = float(timeStampStr )
+    nanos= float(newList[4])/1E9
+    newVal=newVal+nanos
+    timeValue = datetime.fromtimestamp( newVal)
+    print("newLine: " + newLine)
+    print(str(newVal))
     x = np.append(x,timeValue)
+
+    oldVal = newVal
+    oldLine=newLine
   
   print("Statistics: ")
   #for d in dataSet:
