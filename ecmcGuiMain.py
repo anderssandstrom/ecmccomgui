@@ -74,6 +74,12 @@ class ecmcMainWindow(QtWidgets.QMainWindow):
       if len(sys.argv)>2:       
         self.pvName=sys.argv[2]
         self.ui.linepvName.setText(self.pvName)
+    
+    
+    if (len(sys.argv)>2): 
+      for i in range(2,len(sys.argv)):
+        self.ui.linepvName.setText(str(sys.argv[i]))
+        self.showGUI()
 
   def showGUI(self):
     
