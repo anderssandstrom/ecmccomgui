@@ -7,16 +7,16 @@ from caPVArrayLib import caPVArray
 from caMonitorArrayParserLib import caMonitorArrayParser
 
 def printOutHelp():    
-  print "python add.py [<filename>] <numberToAdd>"
-  print "Add constant to data"
-  print "example: python scale.py xx.txt  55"
-  print "example stdin: cat data.log | grep -E 'ActPos' | python scale.py 55" 
+  print("python add.py [<filename>] <numberToAdd>")
+  print("Add constant to data")
+  print("example: python scale.py xx.txt  55")
+  print("example stdin: cat data.log | grep -E 'ActPos' | python scale.py 55" )
 
 def main():
   numberToAdd = 0
   # Check args
   if len(sys.argv)>1:
-    print sys.argv[1] 
+    #print (sys.argv[1] )
     pos1=sys.argv[1].find('-h')
     if(pos1>=0):
       printOutHelp()
@@ -36,7 +36,7 @@ def main():
     fname=""
     dataFile=sys.stdin;
 
-  print "Number to add: " + str(numberToAdd)
+  # print ("Number to add: " + str(numberToAdd))
 
   parser=caMonitorArrayParser()
   pvs=[]
@@ -58,7 +58,7 @@ def main():
     pvToAddDataTo.setValues(timeVal,data)
     if newPv:       
       pvs.append(pvToAddDataTo)
-      print "Added PV: " + pvName
+      #print ("Added PV: " + pvName)
   
   
   legend=[]
