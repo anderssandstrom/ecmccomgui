@@ -49,7 +49,7 @@ time.sleep(1) #ensure that enabled goes down
 error=ecmcSlitDemoLib.getAxisError(motor,1)
 counter = 0;
 
-timeOut = (maxPos-minPos)/velo*1.5
+timeOut = (maxPos-minPos)/velo*3
 
 while 1:
   #run gap and center motor to 0
