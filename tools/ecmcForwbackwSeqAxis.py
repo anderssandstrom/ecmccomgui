@@ -9,8 +9,8 @@ import unittest
 import ecmcSlitDemoLib
 
 if len(sys.argv)!=5:
-  print("python2 ecmcForwbackSeq.py <motorpv> <from pos> <to pos> <velo>")
-  print("python2 ecmcForwbackSeq.py IOC:Axis1 0 100 25")
+  print("python ecmcForwbackSeq.py <motorpv> <from pos> <to pos> <velo>")
+  print("python ecmcForwbackSeq.py IOC:Axis1 0 100 25")
   sys.exit()
 
 
@@ -47,7 +47,7 @@ print ('Enable amplifier')
 ecmcSlitDemoLib.setAxisEnable(motor, 1)
 time.sleep(1) #ensure that enabled goes down
 error=ecmcSlitDemoLib.getAxisError(motor,1)
-counter = 0;
+counter = 0
 
 timeOut = (maxPos-minPos)/velo*3
 
